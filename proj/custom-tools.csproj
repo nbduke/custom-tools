@@ -1,0 +1,77 @@
+﻿<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{69380274-88C0-43A9-ADF2-C562978264C8}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <NoStandardLibraries>false</NoStandardLibraries>
+    <AssemblyName>ClassLibrary</AssemblyName>
+    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>..\bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>..\bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup>
+    <RootNamespace>custom_tools</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="Microsoft.VisualStudio.QualityTools.UnitTestFramework, Version=10.1.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Xml.Linq" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="..\src\DataStructures\BinaryHeap.cs" />
+    <Compile Include="..\src\DataStructures\CollectionExtensions.cs" />
+    <Compile Include="..\src\DataStructures\Grid.cs" />
+    <Compile Include="..\src\DataStructures\GridCell.cs" />
+    <Compile Include="..\src\DataStructures\IDictionary.cs" />
+    <Compile Include="..\src\DataStructures\IVisitor.cs" />
+    <Compile Include="..\src\DataStructures\PrefixTreeDictionary.cs" />
+    <Compile Include="..\src\DataStructures\PrefixTreeDictionaryVisitors.cs" />
+    <Compile Include="..\src\DataStructures\PrefixTreeNode.cs" />
+    <Compile Include="..\src\DataStructures\test\BinaryHeapComponentTests.cs" />
+    <Compile Include="..\src\DataStructures\test\ExtensionsUnitTests.cs" />
+    <Compile Include="..\src\Math\Arrangement.cs" />
+    <Compile Include="..\src\Math\Combinatorics.cs" />
+    <Compile Include="..\src\Math\IndexEnumerator.cs" />
+    <Compile Include="..\src\Math\RandomProvider.cs" />
+    <Compile Include="..\src\Math\SourceIndex.cs" />
+    <Compile Include="..\src\Math\test\ArrangementComponentTests.cs" />
+    <Compile Include="..\src\Search\BacktrackingSearch.cs" />
+    <Compile Include="..\src\Search\BidirectionalSearch.cs" />
+    <Compile Include="..\src\Search\BreadthFirstSearch.cs" />
+    <Compile Include="..\src\Search\DepthFirstSearch.cs" />
+    <Compile Include="..\src\Search\FlexibleBacktrackingSearch.cs" />
+    <Compile Include="..\src\Search\LeastWeightPathSearch.cs" />
+    <Compile Include="..\src\Search\PathNodeBase.cs" />
+    <Compile Include="..\src\Search\SearchBehaviors.cs" />
+    <Compile Include="..\src\Search\test\SearchComponentTests.cs" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSHARP.Targets" />
+  <ProjectExtensions>
+    <VisualStudio AllowExistingFolder="true" />
+  </ProjectExtensions>
+</Project>
