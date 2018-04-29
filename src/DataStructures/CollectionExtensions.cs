@@ -1,21 +1,15 @@
-﻿/*
- * CollectionExtensions.cs
- * 
- * Nathan Duke
- * 1/31/15
- * 
- * Contains useful extension methods for collection data types.
- */
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace CommonTools { namespace DataStructures {
+namespace Tools.DataStructures {
 
+	/*
+	 * Contains useful extension methods for collection data types.
+	 */
 	public static class CollectionExtensions
 	{
-		#region Max
+#region Max
 
 		public static T Max<T>(this IEnumerable<T> items, IComparer<T> comparer)
 		{
@@ -69,9 +63,9 @@ namespace CommonTools { namespace DataStructures {
 			return argMax;
 		}
 
-		#endregion
+#endregion
 
-		#region Min
+#region Min
 
 		public static T Min<T>(this IEnumerable<T> items, IComparer<T> comparer)
 		{
@@ -125,16 +119,16 @@ namespace CommonTools { namespace DataStructures {
 			return argMin;
 		}
 
-		#endregion
+#endregion
 
-		#region ToArray
+#region ToArray
 
 		public static T[] ToArray<T>(this Tuple<T, T> tuple)
 		{
 			return new T[] { tuple.Item1, tuple.Item2 };
 		}
 
-		#endregion
+#endregion
 	}
 
-}}
+}

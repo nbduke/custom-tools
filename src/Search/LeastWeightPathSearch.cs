@@ -1,20 +1,14 @@
-﻿/*
- * LeastWeightPathSearch.cs
- * 
- * Nathan Duke
- * 8/8/2016
- * 
- * Contains the LeastWeightPathSearch class.
- * 
- * Least-weight path search (a.k.a. Uniform Cost Search) explores nodes
- * in order by ascending cumulative path weight.
- */
-
-using CommonTools.DataStructures;
+﻿using Tools.DataStructures;
 using System.Collections.Generic;
 
-namespace CommonTools { namespace Algorithms { namespace Search {
+namespace Tools.Algorithms.Search {
 
+	/*
+	 * Least-weight path search (a.k.a. uniform cost search) explores nodes
+	 * in order by ascending cumulative path weight. It can find the optimal
+	 * (i.e. least-total-weight) path between two nodes in a directed graph
+	 * with no negative cycles.
+	 */
 	public class LeastWeightPathSearch<T> where T : PathNodeBase
 	{
 		private GoalTest<T> IsGoal;
@@ -72,4 +66,4 @@ namespace CommonTools { namespace Algorithms { namespace Search {
 		}
 	}
 
-}}}
+}

@@ -1,26 +1,18 @@
-﻿/*
- * FlexibleBacktrackingSearch.cs
- * 
- * Nathan Duke
- * 8/8/2016
- * 
- * Contains the FlexibleBacktrackingSearch class.
- * 
- * Like BacktrackingSearch, FlexibleBacktrackingSearch is a memory-optimized
- * depth-first search. FlexibleBacktrackingSearch provides the ability to
- * customize how the algorithm behaves when a goal node is found.
- * 
- * The GoalAction given to the constructor allows the following behaviors when
- * a goal is found:
- *		Stop:					the algorithm terminates (identical to BacktrackingSearch)
- *		Continue:				the algorithm extends the current search path through the goal
- *		BacktrackAndContinue:	the algorithm backtracks to the goal's parent and continues with its next child
- */
+﻿using System;
 
-using System;
+namespace Tools.Algorithms.Search {
 
-namespace CommonTools { namespace Algorithms { namespace Search {
-
+	/*
+	 * Like BacktrackingSearch, FlexibleBacktrackingSearch is a memory-optimized
+	 * depth-first search. FlexibleBacktrackingSearch provides the added ability
+	 * to customize how the algorithm behaves when a goal node is found.
+	 * 
+	 * The GoalAction given to the constructor allows the following behaviors when
+	 * a goal is found:
+	 *		Stop:					the algorithm terminates (identical to BacktrackingSearch)
+	 *		Continue:				the algorithm extends the current search path through the goal
+	 *		BacktrackAndContinue:	the algorithm backtracks to the goal's parent and continues with its next child
+	 */
 	public class FlexibleBacktrackingSearch<T> where T : PathNodeBase
 	{
 		GoalTest<T> IsGoal;
@@ -104,4 +96,4 @@ namespace CommonTools { namespace Algorithms { namespace Search {
 		}
 	}
 
-}}}
+}

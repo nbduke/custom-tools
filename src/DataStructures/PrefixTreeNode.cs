@@ -1,30 +1,27 @@
-﻿/*
- * PrefixTreeNode.cs
- * 
- * Nathan Duke
- * 1/31/15
- * 
- * Contains the PrefixTreeNode class.
- */
+﻿using System.Collections.Generic;
 
-using System.Collections.Generic;
+namespace Tools.DataStructures {
 
-namespace CommonTools { namespace DataStructures {
-
-	/// <summary>
-	/// PrefixTreeNode is a single node in a PrefixTreeDictionary. It stores a
-	/// single character, a list of child nodes, and a count of entries that
-	/// terminate in this node.
-	/// </summary>
+	/*
+	 * PrefixTreeNode is a single node in a PrefixTreeDictionary. It stores a
+	 * single character, a list of child nodes, and a count of entries that
+	 * terminate in this node.
+	 */
 	public class PrefixTreeNode
 	{
 		public char Character { get; set; }
 		public int WordCount { get; set; }
-		public bool EndOfWord { get { return WordCount > 0; } }
-		public bool HasChildren { get { return Children.Count > 0; } }
-		public PrefixTreeNode Parent { get; private set; }
+		public bool EndOfWord
+		{
+			get { return WordCount > 0; }
+		}
+		public bool HasChildren
+		{
+			get { return Children.Count > 0; }
+		}
+		public readonly PrefixTreeNode Parent;
 
-		private SortedList<char, PrefixTreeNode> Children { get; set; }
+		private readonly SortedList<char, PrefixTreeNode> Children;
 
 		public PrefixTreeNode(char character, PrefixTreeNode parent)
 		{
@@ -57,7 +54,7 @@ namespace CommonTools { namespace DataStructures {
 			}
 		}
 
-		public IList<PrefixTreeNode> GetChildren()
+		public IEnumerable<PrefixTreeNode> GetChildren()
 		{
 			return Children.Values;
 		}
@@ -94,4 +91,4 @@ namespace CommonTools { namespace DataStructures {
 		}
 	}
 
-}}
+}

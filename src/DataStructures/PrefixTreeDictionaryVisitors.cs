@@ -1,26 +1,17 @@
-﻿/*
- * PrefixTreeDictionaryVisitors.cs
- * 
- * Nathan Duke
- * 1/31/15
- * 
- * Contains visitors for PrefixTreeDictionary.
- */
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
-namespace CommonTools { namespace DataStructures {
+namespace Tools.DataStructures {
 
-	/// <summary>
-	/// Prints words in a PrefixTreeDictionary.
-	/// </summary>
+	/*
+	 * Prints words in a PrefixTreeDictionary.
+	 */
 	public class PrintWordsVisitor : IVisitor<PrefixTreeNode>
 	{
-		private TextWriter OutputStream { get; set; }
-		private StringBuilder CurrentString { get; set; }
+		private readonly TextWriter OutputStream;
+		private readonly StringBuilder CurrentString;
 
 		public PrintWordsVisitor()
 			: this(Console.Out)
@@ -50,14 +41,14 @@ namespace CommonTools { namespace DataStructures {
 	}
 
 
-	/// <summary>
-	/// Generates a list of words in a PrefixTreeDictionary.
-	/// </summary>
+	/*
+	 * Generates a list of words in a PrefixTreeDictionary.
+	 */
 	public class CollectWordsVisitor : IVisitor<PrefixTreeNode>
 	{
-		public List<string> Words { get; private set; }
+		public readonly List<string> Words;
 
-		private StringBuilder CurrentString { get; set; }
+		private readonly StringBuilder CurrentString;
 
 		public CollectWordsVisitor()
 			: this(new List<string>())
@@ -92,9 +83,9 @@ namespace CommonTools { namespace DataStructures {
 	}
 
 
-	/// <summary>
-	/// Counts all nodes in a PrefixTreeDictionary.
-	/// </summary>
+	/*
+	 * Counts all nodes in a PrefixTreeDictionary.
+	 */
 	public class CountNodesVisitor : IVisitor<PrefixTreeNode>
 	{
 		public int Count { get; private set; }
@@ -115,4 +106,4 @@ namespace CommonTools { namespace DataStructures {
 		}
 	}
 
-}}
+}

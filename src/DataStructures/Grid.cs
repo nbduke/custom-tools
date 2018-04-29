@@ -1,46 +1,46 @@
-﻿/*
- * Grid.cs
- * 
- * Nathan Duke
- * 1/31/15
- * 
- * Contains the Grid<T> class and the GridOrder enum.
- */
-
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 
-namespace CommonTools { namespace DataStructures {
+namespace Tools.DataStructures {
 
-	/// <summary>
-	/// Specifies the traversal order over a grid (a 2D array).
-	/// </summary>
+	/*
+	 * Specifies the traversal order over a grid.
+	 */
 	public enum GridOrder
 	{
 		RowMajor,
 		ColumnMajor
 	}
 
-	/// <summary>
-	/// A wrapper around a 2D array of an arbitrary type. Grid provides useful functions
-	/// for iterating over and searching the array.
-	/// </summary>
-	/// <typeparam name="T"></typeparam>
+	/*
+	 * Grid is a wrapper around a 2D array of any type. It provides useful functions for
+	 * iterating over and searching the array.
+	 */
 	public class Grid<T> : IEnumerable<T>
 	{
-		public int Rows { get; private set; }
-		public int Columns { get; private set; }
-		public int Cells { get { return Rows * Columns; } }
-		public bool IsSquare { get { return Rows == Columns; } }
+		public readonly int Rows;
+		public readonly int Columns;
+		public int Cells
+		{
+			get { return Rows * Columns; }
+		}
+		public bool IsSquare
+		{
+			get { return Rows == Columns; }
+		}
 
-		private T[,] Data { get; set; }
+		private readonly T[,] Data;
 
-		public Grid(int rows, int columns, IEnumerable<T> items, GridOrder fillOrder = GridOrder.RowMajor)
+		public Grid(
+			int rows,
+			int columns,
+			IEnumerable<T> items,
+			GridOrder fillOrder = GridOrder.RowMajor)
 			: this(rows, columns)
 		{
 			if (items == null)
-				throw new ArgumentNullException("items cannot be null.");
+				throw new ArgumentNullException("items");
 
 			var enumerator = items.GetEnumerator();
 			VisitCellsInOrder(fillOrder,
@@ -76,46 +76,22 @@ namespace CommonTools { namespace DataStructures {
 
 		public T this[GridCell cell]
 		{
-			get
-			{
-				return this[cell.Row, cell.Column];
-			}
+			get { return this[cell.Row, cell.Column]; }
 
-			set
-			{
-				this[cell.Row, cell.Column] = value;
-			}
+			set { this[cell.Row, cell.Column] = value; }
 		}
 
 		public T this[int row, int column]
 		{
-			get
-			{
-				return Data[row, column];
-			}
+			get { return Data[row, column]; }
 
-			set
-			{
-				Data[row, column] = value;
-			}
+			set { Data[row, column] = value; }
 		}
 
-		public bool Contains(T item)
-		{
-			foreach (T datum in Data)
-			{
-				if (datum.Equals(item))
-					return true;
-			}
-
-			return false;
-		}
-
-		/// <summary>
-		/// Returns a copy of the grid flattened into a 1D array.
-		/// </summary>
-		/// <param name="order">Specifies the order in which elements are moved from the grid to the array</param>
-		/// <returns></returns>
+		/*
+		 * Returns a copy of the grid flattened into a 1D array. The GridOrder
+		 * determines the order in which elements are moved from the grid to the array.
+		 */
 		public List<T> Flatten(GridOrder order)
 		{
 			List<T> result = new List<T>();
@@ -123,6 +99,9 @@ namespace CommonTools { namespace DataStructures {
 			return result;
 		}
 
+		/*
+		 * Returns an enumerable over the row at the given index.
+		 */
 		public IEnumerable<T> RowAt(int rowIndex)
 		{
 			if (rowIndex < 0 || rowIndex >= Rows)
@@ -134,6 +113,9 @@ namespace CommonTools { namespace DataStructures {
 			}
 		}
 
+		/*
+		 * Returns an enumerable over the column at the given index
+		 */
 		public IEnumerable<T> ColumnAt(int columnIndex)
 		{
 			if (columnIndex < 0 || columnIndex >= Columns)
@@ -145,13 +127,11 @@ namespace CommonTools { namespace DataStructures {
 			}
 		}
 
-		/// <summary>
-		/// Returns the items in the grid neighboring the given cell. Neighbors are considered
-		/// to be all items in the grid touching a corner or an edge of the item in the given cell.
-		/// </summary>
-		/// <param name="cell"></param>
-		/// <param name="excludeDiagonals">If true, neighbors touching corners of the item will be excluded</param>
-		/// <returns></returns>
+		/*
+		 * Returns an enumerable over the items that neighbor the given cell. A cell is a
+		 * neighbor if it touches the given cell on any side or corner. If excludeDiagonals
+		 * is true, cells touching the corners are excluded.
+		 */
 		public IEnumerable<T> GetNeighbors(GridCell cell, bool excludeDiagonals = false)
 		{
 			foreach (var cellNeighbor in GetCellNeighbors(cell, excludeDiagonals))
@@ -160,13 +140,9 @@ namespace CommonTools { namespace DataStructures {
 			}
 		}
 
-		/// <summary>
-		/// Returns the cell locations that neighbor the given cell. Neighbors are considered
-		/// to be all cells in the grid touching a corner or an edge of the given cell.
-		/// </summary>
-		/// <param name="cell"></param>
-		/// <param name="excludeDiagonals">If true, neighbors touching corners of the cell will be excluded</param>
-		/// <returns></returns>
+		/*
+		 * Returns an enumerable over the cells that neighbor the given cell.
+		 */
 		public IEnumerable<GridCell> GetCellNeighbors(GridCell cell, bool excludeDiagonals = false)
 		{
 			for (int row = cell.Row - 1; row <= cell.Row + 1; ++row)
@@ -186,10 +162,9 @@ namespace CommonTools { namespace DataStructures {
 			}
 		}
 
-		/// <summary>
-		/// Returns an IEnumerator over the grid that enumerates in row-major order.
-		/// </summary>
-		/// <returns></returns>
+		/*
+		 * Returns an enumerable over the grid that iterates in row-major order.
+		 */
 		public IEnumerator<T> GetEnumerator()
 		{
 			for (int row = 0; row < Rows; ++row)
@@ -206,12 +181,10 @@ namespace CommonTools { namespace DataStructures {
 			return this.GetEnumerator();
 		}
 
-		/// <summary>
-		/// Performs an action on each cell in the grid. Cells are visited in the
-		/// specified order.
-		/// </summary>
-		/// <param name="order">The order in which to act on cells</param>
-		/// <param name="visit">The action to perform on cells</param>
+		/*
+		 * Applies an action to each cell in the grid, iterating according to the
+		 * given GridOrder.
+		 */
 		public void VisitCellsInOrder(GridOrder order, Action<GridCell> visit)
 		{
 			if (order == GridOrder.RowMajor)
@@ -241,4 +214,4 @@ namespace CommonTools { namespace DataStructures {
 		}
 	}
 
-}}
+}

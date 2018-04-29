@@ -1,17 +1,10 @@
-﻿/*
- * DepthFirstSearch.cs
- * 
- * Nathan Duke
- * 8/8/2016
- * 
- * Contains the DepthFirstSearch class. This class performs a
- * standard depth-first search of a state space.
- */
+﻿using System.Collections.Generic;
 
-using System.Collections.Generic;
+namespace Tools.Algorithms.Search {
 
-namespace CommonTools { namespace Algorithms { namespace Search {
-
+	/*
+	 * Implements a depth-first search of a graph.
+	 */
 	public class DepthFirstSearch<T> where T : PathNodeBase
 	{
 		private GoalTest<T> IsGoal;
@@ -62,4 +55,4 @@ namespace CommonTools { namespace Algorithms { namespace Search {
 		}
 	}
 
-}}}
+}

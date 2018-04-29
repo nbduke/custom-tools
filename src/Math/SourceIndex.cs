@@ -1,22 +1,16 @@
-﻿/*
- * SourceIndex.cs
- * 
- * Nathan Duke
- * 8/8/2016
- * 
- * Contains the SourceIndex class. SourceIndex represents the index of
- * an element in an Arrangement. This is used to keep track of items
- * that have been placed into a combination or permutation.
- */
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 
-using CommonTools.Algorithms.Search;
+using Tools.Algorithms.Search;
 
-namespace CommonTools { namespace Algorithms {
+namespace Tools.Algorithms {
 
+	/*
+	 * SourceIndex represents the index of an element in an Arrangement. It
+	 * is used to keep track of items that have been placed into a combination
+	 * or permutation.
+	 */
 	class SourceIndex : PathNodeBase
 	{
 		public int Index { get; private set; }
@@ -58,11 +52,13 @@ namespace CommonTools { namespace Algorithms {
 				return false; // due to the order of child expansion, combinations never need to do this check
 		}
 
-		// Reconstructs the list of elements in the original collection whose indices are
-		// stored in the path which terminates in this SourceIndex.
+		/*
+		 * Reconstructs the list of elements in the original collection whose indices are
+		 * stored in the path which terminates in this SourceIndex.
+		 */
 		public virtual IEnumerable<T> GetOriginals<T>(IList<T> sourceSet)
 		{
-			foreach (PathNodeBase node in GetPathToRoot().Reverse())
+			foreach (PathNodeBase node in GetPath().Reverse())
 			{
 				int indexIntoSource = ((SourceIndex)node).Index;
 				yield return sourceSet[indexIntoSource];
@@ -70,4 +66,4 @@ namespace CommonTools { namespace Algorithms {
 		}
 	}
 
-}}
+}

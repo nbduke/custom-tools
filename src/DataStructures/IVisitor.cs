@@ -1,25 +1,14 @@
-﻿/*
- * IVisitor.cs
- * 
- * Nathan Duke
- * 1/31/15
- * 
- * Contains the IVisitor<T> interface.
- */
+﻿namespace Tools.DataStructures {
 
-namespace CommonTools { namespace DataStructures {
-
-	/// <summary>
-	/// An interface for the Visitor Pattern.
-	/// </summary>
-	/// <typeparam name="T"></typeparam>
+	/*
+	 * A generic interface for the Visitor pattern.
+	 */
 	public interface IVisitor<T>
 	{
-		/// <summary>
-		/// Performs the visit operation on the given item.
-		/// </summary>
-		/// <param name="item"></param>
+		/*
+		 * Performs the visit operation on the given item.
+		 */
 		void Visit(T item);
 	}
 
-}}
+}

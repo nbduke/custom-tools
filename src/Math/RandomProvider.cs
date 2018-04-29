@@ -1,18 +1,11 @@
-﻿/*
- * RandomProvider.cs
- * 
- * Nathan Duke
- * 1/31/15
- * 
- * Contains a set of static methods for performing randomization algorithms
- * in a thread-safe manner.
- */
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 
-namespace CommonTools { namespace Algorithms {
+namespace Tools.Math {
 
+	/// <summary>
+	/// Contains functions for performing thread-safe randomization algorithms.
+	/// </summary>
 	public static class RandomProvider
 	{
 		private static readonly Random Global = new Random();
@@ -22,12 +15,8 @@ namespace CommonTools { namespace Algorithms {
 
 		/// <summary>
 		/// Returns a random int in the interval [0, |maxValue| - 1].
-		/// </summary>
-		/// <remarks>
 		/// If maxValue is 0, this function returns 0.
-		/// </remarks>
-		/// <param name="maxValue"></param>
-		/// <returns></returns>
+		/// </summary>
 		public static int GetInt(int maxValue = int.MaxValue)
 		{
 			CheckThreadLocalMember();
@@ -36,14 +25,9 @@ namespace CommonTools { namespace Algorithms {
 
 		/// <summary>
 		/// Returns a random int in the interval [minValue, maxValue - 1].
+		/// If minValue equals maxValue, minValue is returned. Either or both
+		/// parameters may be negative.
 		/// </summary>
-		/// <remarks>
-		/// minValue must not be greater than maxValue. If they are equal, this function
-		/// returns minValue. Either or both parameters may be negative.
-		/// </remarks>
-		/// <param name="minValue"></param>
-		/// <param name="maxValue"></param>
-		/// <returns></returns>
 		public static int GetInt(int minValue, int maxValue)
 		{
 			CheckThreadLocalMember();
@@ -53,7 +37,6 @@ namespace CommonTools { namespace Algorithms {
 		/// <summary>
 		/// Returns a random double in the interval [0.0, 1.0).
 		/// </summary>
-		/// <returns></returns>
 		public static double GetUnitDouble()
 		{
 			CheckThreadLocalMember();
@@ -63,11 +46,6 @@ namespace CommonTools { namespace Algorithms {
 		/// <summary>
 		/// Returns a random double in the interval [0.0, |maxValue|).
 		/// </summary>
-		/// <remarks>
-		/// If maxValue is 0, this function returns 0.
-		/// </remarks>
-		/// <param name="maxValue"></param>
-		/// <returns></returns>
 		public static double GetDouble(double maxValue)
 		{
 			return GetUnitDouble() * System.Math.Abs(maxValue);
@@ -75,14 +53,8 @@ namespace CommonTools { namespace Algorithms {
 
 		/// <summary>
 		/// Returns a random double in the interval [minValue, maxValue).
+		/// Either or both parameters may be negative.
 		/// </summary>
-		/// <remarks>
-		/// minValue must not be greater than maxValue. If they are equal, this function
-		/// returns minValue. Either or both parameters may be negative.
-		/// </remarks>
-		/// <param name="minValue"></param>
-		/// <param name="maxValue"></param>
-		/// <returns></returns>
 		public static double GetDouble(double minValue, double maxValue)
 		{
 			if (minValue > maxValue)
@@ -93,34 +65,30 @@ namespace CommonTools { namespace Algorithms {
 		}
 
 		/// <summary>
-		/// Flips a weighted coin. Returns true with probability equal to the given weight.
+		/// Flips a weighted coin.
 		/// </summary>
-		/// <param name="weight"></param>
-		/// <returns></returns>
+		/// <param name="weight">A probability in [0, 1]</param>
+		/// <returns>True with probability equal to the given weight</returns>
 		public static bool FlipCoin(double weight = 0.5)
 		{
 			return GetUnitDouble() < weight;
 		}
 
 		/// <summary>
-		/// Returns an element selected uniformly at random from the given collection.
+		/// Returns an element selected uniformly at random from a collection.
 		/// </summary>
-		/// <typeparam name="T"></typeparam>
-		/// <param name="items"></param>
-		/// <returns></returns>
 		public static T Select<T>(IList<T> items)
 		{
 			if (items.Count == 0)
-				throw new ArgumentException("The provided collection cannot be empty.");
+				throw new ArgumentException("The collection cannot be empty.");
 
 			return items[GetInt(items.Count)];
 		}
 
 		/// <summary>
-		/// Samples the given collection uniformly at random.
+		/// Samples a collection uniformly at random.
 		/// </summary>
-		/// <typeparam name="T"></typeparam>
-		/// <param name="items">A collection of type T</param>
+		/// <param name="items">A nonempty collection</param>
 		/// <param name="sampleSize">The number of items to be returned in the sample</param>
 		/// <param name="withReplacement">Indicates whether the sample should allow duplicates</param>
 		/// <returns>A list of items of length sampleSize</returns>
@@ -159,9 +127,8 @@ namespace CommonTools { namespace Algorithms {
 		}
 
 		/// <summary>
-		/// Samples the given discrete distribution at random.
+		/// Samples a discrete distribution at random.
 		/// </summary>
-		/// <typeparam name="T"></typeparam>
 		/// <param name="distribution">A distribution (elements and their corresponding probabilities)</param>
 		/// <param name="sampleSize">The number of items to be returned in the sample</param>
 		/// <param name="preSorted">Indicates whether the distribution is already sorted by ascending probability</param>
@@ -208,11 +175,8 @@ namespace CommonTools { namespace Algorithms {
 		}
 
 		/// <summary>
-		/// Randomly shuffles the given collection in place. This function
-		/// implements the Fisher-Yates random shuffle algorithm.
+		/// Randomly shuffles a collection in place using the Fisher-Yates algorithm.
 		/// </summary>
-		/// <typeparam name="T"></typeparam>
-		/// <param name="items"></param>
 		public static void Shuffle<T>(IList<T> items)
 		{
 			if (items.Count > 1)
@@ -229,7 +193,7 @@ namespace CommonTools { namespace Algorithms {
 			}
 		}
 
-		#region Helper methods
+#region Helper methods
 		private static void CheckThreadLocalMember()
 		{
 			if (Local == null)
@@ -243,7 +207,7 @@ namespace CommonTools { namespace Algorithms {
 				Local = new Random(seed);
 			}
 		}
-		#endregion
+#endregion
 	}
 
-}}
+}

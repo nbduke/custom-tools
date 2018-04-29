@@ -1,12 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-using CommonTools.Algorithms;
-using CommonTools.DataStructures;
+using Tools.Algorithms;
+using Tools.DataStructures;
 
-namespace CommonTools.Tests
+namespace Test
 {
 	[TestClass]
 	public class ArrangementComponentTests

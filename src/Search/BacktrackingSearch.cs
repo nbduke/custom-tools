@@ -1,20 +1,11 @@
-﻿/*
- * BacktrackingSearch.cs
- * 
- * Nathan Duke
- * 8/8/2016
- * 
- * Contains the BacktrackingSearch class.
- * 
- * Backtracking search is a memory-optimized depth-first search. It does not store an
- * explored set nor a frontier. Only elements on the current search path are kept in
- * memory, allowing for minimal memory consumption at the expense of potentially
- * exploring redundant sub-paths.
- */
+﻿namespace Tools.Algorithms.Search {
 
-
-namespace CommonTools { namespace Algorithms { namespace Search {
-
+	/*
+	 * Backtracking search is a memory-optimized depth-first search. Instead of keeping
+	 * track of the explored set and frontier, only elements on the current search path
+	 * are kept in memory. The memory savings come at the expense of potentially
+	 * exploring redundant sub-paths.
+	 */
 	public class BacktrackingSearch<T> where T : PathNodeBase
 	{
 		private GoalTest<T> IsGoal;
@@ -69,4 +60,4 @@ namespace CommonTools { namespace Algorithms { namespace Search {
 		}
 	}
 
-}}}
+}

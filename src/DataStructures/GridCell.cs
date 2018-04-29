@@ -1,17 +1,8 @@
-﻿/*
- * GridCell.cs
- * 
- * Nathan Duke
- * 1/31/15
- * 
- * Contains the GridCell struct.
- */
+﻿namespace Tools.DataStructures {
 
-namespace CommonTools { namespace DataStructures {
-
-	/// <summary>
-	/// An ordered pair that uniquely locates a cell in a grid (a 2D array).
-	/// </summary>
+	/*
+	 * An ordered pair that uniquely locates a cell in a grid (a 2D array).
+	 */
 	public struct GridCell
 	{
 		public int Row { get; set; }
@@ -45,18 +36,18 @@ namespace CommonTools { namespace DataStructures {
 
 		public override string ToString()
 		{
-			return "[" + Row + ", " + Column + "]";
+			return $"[{Row}, {Column}]";
 		}
 
-		public static bool operator ==(GridCell a, GridCell b)
+		public static bool operator==(GridCell a, GridCell b)
 		{
 			return a.Row == b.Row && a.Column == b.Column;
 		}
 
-		public static bool operator !=(GridCell a, GridCell b)
+		public static bool operator!=(GridCell a, GridCell b)
 		{
 			return !(a == b);
 		}
 	}
 
-}}
+}
