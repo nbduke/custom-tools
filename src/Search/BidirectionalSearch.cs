@@ -7,18 +7,23 @@ namespace Tools.Algorithms.Search {
 	 * Bidirectional search is a breadth-first search starting from two
 	 * distinct nodes simultaneously. It is guaranteed to find the shortest
 	 * path between the two nodes, if one exists.
+	 *
+	 * The algorithm assumes that the second node's GetChildren implementation
+	 * is inverted in that it returns a collection of nodes that could be parents
+	 * of that node. If the graph is undirected, this will happen naturally.
 	 */
-	public class BidirectionalSearch<T> where T : PathNodeBase
+	public class BidirectionalSearch<T> where T : PathNode
 	{
-		private ChildGenerator<T> GetForwardChildren;
-		private ChildGenerator<T> GetReverseChildren;
 		private CustomPathMergeFunction<T> MergePaths;
 
-		public BidirectionalSearch(
-			ChildGenerator<T> getForwardChildren,
-			ChildGenerator<T> getReverseChildren)
-			: this(getForwardChildren, getReverseChildren, DefaultMergePaths)
+		public BidirectionalSearch()
+			: this(DefaultMergePaths)
 		{
+		}
+
+		public BidirectionalSearch(CustomPathMergeFunction<T> mergePaths)
+		{
+			MergePaths = mergePaths;
 		}
 
 		private static void DefaultMergePaths(T leafNodeFromStart, T leafNodeFromGoal)
@@ -26,16 +31,6 @@ namespace Tools.Algorithms.Search {
 			T goal = (T)leafNodeFromGoal.GetRoot();
 			leafNodeFromGoal.Parent.InvertPath();
 			goal.JoinPath(leafNodeFromStart);
-		}
-
-		public BidirectionalSearch(
-			ChildGenerator<T> getForwardChildren,
-			ChildGenerator<T> getReverseChildren,
-			CustomPathMergeFunction<T> mergePaths)
-		{
-			GetForwardChildren = getForwardChildren;
-			GetReverseChildren = getReverseChildren;
-			MergePaths = mergePaths;
 		}
 
 		public T Search(T start, T goal)
@@ -48,7 +43,7 @@ namespace Tools.Algorithms.Search {
 			HashSet<T> explored = new HashSet<T>();
 
 			// Pre-load the frontiers of the start and end goal
-			foreach (T child in GetForwardChildren(start))
+			foreach (T child in start.GetChildren())
 			{
 				if (child.Equals(goal)) // check here if start and goal are connected
 					return child;
@@ -56,7 +51,7 @@ namespace Tools.Algorithms.Search {
 					forwardFrontier.Enqueue(child);
 			}
 
-			foreach (T child in GetReverseChildren(goal))
+			foreach (T child in goal.GetChildren())
 			{
 				reverseFrontier.Enqueue(child);
 			}
@@ -71,7 +66,7 @@ namespace Tools.Algorithms.Search {
 
 				T forwardNode = forwardFrontier.Dequeue();
 				explored.Add(forwardNode);
-				foreach (T child in GetForwardChildren(forwardNode))
+				foreach (T child in forwardNode.GetChildren())
 				{
 					if (!explored.Contains(child) && !forwardFrontier.Contains(child))
 						forwardFrontier.Enqueue(child);
@@ -82,7 +77,7 @@ namespace Tools.Algorithms.Search {
 
 				T reverseNode = reverseFrontier.Dequeue();
 				explored.Add(reverseNode);
-				foreach (T child in GetReverseChildren(reverseNode))
+				foreach (T child in reverseNode.GetChildren())
 				{
 					if (!explored.Contains(child) && !reverseFrontier.Contains(child))
 						reverseFrontier.Enqueue(child);

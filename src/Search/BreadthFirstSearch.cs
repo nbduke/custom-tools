@@ -5,17 +5,13 @@ namespace Tools.Algorithms.Search {
 	/*
 	 * Implements a breadth-first search of a graph.
 	 */
-	public class BreadthFirstSearch<T> where T : PathNodeBase
+	public class BreadthFirstSearch<T> where T : PathNode
 	{
 		private GoalTest<T> IsGoal;
-		private ChildGenerator<T> GetChildren;
 
-		public BreadthFirstSearch(
-			GoalTest<T> isGoal,
-			ChildGenerator<T> getChildren)
+		public BreadthFirstSearch(GoalTest<T> isGoal)
 		{
 			IsGoal = isGoal;
-			GetChildren = getChildren;
 		}
 
 		public T Search(T start)
@@ -38,7 +34,7 @@ namespace Tools.Algorithms.Search {
 			{
 				T currentNode = frontier.Dequeue();
 				explored.Add(currentNode);
-				foreach (T child in GetChildren(currentNode))
+				foreach (T child in currentNode.GetChildren())
 				{
 					if (!explored.Contains(child) && !frontier.Contains(child))
 					{

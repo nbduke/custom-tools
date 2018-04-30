@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -16,7 +17,7 @@ namespace Test
 			SmallMapNode start = new SmallMapNode();
 			CityName[] expectedPath = { CityName.Bucharest, CityName.Pitesti, CityName.RimnicuVilcea, CityName.Sibiu };
 
-			var leastWeightPathSearch = new LeastWeightPathSearch<SmallMapNode>(IsGoal, GetChildren);
+			var leastWeightPathSearch = new LeastWeightPathSearch<SmallMapNode>(node => node.City == CityName.Bucharest);
 
 			// Act
 			SmallMapNode goal = leastWeightPathSearch.Search(start);
@@ -42,7 +43,7 @@ namespace Test
 
 			CityName[] expectedPath = { CityName.Bucharest, CityName.Fagaras, CityName.Sibiu };
 
-			var bidirectionalSearch = new BidirectionalSearch<SmallMapNode>(GetChildren, GetReverseChildren);
+			var bidirectionalSearch = new BidirectionalSearch<SmallMapNode>();
 
 			// Act
 			SmallMapNode searchGoal = bidirectionalSearch.Search(start, goal);
@@ -58,56 +59,6 @@ namespace Test
 			Assert.IsTrue(expectedPath.SequenceEqual(actualPath), "The expected and actual sequences should match.");
 		}
 
-
-		private static bool IsGoal(SmallMapNode node)
-		{
-			return node.City == CityName.Bucharest;
-		}
-
-		private static IEnumerable<SmallMapNode> GetChildren(SmallMapNode node)
-		{
-			switch (node.City)
-			{
-				case CityName.Sibiu:
-					yield return new SmallMapNode(CityName.Fagaras, node);
-					yield return new SmallMapNode(CityName.RimnicuVilcea, node);
-					break;
-				case CityName.Fagaras:
-					yield return new SmallMapNode(CityName.Bucharest, node);
-					break;
-				case CityName.RimnicuVilcea:
-					yield return new SmallMapNode(CityName.Pitesti, node);
-					break;
-				case CityName.Pitesti:
-					yield return new SmallMapNode(CityName.Bucharest, node);
-					break;
-				default:
-					yield break;
-			}
-		}
-
-		private static IEnumerable<SmallMapNode> GetReverseChildren(SmallMapNode node)
-		{
-			switch (node.City)
-			{
-				case CityName.Fagaras:
-					yield return new SmallMapNode(CityName.Sibiu, node);
-					break;
-				case CityName.RimnicuVilcea:
-					yield return new SmallMapNode(CityName.Sibiu, node);
-					break;
-				case CityName.Pitesti:
-					yield return new SmallMapNode(CityName.RimnicuVilcea, node);
-					break;
-				case CityName.Bucharest:
-					yield return new SmallMapNode(CityName.Fagaras, node);
-					yield return new SmallMapNode(CityName.Pitesti, node);
-					break;
-				default:
-					yield break;
-			}
-		}
-
 		private enum CityName
 		{
 			Sibiu, // start
@@ -117,9 +68,11 @@ namespace Test
 			Bucharest // goal
 		}
 
-		private class SmallMapNode : PathNodeBase
+		private class SmallMapNode : PathNode
 		{
 			public CityName City { get; set; }
+
+			private static Dictionary<CityName, CityName[]> CityConnections;
 
 			public SmallMapNode()
 			{
@@ -130,6 +83,15 @@ namespace Test
 				: base(parent, CalculateDistance(city, parent.City))
 			{
 				City = city;
+			}
+
+			public override IEnumerable<PathNode> GetChildren()
+			{
+				EnsureConnections();
+				foreach (var connection in CityConnections[City])
+				{
+					yield return new SmallMapNode(connection, this);
+				}
 			}
 
 			public override bool Equals(object obj)
@@ -157,6 +119,39 @@ namespace Test
 						return 101;
 					default:
 						return 0;
+				}
+			}
+
+			private static void EnsureConnections()
+			{
+				if (CityConnections == null)
+				{
+					CityConnections = new Dictionary<CityName, CityName[]>();
+					CityConnections[CityName.Sibiu] = new CityName[]
+					{
+						CityName.Fagaras,
+						CityName.RimnicuVilcea
+					};
+					CityConnections[CityName.Fagaras] = new CityName[]
+					{
+						CityName.Sibiu,
+						CityName.Bucharest
+					};
+					CityConnections[CityName.RimnicuVilcea] = new CityName[]
+					{
+						CityName.Sibiu,
+						CityName.Pitesti
+					};
+					CityConnections[CityName.Pitesti] = new CityName[]
+					{
+						CityName.RimnicuVilcea,
+						CityName.Bucharest
+					};
+					CityConnections[CityName.Bucharest] = new CityName[]
+					{
+						CityName.Fagaras,
+						CityName.Pitesti
+					};
 				}
 			}
 		}

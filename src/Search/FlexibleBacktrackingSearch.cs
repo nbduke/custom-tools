@@ -13,19 +13,16 @@ namespace Tools.Algorithms.Search {
 	 *		Continue:				the algorithm extends the current search path through the goal
 	 *		BacktrackAndContinue:	the algorithm backtracks to the goal's parent and continues with its next child
 	 */
-	public class FlexibleBacktrackingSearch<T> where T : PathNodeBase
+	public class FlexibleBacktrackingSearch<T> where T : PathNode
 	{
 		GoalTest<T> IsGoal;
-		ChildEnumerator<T> GetChildren;
 		GoalAction<T> ProcessGoal;
 
 		public FlexibleBacktrackingSearch(
 			GoalTest<T> isGoal,
-			ChildEnumerator<T> getChildren,
 			GoalAction<T> processGoal)
 		{
 			IsGoal = isGoal;
-			GetChildren = getChildren;
 			ProcessGoal = processGoal;
 		}
 
@@ -61,10 +58,8 @@ namespace Tools.Algorithms.Search {
 
 		private bool SearchHelper(T currentNode, uint maxSearchDistance)
 		{
-			var enumerator = GetChildren(currentNode);
-			while (enumerator.MoveNext())
+			foreach (T child in currentNode.GetChildren())
 			{
-				T child = enumerator.Current;
 				if (!currentNode.PathContains(child))
 				{
 					if (IsGoal(child))

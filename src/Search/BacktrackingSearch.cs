@@ -6,17 +6,13 @@
 	 * are kept in memory. The memory savings come at the expense of potentially
 	 * exploring redundant sub-paths.
 	 */
-	public class BacktrackingSearch<T> where T : PathNodeBase
+	public class BacktrackingSearch<T> where T : PathNode
 	{
 		private GoalTest<T> IsGoal;
-		private ChildEnumerator<T> GetChildren;
 
-		public BacktrackingSearch(
-			GoalTest<T> isGoal,
-			ChildEnumerator<T> getChildren)
+		public BacktrackingSearch(GoalTest<T> isGoal)
 		{
 			IsGoal = isGoal;
-			GetChildren = getChildren;
 		}
 
 		public T Search(T start)
@@ -36,10 +32,8 @@
 
 		private T SearchHelper(T currentNode, uint maxSearchDistance)
 		{
-			var enumerator = GetChildren(currentNode);
-			while (enumerator.MoveNext())
+			foreach (T child in currentNode.GetChildren())
 			{
-				T child = enumerator.Current;
 				if (!currentNode.PathContains(child))
 				{
 					if (IsGoal(child))
