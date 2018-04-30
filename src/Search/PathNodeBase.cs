@@ -1,38 +1,39 @@
-﻿/*
- * PathNodeBase.cs
- * 
- * Nathan Duke
- * 1/31/15
- * 
- * Contains the PathNodeBase class. This is the base class for all
- * state representations that can be used in the Search algorithms
- * in this library. It provides some of the mechanisms required by
- * each algorithm, like tracking cumulative path length and weight.
- */
+﻿using System.Collections.Generic;
 
-using System;
-using System.Collections.Generic;
+namespace Tools.Algorithms.Search {
 
-namespace CommonTools { namespace Algorithms { namespace Search {
-
-	// PathNodeBase is the base class for nodes in a generic graph search algorithm.
-	// It contains a core set of methods and properties for most algorithms.
+	/*
+	 * PathNodeBase represents a single node in an arbitrary path of a graph.
+	 * The path is maintained by links from each node to its parent node (the
+	 * preceeding node on the path). The class also keeps track of the
+	 * cumulative path length and weight.
+	 */
 	public class PathNodeBase
 	{
 		public PathNodeBase Parent { get; private set; }
 		public uint CumulativePathLength { get; private set; }
 		public double CumulativePathWeight { get; private set; }
 
-		public PathNodeBase() // constructs a root node
+		/*
+		 * Constructs a root node (the first node in a path).
+		 */
+		public PathNodeBase()
 			: this(null)
 		{
 		}
 
+		/*
+		 * Constructs a node with zero weight on the incoming edge.
+		 */
 		public PathNodeBase(PathNodeBase parent)
 			: this(parent, 0)
 		{
 		}
 
+		/*
+		 * Constructs a node with the given parent and the given weight on
+		 * its incoming edge.
+		 */
 		public PathNodeBase(PathNodeBase parent, double weight)
 		{
 			Parent = parent;
@@ -49,15 +50,12 @@ namespace CommonTools { namespace Algorithms { namespace Search {
 			}
 		}
 
-		public virtual bool IsRoot
+		public bool IsRoot
 		{
-			get
-			{
-				return Parent == null;
-			}
+			get { return Parent == null; }
 		}
 
-		public virtual PathNodeBase GetRoot()
+		public PathNodeBase GetRoot()
 		{
 			PathNodeBase currentNode = this;
 			while (!currentNode.IsRoot)
@@ -66,7 +64,7 @@ namespace CommonTools { namespace Algorithms { namespace Search {
 			return currentNode;
 		}
 
-		public virtual IEnumerable<PathNodeBase> GetPathToRoot()
+		public IEnumerable<PathNodeBase> GetPath()
 		{
 			PathNodeBase currentNode = this;
 			while (currentNode != null)
@@ -78,7 +76,7 @@ namespace CommonTools { namespace Algorithms { namespace Search {
 
 		public virtual bool PathContains(PathNodeBase node)
 		{
-			foreach (var other in GetPathToRoot())
+			foreach (var other in GetPath())
 			{
 				if (node.Equals(other))
 					return true;
@@ -87,12 +85,14 @@ namespace CommonTools { namespace Algorithms { namespace Search {
 			return false;
 		}
 
-		// Reverses the child-parent relationships of all nodes on the path to the root.
-		// The edge weights between nodes are preserved. If the original root has nonzero
-		// weight, its weight is transferred to the new root after inversion.
+		/*
+		 * Reverses the child-parent relationships of all nodes on the path. The edge
+		 * weights between nodes are preserved. If the original root has nonzero weight,
+		 * then its weight is transferred to the new root after inversion.
+		 */
 		public virtual void InvertPath()
 		{
-			List<PathNodeBase> path = new List<PathNodeBase>(GetPathToRoot());
+			List<PathNodeBase> path = new List<PathNodeBase>(GetPath());
 			List<double> edgeWeights = new List<double>();
 
 			for (int i = 0; i < path.Count - 1; ++i)
@@ -115,14 +115,16 @@ namespace CommonTools { namespace Algorithms { namespace Search {
 			}
 		}
 
-		// Sets the parent of this node's root to otherNode, adjusting the cumulative path
-		// lengths and weights of each node on the path to the root accordingly.
+		/*
+		 * Sets the parent of this node's root to otherNode, adjusting the cumulative path
+		 * lengths and weights of each node on the path accordingly.
+		 */
 		public virtual void JoinPath(PathNodeBase otherNode)
 		{
 			if (otherNode == null)
 				return;
 
-			foreach (PathNodeBase node in GetPathToRoot())
+			foreach (PathNodeBase node in GetPath())
 			{
 				node.CumulativePathLength += otherNode.CumulativePathLength;
 				node.CumulativePathWeight += otherNode.CumulativePathWeight;
@@ -130,10 +132,10 @@ namespace CommonTools { namespace Algorithms { namespace Search {
 				if (node.IsRoot)
 				{
 					node.Parent = otherNode;
-					break; // break or else GetPathToRoot will continue returning nodes in the joined path
+					break; // break or else GetPath will continue returning nodes in the joined path
 				}
 			}
 		}
 	}
 
-}}}
+}

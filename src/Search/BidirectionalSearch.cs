@@ -1,21 +1,13 @@
-﻿/*
- * BidirectionalSearch.cs
- * 
- * Nathan Duke
- * 8/8/2016
- * 
- * Contains the BidirectionalSearch class.
- * 
- * BidirectionalSearch performs a breadth-first search starting from two
- * distinct nodes simultaneously. This is guaranteed to find the shortest
- * path between the two nodes.
- */
-
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 
-namespace CommonTools { namespace Algorithms { namespace Search {
+namespace Tools.Algorithms.Search {
 
+	/*
+	 * Bidirectional search is a breadth-first search starting from two
+	 * distinct nodes simultaneously. It is guaranteed to find the shortest
+	 * path between the two nodes, if one exists.
+	 */
 	public class BidirectionalSearch<T> where T : PathNodeBase
 	{
 		private ChildGenerator<T> GetForwardChildren;
@@ -133,4 +125,4 @@ namespace CommonTools { namespace Algorithms { namespace Search {
 		}
 	}
 
-}}}
+}

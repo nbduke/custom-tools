@@ -1,34 +1,31 @@
-﻿/*
- * BinaryHeap.cs
- * 
- * Nathan Duke
- * 1/31/15
- * 
- * Contains the BinaryHeap<T> class and the HeapOrder enum.
- */
-
-using System;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace CommonTools { namespace DataStructures {
+namespace Tools.DataStructures {
 
-	// Specifies the partial ordering of elements in a heap. This
-	// determines the element at the top of the heap.
+	/*
+	 * Specifies the partial ordering of elements in a heap. This
+	 * determines the element at the top of the heap.
+	 */
 	public enum HeapOrder
 	{
 		MinFirst,
 		MaxFirst
 	}
 
-	// A heap in which each node has at most two children. The heap is implemented as
-	// an array with the Top at index 0. The heap order is configurable at construction.
+	/*
+	 * A priority-based heap in which each node has at most two children. The heap is
+	 * implemented as an array with the Top at index 0. The heap order is configurable
+	 * at construction.
+	 */
 	public class BinaryHeap<T> : IEnumerable<T>
 	{
 #region Support classes
 
-		// A tuple consisting of an element in the heap and its real-valued priority.
+		/*
+		 * A tuple consisting of an element in the heap and its real-valued priority.
+		 */
 		public class Handle
 		{
 			public T Value { get; set; }
@@ -41,32 +38,33 @@ namespace CommonTools { namespace DataStructures {
 			}
 		}
 
-#endregion
+		#endregion
 
-
-		public int Count { get { return Data.Count; } }
-		public HeapOrder DataOrder { get; private set; }
+		public readonly HeapOrder Order;
+		public int Count
+		{
+			get { return Data.Count; }
+		}
 		public Handle Top
 		{
 			get { return Data[0]; }
 		}
 
-		private List<Handle> Data { get; set; }
+		private readonly List<Handle> Data;
 
-
-		static public BinaryHeap<T> CreateMinFirstHeap()
+		public static BinaryHeap<T> CreateMinFirstHeap()
 		{
 			return new BinaryHeap<T>(HeapOrder.MinFirst);
 		}
 
-		static public BinaryHeap<T> CreateMaxFirstHeap()
+		public static BinaryHeap<T> CreateMaxFirstHeap()
 		{
 			return new BinaryHeap<T>(HeapOrder.MaxFirst);
 		}
 
-		private BinaryHeap(HeapOrder dataOrder)
+		private BinaryHeap(HeapOrder order)
 		{
-			DataOrder = dataOrder;
+			Order = order;
 			Data = new List<Handle>();
 		}
 
@@ -92,24 +90,13 @@ namespace CommonTools { namespace DataStructures {
 			Data.Clear();
 		}
 
-		public bool Contains(T item)
-		{
-			foreach (Handle datum in Data)
-			{
-				if (datum.Value.Equals(item))
-					return true;
-			}
-
-			return false;
-		}
-
 		public bool TryGetPriority(T item, ref double priority)
 		{
-			foreach (Handle datum in Data)
+			foreach (Handle handle in Data)
 			{
-				if (datum.Value.Equals(item))
+				if (handle.Value.Equals(item))
 				{
-					priority = datum.Priority;
+					priority = handle.Priority;
 					return true;
 				}
 			}
@@ -129,8 +116,10 @@ namespace CommonTools { namespace DataStructures {
 			return this.GetEnumerator();
 		}
 
-		// Enforces the heap property starting from the given node and
-		// propagating toward the root.
+		/*
+		 * Enforces the heap property starting from the given node and
+		 * propagating toward the root.
+		 */
 		private void HeapifyBottomUp(int nodeIndex)
 		{
 			if (nodeIndex <= 0)
@@ -144,8 +133,10 @@ namespace CommonTools { namespace DataStructures {
 			}
 		}
 
-		// Enforces the heap property starting from the given node and
-		// propagating toward the leaves.
+		/*
+		 * Enforces the heap property starting from the given node and
+		 * propagating toward the leaves.
+		 */
 		private void HeapifyTopDown(int nodeIndex)
 		{
 			int leftChildIndex = nodeIndex * 2 + 1;
@@ -167,18 +158,19 @@ namespace CommonTools { namespace DataStructures {
 			}
 		}
 
-		// Uses DataOrder to determine if the node at index p comes at or before the node
-		// at index r according to this heap's partial ordering.
+		/*
+		 * Determines if the node at index p comes at or before the node at index q,
+		 * according to the heap's partial ordering.
+		 */
 		private bool InOrder(int p, int q)
 		{
 			double firstPriority = Data[p].Priority;
 			double secondPriority = Data[q].Priority;
 
-			return (DataOrder == HeapOrder.MinFirst && firstPriority <= secondPriority) ||
-				   (DataOrder == HeapOrder.MaxFirst && firstPriority >= secondPriority);
+			return (Order == HeapOrder.MinFirst && firstPriority <= secondPriority) ||
+				   (Order == HeapOrder.MaxFirst && firstPriority >= secondPriority);
 		}
 
-		// Swaps two nodes in the heap.
 		private void Swap(int p, int q)
 		{
 			var temp = Data[p];
@@ -189,4 +181,4 @@ namespace CommonTools { namespace DataStructures {
 #endregion
 	}
 
-}}
+}

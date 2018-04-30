@@ -1,17 +1,10 @@
-﻿/*
- * BreadthFirstSearch.cs
- * 
- * Nathan Duke
- * 8/8/2016
- * 
- * Contains the BreadthFirstSearch class. This class performs a
- * standard breadth-first search of a state space.
- */
+﻿using System.Collections.Generic;
 
-using System.Collections.Generic;
+namespace Tools.Algorithms.Search {
 
-namespace CommonTools { namespace Algorithms { namespace Search {
-
+	/*
+	 * Implements a breadth-first search of a graph.
+	 */
 	public class BreadthFirstSearch<T> where T : PathNodeBase
 	{
 		private GoalTest<T> IsGoal;
@@ -62,4 +55,4 @@ namespace CommonTools { namespace Algorithms { namespace Search {
 		}
 	}
 
-}}}
+}

@@ -1,9 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using CommonTools.Algorithms.Search;
 
-namespace CommonTools.Tests
+using Tools.Algorithms.Search;
+
+namespace Test
 {
 	[TestClass]
 	public class SearchComponentTests
@@ -25,7 +26,7 @@ namespace CommonTools.Tests
 				return;
 			}
 
-			var actualPath = goal.GetPathToRoot().Select((node) => ((SmallMapNode)node).City);
+			var actualPath = goal.GetPath().Select((node) => ((SmallMapNode)node).City);
 
 			// Assert
 			Assert.IsTrue(expectedPath.SequenceEqual(actualPath), "The expected and actual sequences should match.");
@@ -51,7 +52,7 @@ namespace CommonTools.Tests
 				return;
 			}
 
-			var actualPath = searchGoal.GetPathToRoot().Select((node) => ((SmallMapNode)node).City);
+			var actualPath = searchGoal.GetPath().Select((node) => ((SmallMapNode)node).City);
 
 			// Assert
 			Assert.IsTrue(expectedPath.SequenceEqual(actualPath), "The expected and actual sequences should match.");

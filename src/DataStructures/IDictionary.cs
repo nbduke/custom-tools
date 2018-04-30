@@ -1,45 +1,31 @@
-﻿/*
- * IDictionary.cs
- * 
- * Nathan Duke
- * 1/31/15
- * 
- * Contains the IDictionary<T> interface.
- */
+﻿namespace Tools.DataStructures {
 
-namespace CommonTools { namespace DataStructures {
-
-	/// <summary>
-	/// An interface that dictionaries should implement.
-	/// </summary>
-	/// <typeparam name="T"></typeparam>
+	/*
+	 * An interface for a generic dictionary.
+	 */
 	public interface IDictionary<T>
 	{
-		/// <summary>
-		/// The number of entries in the dictionary.
-		/// </summary>
+		/*
+		 * The number of entries in the dictionary.
+		 */
 		int Count { get; }
 
-		/// <summary>
-		/// Inserts the entry into the dictionary.
-		/// </summary>
-		/// <param name="entry"></param>
-		/// <returns>True iff the insertion was successful</returns>
+		/*
+		 * Inserts the entry into the dictionary. Returns true if the
+		 * insertion succeeded.
+		 */
 		bool Insert(T entry);
 
-		/// <summary>
-		/// Deletes all occurrences of the entry from the dictionary.
-		/// </summary>
-		/// <param name="entry"></param>
-		/// <returns>The number of entries or occurrences deleted</returns>
+		/*
+		 * Deletes all occurrences of the entry from the dictionary and
+		 * returns the number of items deleted.
+		 */
 		int Delete(T entry);
 
-		/// <summary>
-		/// Returns true iff entry is in the dictionary.
-		/// </summary>
-		/// <param name="entry"></param>
-		/// <returns></returns>
+		/*
+		 * Returns true if the item is in the dictionary.
+		 */
 		bool Contains(T entry);
 	}
 
-}}
+}

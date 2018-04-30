@@ -1,27 +1,24 @@
-﻿/*
- * IndexEnumerator.cs
- * 
- * Nathan Duke
- * 8/8/2016
- * 
- * Contains the IndexEnumerator class: an IEnumerator over indices
- * of elements in an Arrangement.
- */
-
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 
-namespace CommonTools { namespace Algorithms {
+namespace Tools.Algorithms {
 
+	/*
+	 * An IndexEnumerator is an IEnumerator over indices of elements in
+	 * an Arrangement.
+	 */
 	class IndexEnumerator : IEnumerator<SourceIndex>
 	{
-		private int MaxIndex { get; set; }
-		private int CurrentIndex { get; set; }
-		private SourceIndex Parent { get; set; }
+		private readonly int MaxIndex;
+		private readonly SourceIndex Parent;
+		private int CurrentIndex;
 
 		public SourceIndex Current { get; private set; }
-		object IEnumerator.Current { get { return Current; } }
+		object IEnumerator.Current
+		{
+			get { return Current; }
+		}
 
 		public IndexEnumerator(int maxSourceIndex, SourceIndex parent)
 		{
@@ -51,4 +48,4 @@ namespace CommonTools { namespace Algorithms {
 		}
 	}
 
-}}
+}

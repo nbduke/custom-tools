@@ -1,21 +1,17 @@
-﻿/*
- * Combinatorics.cs
- * 
- * Nathan Duke
- * 8/8/2016
- * 
- * Contains the Combinatorics static class. This class exposes mathematical
- * functions for performing factorials, combinations, and permutationls.
- */
+﻿using System;
 
-using System;
+namespace Tools.Math {
 
-namespace CommonTools { namespace Math {
-
+	/*
+	 * Combinatorics exposes helper functions for calculating factorials,
+	 * combinations, and permutations.
+	 */
 	public static class Combinatorics
 	{
-		// Computes the number of combinations of n choosing r (i.e. nCr) from
-		// a set without replacement.
+		/*
+		 * Computes the number of combinations of n choosing r (i.e. nCr) from
+		 * a set without replacement.
+		 */
 		public static ulong GetNumberOfCombinations(uint n, uint r)
 		{
 			if (r > n)
@@ -35,8 +31,10 @@ namespace CommonTools { namespace Math {
 			}
 		}
 
-		// Computes the number of permutations of n choosing r (i.e. nPr) from
-		// a set without replacement.
+		/*
+		 * Computes the number of permutations of n choosing r (i.e. nPr) from
+		 * a set without replacement.
+		 */
 		public static ulong GetNumberOfPermutations(uint n, uint r)
 		{
 			if (r > n)
@@ -48,7 +46,9 @@ namespace CommonTools { namespace Math {
 				return FactorialRatio(n, n - r); // n!/(n - r)!
 		}
 
-		// Returns the factorial of x (i.e. x!).
+		/*
+		 * Returns the factorial of x (i.e. x!).
+		 */
 		public static ulong Factorial(uint x)
 		{
 			if (x <= 1)
@@ -63,7 +63,9 @@ namespace CommonTools { namespace Math {
 			return value;
 		}
 
-		// Returns the ratio of the factorial of n to the factorial of r (i.e. n!/r!).
+		/*
+		 * Returns the ratio of the factorial of n to the factorial of r (i.e. n!/r!).
+		 */
 		public static ulong FactorialRatio(uint n, uint r)
 		{
 			if (r > n)
@@ -82,4 +84,4 @@ namespace CommonTools { namespace Math {
 		}
 	}
 
-}}
+}

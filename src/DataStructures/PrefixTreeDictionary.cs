@@ -1,26 +1,20 @@
-﻿/*
- * PrefixTreeDictionary.cs
- * 
- * Nathan Duke
- * 1/31/15
- * 
- * Contains the PrefixTreeDictionary class.
- */
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 
-namespace CommonTools { namespace DataStructures {
+namespace Tools.DataStructures {
 
-	/// <summary>
-	/// PrefixTreeDictionary is a dictionary of strings that groups elements
-	/// by common prefixes. This allows for prefix-based queries. The dictionary
-	/// is represented as a tree whose nodes are characters and whose edges
-	/// represent concatenation. E.g. the string "cat" would be represented by
-	/// the nodes C->A->T. Moreover, the nodes of common prefixes are merged, so
-	/// if "car" is also in the tree, then "cat" and "car" share the nodes C and A
-	/// (A would have child nodes T and R).
-	/// </summary>
+	/*
+	 * PrefixTreeDictionary is a collection of strings that groups elements
+	 * by common prefixes. This allows for prefix-based queries. The dictionary
+	 * is represented as a tree whose nodes are characters and whose edges
+	 * represent concatenation.
+	 * 
+	 * For example, the string "cat" would be represented by the nodes C->A->T.
+	 * 
+	 * Moreover, the nodes of common prefixes are shared. If "car" is also in
+	 * the tree, then "cat" and "car" share the nodes C and A, and A would have
+	 * two child nodes: R and T.
+	 */
 	public class PrefixTreeDictionary : IDictionary<string>
 	{
 		public int Count { get; private set; }
@@ -33,7 +27,6 @@ namespace CommonTools { namespace DataStructures {
 			Clear();
 		}
 
-		// Deletes all words in the dictionary.
 		public void Clear()
 		{
 			Root = new PrefixTreeNode('\0', null); // arbitrary character
@@ -41,8 +34,10 @@ namespace CommonTools { namespace DataStructures {
 			UniqueCount = 0;
 		}
 
-		// Inserts a word into the dictionary. Duplicate entries are accepted and will increase
-		// Count but not UniqueCount.
+		/*
+		 * Inserts a word into the dictionary. Duplicate entries are accepted and
+		 * will increase Count but not UniqueCount.
+		 */
 		public bool Insert(string entry)
 		{
 			if (string.IsNullOrEmpty(entry))
@@ -65,7 +60,6 @@ namespace CommonTools { namespace DataStructures {
 			return true;
 		}
 
-		// Deletes all occurrences of the word in the dictionary.
 		public int Delete(string entry)
 		{
 			if (string.IsNullOrEmpty(entry))
@@ -86,8 +80,10 @@ namespace CommonTools { namespace DataStructures {
 			return wordCount;
 		}
 
-		// Traverses the path from node to Root, deleting all leaf nodes that are not the
-		// end of a word.
+		/*
+		 * Traverses the path from node to Root, deleting all leaf nodes that are not the
+		 * end of a word.
+		 */
 		private void DeleteHelper(PrefixTreeNode node)
 		{
 			PrefixTreeNode currentNode = node;
@@ -99,14 +95,15 @@ namespace CommonTools { namespace DataStructures {
 			}
 		}
 
-		// Returns true if the entry is in the dictionary.
 		public bool Contains(string entry)
 		{
 			return Lookup(entry) != null;
 		}
 
-		// Returns the tree node that terminates the given word. If the word is not in
-		// the dictionary, null is returned.
+		/*
+		 * Returns the tree node that terminates the given word or null if the word
+		 * is not in the dictionary.
+		 */
 		public PrefixTreeNode Lookup(string entry)
 		{
 			if (string.IsNullOrEmpty(entry))
@@ -119,15 +116,19 @@ namespace CommonTools { namespace DataStructures {
 				return matchingNode;
 		}
 
-		// Performs a prefix lookup starting at the root. Whereas Lookup only returns
-		// a node that terminates an entry in the dictionary, PartialLookup returns a
-		// node as long as the given prefix exists in the dictionary.
+		/*
+		 * Performs a prefix lookup starting at the root. Whereas Lookup only returns
+		 * a node that terminates an entry in the dictionary, PartialLookup returns a
+		 * node as long as the given prefix exists in the dictionary.
+		 */
 		public PrefixTreeNode PartialLookup(string prefix)
 		{
 			return PartialLookup(prefix, Root);
 		}
 
-		// Performs a prefix lookup using startNode as the root.
+		/*
+		 * Performs a prefix lookup using startNode as the root.
+		 */
 		public PrefixTreeNode PartialLookup(string prefix, PrefixTreeNode startNode)
 		{
 			if (prefix == null)
@@ -148,7 +149,9 @@ namespace CommonTools { namespace DataStructures {
 			return currentNode;
 		}
 
-		// Returns a list of entries in the dictionary that begin with the given prefix.
+		/*
+		 * Returns a list of entries in the dictionary that begin with the given prefix.
+		 */
 		public List<string> GetWordsWithPrefix(string prefix)
 		{
 			List<string> result = new List<string>();
@@ -163,13 +166,17 @@ namespace CommonTools { namespace DataStructures {
 			return result;
 		}
 
-		// Applies the given visitor to all nodes in the tree.
+		/*
+		 * Applies the given visitor to all nodes in the tree.
+		 */
 		public void VisitAllNodes(IVisitor<PrefixTreeNode> visitor)
 		{
 			VisitNodesInSubtree(visitor, Root);
 		}
 
-		// Applies the given visitor to all nodes in the subtree rooted at the given node.
+		/*
+		 * Applies the given visitor to all nodes in the subtree rooted at the given node.
+		 */
 		public void VisitNodesInSubtree(IVisitor<PrefixTreeNode> visitor, PrefixTreeNode subtreeRoot)
 		{
 			foreach (PrefixTreeNode startNode in subtreeRoot.GetChildren())
@@ -179,4 +186,4 @@ namespace CommonTools { namespace DataStructures {
 		}
 	}
 
-}}
+}

@@ -1,23 +1,17 @@
-﻿/*
- * Arrangement.cs
- * 
- * Nathan Duke
- * 8/8/2016
- * 
- * Contains the Arrangement class. Arrangement wraps a collection of
- * items and provides methods for computing combinations and
- * permutations on them.
- */
-
-using CommonTools.Algorithms.Search;
-using System;
+﻿using System;
 using System.Collections.Generic;
 
-namespace CommonTools { namespace Algorithms {
+using Tools.Algorithms.Search;
 
+namespace Tools.Algorithms {
+
+	/*
+	 * Arrangement wraps a collection of items and provides methods
+	 * for computing combinations and permutations on them.
+	 */
 	public class Arrangement<T>
 	{
-		private List<T> Items;
+		private readonly List<T> Items;
 
 		public Arrangement(IEnumerable<T> items)
 		{
@@ -29,10 +23,7 @@ namespace CommonTools { namespace Algorithms {
 
 		public int Count
 		{
-			get
-			{
-				return Items.Count;
-			}
+			get { return Items.Count; }
 		}
 
 		public IEnumerable<Tuple<T, T>> GetPairs()
@@ -107,8 +98,10 @@ namespace CommonTools { namespace Algorithms {
 			CoreAlgorithm(minimumSize, maximumSize, action, true /*doPermutations*/);
 		}
 
-		// Uses the Search.FlexibleBacktrackingSearch algorithm to construct combinations or permutations of
-		// a collection. Each combination/permutation is passed to action for processing.
+		/*
+		 * Uses the FlexibleBacktrackingSearch algorithm to construct combinations or permutations
+		 * of a collection. Each combination/permutation is passed to action for processing.
+		 */
 		private void CoreAlgorithm(
 			uint minimumSize,
 			uint maximumSize,
@@ -151,4 +144,4 @@ namespace CommonTools { namespace Algorithms {
 		}
 	}
 
-}}
+}

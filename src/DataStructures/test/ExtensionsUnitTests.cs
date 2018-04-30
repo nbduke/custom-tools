@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-using CommonTools.DataStructures;
+using Tools.DataStructures;
 
-namespace CommonTools.Tests
+namespace Test
 {
 	[TestClass]
 	public class ExtensionsUnitTests
