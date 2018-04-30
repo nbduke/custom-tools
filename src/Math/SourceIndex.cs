@@ -11,19 +11,25 @@ namespace Tools.Algorithms {
 	 * is used to keep track of items that have been placed into a combination
 	 * or permutation.
 	 */
-	class SourceIndex : PathNodeBase
+	class SourceIndex<T> : PathNode
 	{
 		public int Index { get; private set; }
 		public bool IsIndexOfPermutation { get; private set; }
 
-		public SourceIndex(int index, bool isPermutation)
+		private readonly IList<T> Source;
+
+		public SourceIndex(int index, bool isPermutation, IList<T> source)
 			: base(null)
 		{
+			if (source == null)
+				throw new ArgumentNullException("collection");
+
 			Index = index;
 			IsIndexOfPermutation = isPermutation;
+			Source = source;
 		}
 
-		public SourceIndex(int index, SourceIndex parent)
+		public SourceIndex(int index, SourceIndex<T> parent)
 			: base(parent)
 		{
 			if (parent == null)
@@ -31,11 +37,22 @@ namespace Tools.Algorithms {
 
 			Index = index;
 			IsIndexOfPermutation = parent.IsIndexOfPermutation;
+			Source = parent.Source;
+		}
+
+		public override IEnumerable<PathNode> GetChildren()
+		{
+			int startOfChildIndices = IsIndexOfPermutation ? 0 : Index + 1;
+			for (int i = startOfChildIndices; i < Source.Count; ++i)
+			{
+				if (i != Index)
+					yield return new SourceIndex<T>(i, this);
+			}
 		}
 
 		public override bool Equals(object node)
 		{
-			var nodeAsSourceIndex = node as SourceIndex;
+			var nodeAsSourceIndex = node as SourceIndex<T>;
 			return nodeAsSourceIndex != null && Index == nodeAsSourceIndex.Index;
 		}
 
@@ -44,7 +61,7 @@ namespace Tools.Algorithms {
 			return Index.GetHashCode();
 		}
 
-		public override bool PathContains(PathNodeBase node)
+		public override bool PathContains(PathNode node)
 		{
 			if (IsIndexOfPermutation)
 				return base.PathContains(node);
@@ -56,12 +73,12 @@ namespace Tools.Algorithms {
 		 * Reconstructs the list of elements in the original collection whose indices are
 		 * stored in the path which terminates in this SourceIndex.
 		 */
-		public virtual IEnumerable<T> GetOriginals<T>(IList<T> sourceSet)
+		public virtual IEnumerable<T> GetOriginalsFromPath()
 		{
-			foreach (PathNodeBase node in GetPath().Reverse())
+			foreach (PathNode node in GetPath().Reverse())
 			{
-				int indexIntoSource = ((SourceIndex)node).Index;
-				yield return sourceSet[indexIntoSource];
+				int indexIntoSource = ((SourceIndex<T>)node).Index;
+				yield return Source[indexIntoSource];
 			}
 		}
 	}

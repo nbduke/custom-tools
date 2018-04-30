@@ -5,17 +5,13 @@ namespace Tools.Algorithms.Search {
 	/*
 	 * Implements a depth-first search of a graph.
 	 */
-	public class DepthFirstSearch<T> where T : PathNodeBase
+	public class DepthFirstSearch<T> where T : PathNode
 	{
 		private GoalTest<T> IsGoal;
-		private ChildGenerator<T> GetChildren;
 
-		public DepthFirstSearch(
-			GoalTest<T> isGoal,
-			ChildGenerator<T> getChildren)
+		public DepthFirstSearch(GoalTest<T> isGoal)
 		{
 			IsGoal = isGoal;
-			GetChildren = getChildren;
 		}
 
 		public T Search(T start)
@@ -38,7 +34,7 @@ namespace Tools.Algorithms.Search {
 			{
 				T currentNode = frontier.Pop();
 				explored.Add(currentNode);
-				foreach (T child in GetChildren(currentNode))
+				foreach (T child in currentNode.GetChildren())
 				{
 					if (!explored.Contains(child) && !frontier.Contains(child))
 					{

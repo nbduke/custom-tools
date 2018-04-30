@@ -6,20 +6,16 @@ namespace Tools.Algorithms.Search {
 	/*
 	 * Least-weight path search (a.k.a. uniform cost search) explores nodes
 	 * in order by ascending cumulative path weight. It can find the optimal
-	 * (i.e. least-total-weight) path between two nodes in a directed graph
-	 * with no negative cycles.
+	 * (i.e. least-total-weight) path between two nodes in a graph with no
+	 * negative cycles.
 	 */
-	public class LeastWeightPathSearch<T> where T : PathNodeBase
+	public class LeastWeightPathSearch<T> where T : PathNode
 	{
 		private GoalTest<T> IsGoal;
-		private ChildGenerator<T> GetChildren;
 
-		public LeastWeightPathSearch(
-			GoalTest<T> isGoal,
-			ChildGenerator<T> getChildren)
+		public LeastWeightPathSearch(GoalTest<T> isGoal)
 		{
 			IsGoal = isGoal;
-			GetChildren = getChildren;
 		}
 
 		public T Search(T start)
@@ -47,7 +43,7 @@ namespace Tools.Algorithms.Search {
 					continue;
 
 				explored.Add(currentNode);
-				foreach (T child in GetChildren(currentNode))
+				foreach (T child in currentNode.GetChildren())
 				{
 					if (!explored.Contains(child))
 					{

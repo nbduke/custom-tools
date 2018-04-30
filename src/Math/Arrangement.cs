@@ -114,31 +114,25 @@ namespace Tools.Algorithms {
 				throw new ArgumentException("The minimum size cannot exceed the maximum size.");
 
 			// Create functors used by FlexibleBacktrackingSearch
-			GoalTest<SourceIndex> isValidCombination =
+			GoalTest<SourceIndex<T>> isValidCombination =
 				(node) =>
 				{
 					return node.CumulativePathLength >= minimumSize;
 				};
 
-			ChildEnumerator<SourceIndex> getNextIndices =
+			GoalAction<SourceIndex<T>> processCombination =
 				(node) =>
 				{
-					return new IndexEnumerator(Items.Count - 1, node);
-				};
-
-			GoalAction<SourceIndex> processCombination =
-				(node) =>
-				{
-					action(node.GetOriginals(Items));
+					action(node.GetOriginalsFromPath());
 					return GoalOption.Continue;
 				};
 
-			var fbs = new FlexibleBacktrackingSearch<SourceIndex>(isValidCombination, getNextIndices, processCombination);
+			var fbs = new FlexibleBacktrackingSearch<SourceIndex<T>>(isValidCombination, processCombination);
 
 			// Run FlexibleBacktrackingSearch starting from every position in Items
 			for (int i = 0; i < Items.Count; ++i)
 			{
-				SourceIndex startOfCombination = new SourceIndex(i, doPermutations);
+				var startOfCombination = new SourceIndex<T>(i, doPermutations, Items);
 				fbs.Search(startOfCombination, maximumSize);
 			}
 		}

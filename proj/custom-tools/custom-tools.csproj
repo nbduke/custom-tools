@@ -53,7 +53,6 @@
     <Compile Include="..\..\src\DataStructures\PrefixTreeNode.cs" />
     <Compile Include="..\..\src\Math\Arrangement.cs" />
     <Compile Include="..\..\src\Math\Combinatorics.cs" />
-    <Compile Include="..\..\src\Math\IndexEnumerator.cs" />
     <Compile Include="..\..\src\Math\RandomProvider.cs" />
     <Compile Include="..\..\src\Math\SourceIndex.cs" />
     <Compile Include="..\..\src\Search\BacktrackingSearch.cs" />
@@ -62,7 +61,7 @@
     <Compile Include="..\..\src\Search\DepthFirstSearch.cs" />
     <Compile Include="..\..\src\Search\FlexibleBacktrackingSearch.cs" />
     <Compile Include="..\..\src\Search\LeastWeightPathSearch.cs" />
-    <Compile Include="..\..\src\Search\PathNodeBase.cs" />
+    <Compile Include="..\..\src\Search\PathNode.cs" />
     <Compile Include="..\..\src\Search\SearchBehaviors.cs" />
   </ItemGroup>
   <ItemGroup>
