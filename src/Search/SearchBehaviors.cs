@@ -1,11 +1,13 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace Tools.Algorithms.Search {
 
 	/*
-	 * GoalOption specifies a default set of behaviors at a goal node.
+	 * NodeOption specifies behaviors at each node for a backtracking search
+	 * algorithm.
 	 */
-	public enum GoalOption
+	public enum NodeOption
 	{
 		Stop,
 		Continue,
@@ -15,8 +17,12 @@ namespace Tools.Algorithms.Search {
 	/*
 	 * A set of delegates that define injectable behaviors for search algorithms.
 	 */
-	public delegate bool GoalTest<T>(T node);
-	public delegate GoalOption GoalAction<T>(T node);
-	public delegate void CustomPathMergeFunction<T>(T leafNodeFromStart, T leafNodeFromGoal);
+	public delegate IEnumerable<T> ChildGenerator<T>(T state);
+	public delegate IEnumerable<Tuple<T, double>> WeightedChildGenerator<T>(T state);
+	public delegate bool NodePredicate<T>(PathNode<T> node);
+	public delegate NodeOption NodeAction<T>(PathNode<T> node);
+	public delegate void CustomPathMergeFunction<T>(
+		PathNode<T> leafNodeFromStart,
+		PathNode<T> leafNodeFromEnd);
 
 }

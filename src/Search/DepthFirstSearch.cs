@@ -1,47 +1,54 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace Tools.Algorithms.Search {
 
 	/*
 	 * Implements a depth-first search of a graph.
 	 */
-	public class DepthFirstSearch<T> where T : PathNode
+	public class DepthFirstSearch<T>
 	{
-		private GoalTest<T> IsGoal;
+		private readonly ChildGenerator<T> GetChildren;
 
-		public DepthFirstSearch(GoalTest<T> isGoal)
+		public DepthFirstSearch(ChildGenerator<T> getChildren)
 		{
-			IsGoal = isGoal;
+			if (getChildren == null)
+				throw new ArgumentNullException("getChildren");
+
+			GetChildren = getChildren;
 		}
 
-		public T Search(T start)
+		public PathNode<T> FindNode(
+			T start,
+			NodePredicate<T> nodePredicate,
+			uint maxSearchDistance = uint.MaxValue)
 		{
-			return Search(start, uint.MaxValue);
-		}
-
-		public T Search(T start, uint maxSearchDistance)
-		{
-			if (start == null || IsGoal(start))
-				return start;
+			if (nodePredicate == null)
+				throw new ArgumentNullException("nodePredicate");
 			else if (maxSearchDistance == 0)
 				return null;
 
-			Stack<T> frontier = new Stack<T>();
-			HashSet<T> explored = new HashSet<T>();
-			frontier.Push(start);
+			var startNode = new PathNode<T>(start);
+			if (nodePredicate(startNode))
+				return startNode;
+
+			var frontier = new Stack<PathNode<T>>();
+			var explored = new HashSet<PathNode<T>>();
+			frontier.Push(startNode);
 
 			while (frontier.Count > 0)
 			{
-				T currentNode = frontier.Pop();
+				PathNode<T> currentNode = frontier.Pop();
 				explored.Add(currentNode);
-				foreach (T child in currentNode.GetChildren())
+				foreach (T child in GetChildren(currentNode.State))
 				{
-					if (!explored.Contains(child) && !frontier.Contains(child))
+					var childNode = new PathNode<T>(child, currentNode);
+					if (!explored.Contains(childNode) && !frontier.Contains(childNode))
 					{
-						if (IsGoal(child))
-							return child;
-						else if (child.CumulativePathLength < maxSearchDistance)
-							frontier.Push(child);
+						if (nodePredicate(childNode))
+							return childNode;
+						else if (childNode.CumulativePathLength < maxSearchDistance)
+							frontier.Push(childNode);
 					}
 				}
 			}

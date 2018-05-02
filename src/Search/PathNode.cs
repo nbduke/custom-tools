@@ -1,32 +1,36 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Tools.Algorithms.Search {
 
 	/*
-	 * PathNode represents a single node in an arbitrary path of a graph.
-	 * The path is maintained by links from each node to its parent node (the
-	 * preceeding node on the path). The class also keeps track of the
+	 * PathNode encapsulates a single node in a path of a graph whose nodes
+	 * are represented by the template type T. The path is maintained by
+	 * links from each node to its parent node (the preceding node on the
+	 * path). PathNode also keeps track of information such as the
 	 * cumulative path length and weight.
 	 */
-	public abstract class PathNode
+	public class PathNode<T>
 	{
-		public PathNode Parent { get; private set; }
+		public readonly T State;
+		public PathNode<T> Parent { get; private set; }
 		public uint CumulativePathLength { get; private set; }
 		public double CumulativePathWeight { get; private set; }
 
 		/*
 		 * Constructs a root node (the first node in a path).
 		 */
-		public PathNode()
-			: this(null)
+		public PathNode(T state)
+			: this(state, null)
 		{
 		}
 
 		/*
 		 * Constructs a node with zero weight on the incoming edge.
 		 */
-		public PathNode(PathNode parent)
-			: this(parent, 0)
+		public PathNode(T state, PathNode<T> parent)
+			: this(state, parent, 0)
 		{
 		}
 
@@ -34,8 +38,12 @@ namespace Tools.Algorithms.Search {
 		 * Constructs a node with the given parent and the given weight on
 		 * its incoming edge.
 		 */
-		public PathNode(PathNode parent, double weight)
+		public PathNode(T state, PathNode<T> parent, double weight)
 		{
+			if (state == null)
+				throw new ArgumentNullException("state");
+
+			State = state;
 			Parent = parent;
 
 			if (IsRoot)
@@ -50,33 +58,28 @@ namespace Tools.Algorithms.Search {
 			}
 		}
 
-		/*
-		 * Returns all nodes that are reachable from this node, all of which
-		 * must point to this node as their parent.
-		 * 
-		 * NOTE: For best performance, it's a good idea to generate children
-		 * one at a time rather than all at once, for example by using a yield
-		 * statement.
-		 */
-		public abstract IEnumerable<PathNode> GetChildren();
-
 		public bool IsRoot
 		{
 			get { return Parent == null; }
 		}
 
-		public PathNode GetRoot()
+		public PathNode<T> GetRoot()
 		{
-			PathNode currentNode = this;
+			PathNode<T> currentNode = this;
 			while (!currentNode.IsRoot)
 				currentNode = currentNode.Parent;
 
 			return currentNode;
 		}
 
-		public IEnumerable<PathNode> GetPath()
+		public IEnumerable<T> GetPath()
 		{
-			PathNode currentNode = this;
+			return GetPathToRoot().Select(node => node.State).Reverse();
+		}
+
+		private IEnumerable<PathNode<T>> GetPathToRoot()
+		{
+			PathNode<T> currentNode = this;
 			while (currentNode != null)
 			{
 				yield return currentNode;
@@ -84,15 +87,26 @@ namespace Tools.Algorithms.Search {
 			}
 		}
 
-		public virtual bool PathContains(PathNode node)
+		public bool PathContains(T state)
 		{
-			foreach (var other in GetPath())
+			foreach (var otherState in GetPath())
 			{
-				if (node.Equals(other))
+				if (otherState.Equals(state))
 					return true;
 			}
 
 			return false;
+		}
+
+		public override bool Equals(object obj)
+		{
+			PathNode<T> other = obj as PathNode<T>;
+			return other != null && State.Equals(other.State);
+		}
+
+		public override int GetHashCode()
+		{
+			return State.GetHashCode();
 		}
 
 		/*
@@ -100,10 +114,10 @@ namespace Tools.Algorithms.Search {
 		 * weights between nodes are preserved. If the original root has nonzero weight,
 		 * then its weight is transferred to the new root after inversion.
 		 */
-		public virtual void InvertPath()
+		public void InvertPath()
 		{
-			List<PathNode> path = new List<PathNode>(GetPath());
-			List<double> edgeWeights = new List<double>();
+			var path = new List<PathNode<T>>(GetPathToRoot());
+			var edgeWeights = new List<double>();
 
 			for (int i = 0; i < path.Count - 1; ++i)
 			{
@@ -116,8 +130,8 @@ namespace Tools.Algorithms.Search {
 
 			for (int i = 1; i < path.Count; ++i)
 			{
-				PathNode node = path[i];
-				PathNode parent = path[i - 1];
+				PathNode<T> node = path[i];
+				PathNode<T> parent = path[i - 1];
 
 				node.Parent = parent;
 				node.CumulativePathLength = parent.CumulativePathLength + 1;
@@ -129,12 +143,12 @@ namespace Tools.Algorithms.Search {
 		 * Sets the parent of this node's root to otherNode, adjusting the cumulative path
 		 * lengths and weights of each node on the path accordingly.
 		 */
-		public virtual void JoinPath(PathNode otherNode)
+		public void JoinPath(PathNode<T> otherNode)
 		{
 			if (otherNode == null)
 				return;
 
-			foreach (PathNode node in GetPath())
+			foreach (PathNode<T> node in GetPathToRoot())
 			{
 				node.CumulativePathLength += otherNode.CumulativePathLength;
 				node.CumulativePathWeight += otherNode.CumulativePathWeight;

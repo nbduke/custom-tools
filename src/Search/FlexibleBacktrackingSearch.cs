@@ -4,84 +4,92 @@ namespace Tools.Algorithms.Search {
 
 	/*
 	 * Like BacktrackingSearch, FlexibleBacktrackingSearch is a memory-optimized
-	 * depth-first search. FlexibleBacktrackingSearch provides the added ability
-	 * to customize how the algorithm behaves when a goal node is found.
+	 * depth-first search. Rather than terminating when a particular node is found,
+	 * however, FlexibleBacktrackingSearch enables searching over arbitrary regions
+	 * of the graph, applying a customizable action at each node.
 	 * 
-	 * The GoalAction given to the constructor allows the following behaviors when
-	 * a goal is found:
+	 * The NodeAction given to the Search method allows one of the following behaviors at
+	 * each node:
 	 *		Stop:					the algorithm terminates (identical to BacktrackingSearch)
-	 *		Continue:				the algorithm extends the current search path through the goal
-	 *		BacktrackAndContinue:	the algorithm backtracks to the goal's parent and continues with its next child
+	 *		Continue:				the algorithm extends the search path through the current node
+	 *		BacktrackAndContinue:	the algorithm backtracks to the node's parent and continues with its next child
 	 */
-	public class FlexibleBacktrackingSearch<T> where T : PathNode
+	public class FlexibleBacktrackingSearch<T>
 	{
-		GoalTest<T> IsGoal;
-		GoalAction<T> ProcessGoal;
+		private readonly ChildGenerator<T> GetChildren;
+		private readonly bool AssumeChildrenNotInPath;
+		private NodeAction<T> ProcessNode;
+		private uint MaxSearchDistance;
 
+		/// <summary>
+		/// Creates a FlexibleBacktrackingSearch.
+		/// </summary>
+		/// <param name="getChildren">generates child states</param>
+		/// <param name="assumeChildrenNotInPath">if true, the algorithm will not check
+		/// whether each child is already in the current path. BEWARE: This is a performance
+		/// optimization for special cases. The algorithm is always correct when this is set
+		/// to false.</param>
 		public FlexibleBacktrackingSearch(
-			GoalTest<T> isGoal,
-			GoalAction<T> processGoal)
+			ChildGenerator<T> getChildren,
+			bool assumeChildrenNotInPath = true)
 		{
-			IsGoal = isGoal;
-			ProcessGoal = processGoal;
+			if (getChildren == null)
+				throw new ArgumentNullException("getChildren");
+
+			GetChildren = getChildren;
+			AssumeChildrenNotInPath = assumeChildrenNotInPath;
 		}
 
-		public void Search(T start)
+		public void Search(
+			T start,
+			NodeAction<T> processNode,
+			uint maxSearchDistance = uint.MaxValue)
 		{
-			Search(start, uint.MaxValue);
-		}
-
-		public void Search(T start, uint maxSearchDistance)
-		{
-			if (start == null || maxSearchDistance == 0)
+			if (processNode == null)
+				throw new ArgumentNullException("processNode");
+			else if (maxSearchDistance == 0)
 				return;
 
-			if (IsGoal(start))
+			var startNode = new PathNode<T>(start);
+			switch (processNode(startNode))
 			{
-				GoalOption option = ProcessGoal(start);
-
-				switch (option)
-				{
-					case GoalOption.Stop:
-						return;
-					case GoalOption.Continue:
-						break;
-					case GoalOption.BacktrackThenContinue:
-						return;
-					default:
-						throw new ArgumentException("Unrecognized GoalOption");
-				}
+				case NodeOption.Stop:
+					return;
+				case NodeOption.Continue:
+					break;
+				case NodeOption.BacktrackThenContinue:
+					return; // there is nothing to backtrack to
+				default:
+					throw new ArgumentException("Unknown NodeOption");
 			}
 
-			SearchHelper(start, maxSearchDistance);
+			ProcessNode = processNode;
+			MaxSearchDistance = maxSearchDistance;
+			SearchHelper(startNode);
 		}
 
-		private bool SearchHelper(T currentNode, uint maxSearchDistance)
+		private bool SearchHelper(PathNode<T> currentNode)
 		{
-			foreach (T child in currentNode.GetChildren())
+			foreach (T child in GetChildren(currentNode.State))
 			{
-				if (!currentNode.PathContains(child))
+				var childNode = new PathNode<T>(child, currentNode);
+				if (AssumeChildrenNotInPath || !currentNode.PathContains(child))
 				{
-					if (IsGoal(child))
+					switch (ProcessNode(childNode))
 					{
-						GoalOption option = ProcessGoal(child);
-
-						switch (option)
-						{
-							case GoalOption.Stop:
-								return false;
-							case GoalOption.Continue:
-								break;
-							case GoalOption.BacktrackThenContinue:
-								continue;
-							default:
-								throw new ArgumentException("Unrecognized GoalOption");
-						}
+						case NodeOption.Stop:
+							return false;
+						case NodeOption.Continue:
+							break;
+						case NodeOption.BacktrackThenContinue:
+							continue;
+						default:
+							throw new ArgumentException("Unknown NodeOption");
 					}
 
-					if (child.CumulativePathLength < maxSearchDistance)
+					if (childNode.CumulativePathLength < MaxSearchDistance)
 					{
-						if (!SearchHelper(child, maxSearchDistance))
+						if (!SearchHelper(childNode))
 							return false;
 					}
 				}

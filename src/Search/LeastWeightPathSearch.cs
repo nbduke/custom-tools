@@ -1,5 +1,7 @@
-﻿using Tools.DataStructures;
+﻿using System;
 using System.Collections.Generic;
+
+using Tools.DataStructures;
 
 namespace Tools.Algorithms.Search {
 
@@ -9,49 +11,67 @@ namespace Tools.Algorithms.Search {
 	 * (i.e. least-total-weight) path between two nodes in a graph with no
 	 * negative cycles.
 	 */
-	public class LeastWeightPathSearch<T> where T : PathNode
+	public class LeastWeightPathSearch<T>
 	{
-		private GoalTest<T> IsGoal;
+		private readonly WeightedChildGenerator<T> GetChildren;
 
-		public LeastWeightPathSearch(GoalTest<T> isGoal)
+		public LeastWeightPathSearch(WeightedChildGenerator<T> getChildren)
 		{
-			IsGoal = isGoal;
+			if (getChildren == null)
+				throw new ArgumentNullException("getChildren");
+
+			GetChildren = getChildren;
 		}
 
-		public T Search(T start)
+		public IEnumerable<T> FindPath(T start, T end)
 		{
-			return Search(start, uint.MaxValue);
+			if (start == null || end == null)
+				return null;
+
+			PathNode<T> terminalNode = FindNode(start, node => node.Equals(end));
+			if (terminalNode == null)
+				return new T[] { };
+			else
+				return terminalNode.GetPath();
 		}
 
-		public T Search(T start, uint maxSearchDistance)
+		public PathNode<T> FindNode(
+			T start,
+			NodePredicate<T> nodePredicate,
+			uint maxSearchDistance = uint.MaxValue)
 		{
-			if (start == null || IsGoal(start))
-				return start;
+			if (nodePredicate == null)
+				throw new ArgumentNullException("nodePredicate");
 			else if (maxSearchDistance == 0)
 				return null;
 
-			BinaryHeap<T> frontier = BinaryHeap<T>.CreateMinFirstHeap();
-			HashSet<T> explored = new HashSet<T>();
-			frontier.Enqueue(start, start.CumulativePathWeight);
+			var frontier = BinaryHeap<PathNode<T>>.CreateMinFirstHeap();
+			var explored = new HashSet<PathNode<T>>();
+			frontier.Enqueue(new PathNode<T>(start), 0);
 
 			while (frontier.Count > 0)
 			{
-				T currentNode = frontier.Dequeue().Value;
-				if (IsGoal(currentNode))
+				PathNode<T> currentNode = frontier.Dequeue().Value;
+				if (nodePredicate(currentNode))
 					return currentNode;
 				else if (currentNode.CumulativePathLength >= maxSearchDistance)
 					continue;
 
 				explored.Add(currentNode);
-				foreach (T child in currentNode.GetChildren())
+				foreach (var childAndWeight in GetChildren(currentNode.State))
 				{
-					if (!explored.Contains(child))
+					var childNode = new PathNode<T>(
+						childAndWeight.Item1,
+						currentNode,
+						childAndWeight.Item2);
+
+					if (!explored.Contains(childNode))
 					{
 						double priorPathWeight = 0;
-						if (!frontier.TryGetPriority(child, ref priorPathWeight) ||
-							 priorPathWeight > child.CumulativePathWeight)
+						if (!frontier.TryGetPriority(childNode, ref priorPathWeight) ||
+							 priorPathWeight > childNode.CumulativePathWeight)
 						{
-							frontier.Enqueue(child, child.CumulativePathWeight);
+							frontier.Enqueue(childNode, childNode.CumulativePathWeight);
 						}
 					}
 				}
