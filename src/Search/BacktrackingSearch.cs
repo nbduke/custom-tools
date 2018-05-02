@@ -1,4 +1,6 @@
-﻿namespace Tools.Algorithms.Search {
+﻿using System;
+
+namespace Tools.Algorithms.Search {
 
 	/*
 	 * Backtracking search is a memory-optimized depth-first search. Instead of keeping
@@ -6,43 +8,53 @@
 	 * are kept in memory. The memory savings come at the expense of potentially
 	 * exploring redundant sub-paths.
 	 */
-	public class BacktrackingSearch<T> where T : PathNode
+	public class BacktrackingSearch<T>
 	{
-		private GoalTest<T> IsGoal;
+		private readonly ChildGenerator<T> GetChildren;
+		private NodePredicate<T> NodePredicate;
+		private uint MaxSearchDistance;
 
-		public BacktrackingSearch(GoalTest<T> isGoal)
+		public BacktrackingSearch(ChildGenerator<T> getChildren)
 		{
-			IsGoal = isGoal;
+			if (getChildren == null)
+				throw new ArgumentNullException("getChildren");
+
+			GetChildren = getChildren;
 		}
 
-		public T Search(T start)
+		public PathNode<T> FindNode(
+			T start,
+			NodePredicate<T> nodePredicate,
+			uint maxSearchDistance = uint.MaxValue)
 		{
-			return Search(start, uint.MaxValue);
-		}
-
-		public T Search(T start, uint maxSearchDistance)
-		{
-			if (start == null || IsGoal(start))
-				return start;
+			if (nodePredicate == null)
+				throw new ArgumentNullException("nodePredicate");
 			else if (maxSearchDistance == 0)
 				return null;
 
-			return SearchHelper(start, maxSearchDistance);
+			var startNode = new PathNode<T>(start);
+			if (nodePredicate(startNode))
+				return startNode;
+
+			NodePredicate = nodePredicate;
+			MaxSearchDistance = maxSearchDistance;
+			return SearchHelper(new PathNode<T>(start));
 		}
 
-		private T SearchHelper(T currentNode, uint maxSearchDistance)
+		private PathNode<T> SearchHelper(PathNode<T> currentNode)
 		{
-			foreach (T child in currentNode.GetChildren())
+			foreach (T child in GetChildren(currentNode.State))
 			{
+				var childNode = new PathNode<T>(child, currentNode);
 				if (!currentNode.PathContains(child))
 				{
-					if (IsGoal(child))
+					if (NodePredicate(childNode))
 					{
-						return child;
+						return childNode;
 					}
-					else if (child.CumulativePathLength < maxSearchDistance)
+					else if (childNode.CumulativePathLength < MaxSearchDistance)
 					{
-						T returnValue = SearchHelper(child, maxSearchDistance);
+						PathNode<T> returnValue = SearchHelper(childNode);
 						if (returnValue != null)
 							return returnValue;
 					}

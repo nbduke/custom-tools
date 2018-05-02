@@ -1,86 +1,141 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace Tools.Algorithms.Search {
 
 	/*
-	 * Bidirectional search is a breadth-first search starting from two
-	 * distinct nodes simultaneously. It is guaranteed to find the shortest
-	 * path between the two nodes, if one exists.
-	 *
-	 * The algorithm assumes that the second node's GetChildren implementation
-	 * is inverted in that it returns a collection of nodes that could be parents
-	 * of that node. If the graph is undirected, this will happen naturally.
+	 * Bidirectional search is a breadth-first search starting from two nodes
+	 * simultaneously. It is guaranteed to find the shortest path between the two
+	 * nodes, if one exists.
 	 */
-	public class BidirectionalSearch<T> where T : PathNode
+	public class BidirectionalSearch<T>
 	{
+		private readonly ChildGenerator<T> GetForwardChildren;
+		private readonly ChildGenerator<T> GetReverseChildren;
 		private CustomPathMergeFunction<T> MergePaths;
 
-		public BidirectionalSearch()
-			: this(DefaultMergePaths)
+		/// <summary>
+		/// Creates a BidirectionalSearch for an undirected graph.
+		/// </summary>
+		/// <param name="getChildrenUndirected">the ChildGenerator for both search paths</param>
+		public BidirectionalSearch(ChildGenerator<T> getChildrenUndirected)
+			: this(getChildrenUndirected, getChildrenUndirected)
 		{
 		}
 
-		public BidirectionalSearch(CustomPathMergeFunction<T> mergePaths)
+		/// <summary>
+		/// Creates a BidirectionalSearch for a directed graph.
+		/// </summary>
+		/// <param name="getChildren">generates child states</param>
+		/// <param name="getParents">generates parent states
+		/// (the argument should be a child of all returned states)</param>
+		public BidirectionalSearch(
+			ChildGenerator<T> getChildren,
+			ChildGenerator<T> getParents)
+			: this(getChildren, getParents, DefaultMergePaths)
 		{
+		}
+
+		/// <summary>
+		/// Creates a BidirectionalSearch for a directed graph with a custom
+		/// function for merging the two search paths.
+		/// </summary>
+		/// <param name="getChildren">generates child states</param>
+		/// <param name="getParents">generates parent states
+		/// (the argument should be a child of all returned states)</param>
+		/// <param name="mergePaths">combines two search paths into one</param>
+		public BidirectionalSearch(
+			ChildGenerator<T> getChildren,
+			ChildGenerator<T> getParents,
+			CustomPathMergeFunction<T> mergePaths)
+		{
+			if (getChildren == null)
+				throw new ArgumentNullException("getChildren");
+			if (getParents == null)
+				throw new ArgumentNullException("getChildrenInverted");
+			if (mergePaths == null)
+				throw new ArgumentNullException("mergePaths");
+
+			GetForwardChildren = getChildren;
+			GetReverseChildren = getParents;
 			MergePaths = mergePaths;
 		}
 
-		private static void DefaultMergePaths(T leafNodeFromStart, T leafNodeFromGoal)
+		private static void DefaultMergePaths(
+			PathNode<T> leafNodeFromStart,
+			PathNode<T> leafNodeFromEnd)
 		{
-			T goal = (T)leafNodeFromGoal.GetRoot();
-			leafNodeFromGoal.Parent.InvertPath();
+			PathNode<T> goal = leafNodeFromEnd.GetRoot();
+			leafNodeFromEnd.Parent.InvertPath();
 			goal.JoinPath(leafNodeFromStart);
 		}
 
-		public T Search(T start, T goal)
+		public IEnumerable<T> FindPath(T start, T end)
 		{
-			if (start == null || start.Equals(goal))
-				return start;
+			if (start == null || end == null)
+				return new T[] { };
+			else if (start.Equals(end))
+				return new T[] { start };
 
-			Queue<T> forwardFrontier = new Queue<T>();
-			Queue<T> reverseFrontier = new Queue<T>();
-			HashSet<T> explored = new HashSet<T>();
+			PathNode<T> terminalNode = BuildPath(start, end);
+			if (terminalNode == null)
+				return new T[] { };
+			else
+				return terminalNode.GetPath();
+		}
 
-			// Pre-load the frontiers of the start and end goal
-			foreach (T child in start.GetChildren())
+		private PathNode<T> BuildPath(T start, T end)
+		{
+			var startNode = new PathNode<T>(start);
+			var endNode = new PathNode<T>(end);
+
+			var forwardFrontier = new Queue<PathNode<T>>();
+			var reverseFrontier = new Queue<PathNode<T>>();
+			var explored = new HashSet<PathNode<T>>();
+
+			// Pre-load the frontiers of the start and end states
+			foreach (T child in GetForwardChildren(start))
 			{
-				if (child.Equals(goal)) // check here if start and goal are connected
-					return child;
+				var childNode = new PathNode<T>(child, startNode);
+				if (child.Equals(end)) // check here if start and end are connected
+					return childNode;
 				else
-					forwardFrontier.Enqueue(child);
+					forwardFrontier.Enqueue(childNode);
 			}
 
-			foreach (T child in goal.GetChildren())
+			foreach (T child in GetReverseChildren(end))
 			{
-				reverseFrontier.Enqueue(child);
+				reverseFrontier.Enqueue(new PathNode<T>(child, endNode));
 			}
 
-			explored.Add(start);
-			explored.Add(goal);
+			explored.Add(startNode);
+			explored.Add(endNode);
 
 			while (forwardFrontier.Count > 0 && reverseFrontier.Count > 0)
 			{
 				if (CheckForSolution(forwardFrontier, reverseFrontier))
-					return goal;
+					return endNode;
 
-				T forwardNode = forwardFrontier.Dequeue();
+				PathNode<T> forwardNode = forwardFrontier.Dequeue();
 				explored.Add(forwardNode);
-				foreach (T child in forwardNode.GetChildren())
+				foreach (T child in GetForwardChildren(forwardNode.State))
 				{
-					if (!explored.Contains(child) && !forwardFrontier.Contains(child))
-						forwardFrontier.Enqueue(child);
+					var childNode = new PathNode<T>(child, forwardNode);
+					if (!explored.Contains(childNode) && !forwardFrontier.Contains(childNode))
+						forwardFrontier.Enqueue(childNode);
 				}
 
 				if (CheckForSolution(forwardFrontier, reverseFrontier))
-					return goal;
+					return endNode;
 
-				T reverseNode = reverseFrontier.Dequeue();
+				PathNode<T> reverseNode = reverseFrontier.Dequeue();
 				explored.Add(reverseNode);
-				foreach (T child in reverseNode.GetChildren())
+				foreach (T child in GetReverseChildren(reverseNode.State))
 				{
-					if (!explored.Contains(child) && !reverseFrontier.Contains(child))
-						reverseFrontier.Enqueue(child);
+					var childNode = new PathNode<T>(child, reverseNode);
+					if (!explored.Contains(childNode) && !reverseFrontier.Contains(childNode))
+						reverseFrontier.Enqueue(childNode);
 				}
 			}
 
@@ -89,18 +144,18 @@ namespace Tools.Algorithms.Search {
 		}
 
 		private bool CheckForSolution(
-			Queue<T> forwardFrontier,
-			Queue<T> reverseFrontier)
+			Queue<PathNode<T>> forwardFrontier,
+			Queue<PathNode<T>> reverseFrontier)
 		{
-			HashSet<T> forwardSet = new HashSet<T>(forwardFrontier);
+			var forwardSet = new HashSet<PathNode<T>>(forwardFrontier);
 			forwardSet.IntersectWith(reverseFrontier);
 
 			if (forwardSet.Count > 0)
 			{
-				T forwardNode = forwardSet.First();
-				T reverseNode = null;
+				PathNode<T> forwardNode = forwardSet.First();
+				PathNode<T> reverseNode = null;
 
-				foreach (T node in reverseFrontier)
+				foreach (PathNode<T> node in reverseFrontier)
 				{
 					if (node.Equals(forwardNode))
 					{

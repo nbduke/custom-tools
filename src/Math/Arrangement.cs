@@ -98,9 +98,14 @@ namespace Tools.Algorithms {
 			CoreAlgorithm(minimumSize, maximumSize, action, true /*doPermutations*/);
 		}
 
+#region Helper methods
 		/*
-		 * Uses the FlexibleBacktrackingSearch algorithm to construct combinations or permutations
-		 * of a collection. Each combination/permutation is passed to action for processing.
+		 * If we view the items of a collection as nodes in a complete graph, then nPr can be
+		 * expressed as building all possible paths of lengths n through r in the graph. nCr can
+		 * be expressed similarly, but with fewer edges than a complete graph.
+		 * 
+		 * We can therefore use FlexibleBacktrackingSearch to generate and search the graph
+		 * over the indices in Items in order to calculate combinations and permutations.
 		 */
 		private void CoreAlgorithm(
 			uint minimumSize,
@@ -114,28 +119,54 @@ namespace Tools.Algorithms {
 				throw new ArgumentException("The minimum size cannot exceed the maximum size.");
 
 			// Create functors used by FlexibleBacktrackingSearch
-			GoalTest<SourceIndex<T>> isValidCombination =
-				(node) =>
-				{
-					return node.CumulativePathLength >= minimumSize;
-				};
+			ChildGenerator<int> getChildIndices = (currentIndex) =>
+			{
+				return GetChildIndices(currentIndex, doPermutations);
+			};
 
-			GoalAction<SourceIndex<T>> processCombination =
-				(node) =>
+			NodeAction<int> processNode = (node) =>
+			{
+				if (node.CumulativePathLength >= minimumSize)
 				{
-					action(node.GetOriginalsFromPath());
-					return GoalOption.Continue;
-				};
+					// Record the valid combination/permutation
+					action(GetItemsFromIndexPath(node.GetPath()));
+				}
 
-			var fbs = new FlexibleBacktrackingSearch<SourceIndex<T>>(isValidCombination, processCombination);
+				return NodeOption.Continue;
+			};
+
+			// Due to the order of index generation for combinations, we can skip
+			// checking whether each index is already in the path.
+			var fbs = new FlexibleBacktrackingSearch<int>(
+				getChildIndices,
+				!doPermutations /*assumeChildrenNotInPath*/);
 
 			// Run FlexibleBacktrackingSearch starting from every position in Items
 			for (int i = 0; i < Items.Count; ++i)
 			{
-				var startOfCombination = new SourceIndex<T>(i, doPermutations, Items);
-				fbs.Search(startOfCombination, maximumSize);
+				fbs.Search(i, processNode, maximumSize);
+			}
+		}
+
+		private IEnumerable<int> GetChildIndices(int currentIndex, bool doPermutations)
+		{
+			// Every index leads to every other index in a permutation (complete graph),
+			// but in a combination, only indices after the current one are reachable.
+			int nextIndex = doPermutations ? 0 : currentIndex + 1;
+			for (int i = nextIndex; i < Items.Count; ++i)
+			{
+				yield return i;
+			}
+		}
+
+		private IEnumerable<T> GetItemsFromIndexPath(IEnumerable<int> indexPath)
+		{
+			foreach (int index in indexPath)
+			{
+				yield return Items[index];
 			}
 		}
 	}
+#endregion
 
 }

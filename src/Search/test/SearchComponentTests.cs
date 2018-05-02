@@ -14,20 +14,23 @@ namespace Test
 		public void TestLeastWeightPathSearch()
 		{
 			// Arrange
-			SmallMapNode start = new SmallMapNode();
-			CityName[] expectedPath = { CityName.Bucharest, CityName.Pitesti, CityName.RimnicuVilcea, CityName.Sibiu };
+			City start = new City(CityName.Sibiu);
+			CityName[] expectedPath = { CityName.Sibiu, CityName.RimnicuVilcea, CityName.Pitesti, CityName.Bucharest };
 
-			var leastWeightPathSearch = new LeastWeightPathSearch<SmallMapNode>(node => node.City == CityName.Bucharest);
+			var leastWeightPathSearch = new LeastWeightPathSearch<City>(
+				city => city.GetNeighboringCitiesWithDistances());
 
 			// Act
-			SmallMapNode goal = leastWeightPathSearch.Search(start);
-			if (goal == null)
+			var finalNode = leastWeightPathSearch.FindNode(start,
+				node => node.State.Name == CityName.Bucharest); // find Bucharest
+
+			if (finalNode == null)
 			{
-				Assert.Fail("A solution should have been found.");
+				Assert.Fail("FindNode must find the corret node");
 				return;
 			}
 
-			var actualPath = goal.GetPath().Select((node) => ((SmallMapNode)node).City);
+			var actualPath = finalNode.GetPath().Select(city => city.Name);
 
 			// Assert
 			Assert.IsTrue(expectedPath.SequenceEqual(actualPath), "The expected and actual sequences should match.");
@@ -37,80 +40,76 @@ namespace Test
 		public void TestBidirectionalSearch()
 		{
 			// Arrange
-			SmallMapNode start = new SmallMapNode();
-			SmallMapNode goal = new SmallMapNode();
-			goal.City = CityName.Bucharest;
+			City start = new City(CityName.Sibiu);
+			City end = new City(CityName.Bucharest);
+			CityName[] expectedPath = { CityName.Sibiu, CityName.Fagaras, CityName.Bucharest };
 
-			CityName[] expectedPath = { CityName.Bucharest, CityName.Fagaras, CityName.Sibiu };
-
-			var bidirectionalSearch = new BidirectionalSearch<SmallMapNode>();
+			var bidirectionalSearch = new BidirectionalSearch<City>(
+				city => city.GetNeighboringCities());
 
 			// Act
-			SmallMapNode searchGoal = bidirectionalSearch.Search(start, goal);
-			if (searchGoal == null)
-			{
-				Assert.Fail("A solution should have been found.");
-				return;
-			}
-
-			var actualPath = searchGoal.GetPath().Select((node) => ((SmallMapNode)node).City);
+			var actualPath = bidirectionalSearch.FindPath(start, end).Select(city => city.Name);
 
 			// Assert
 			Assert.IsTrue(expectedPath.SequenceEqual(actualPath), "The expected and actual sequences should match.");
 		}
 
+#region Helper classes
 		private enum CityName
 		{
-			Sibiu, // start
+			Sibiu,
 			Fagaras,
 			RimnicuVilcea,
 			Pitesti,
-			Bucharest // goal
+			Bucharest
 		}
 
-		private class SmallMapNode : PathNode
+		private class City
 		{
-			public CityName City { get; set; }
+			public CityName Name;
 
-			private static Dictionary<CityName, CityName[]> CityConnections;
+			private static Dictionary<CityName, CityName[]> Neighbors;
 
-			public SmallMapNode()
+			public City(CityName name)
 			{
-				City = CityName.Sibiu;
-			}
-
-			public SmallMapNode(CityName city, SmallMapNode parent)
-				: base(parent, CalculateDistance(city, parent.City))
-			{
-				City = city;
-			}
-
-			public override IEnumerable<PathNode> GetChildren()
-			{
+				Name = name;
 				EnsureConnections();
-				foreach (var connection in CityConnections[City])
+			}
+
+			public IEnumerable<City> GetNeighboringCities()
+			{
+				foreach (var neighbor in Neighbors[Name])
 				{
-					yield return new SmallMapNode(connection, this);
+					yield return new City(neighbor);
+				}
+			}
+
+			public IEnumerable<Tuple<City, double>> GetNeighboringCitiesWithDistances()
+			{
+				foreach (var neighbor in Neighbors[Name])
+				{
+					yield return new Tuple<City, double>(
+						new City(neighbor), GetDistance(Name, neighbor));
 				}
 			}
 
 			public override bool Equals(object obj)
 			{
-				SmallMapNode other = obj as SmallMapNode;
-				return other != null && City == other.City;
+				City other = obj as City;
+				return other != null && Name == other.Name;
 			}
 
 			public override int GetHashCode()
 			{
-				return City.GetHashCode();
+				return Name.GetHashCode();
 			}
 
-			private static double CalculateDistance(CityName city, CityName parentCity)
+			private static double GetDistance(CityName fromCity, CityName toCity)
 			{
-				switch (parentCity)
+				switch (fromCity)
 				{
 					case CityName.Sibiu:
-						return city == CityName.Fagaras ? 99 : 80;
+						return toCity == CityName.Fagaras ? 99 : 80;
 					case CityName.Fagaras:
 						return 211;
 					case CityName.RimnicuVilcea:
@@ -124,30 +123,30 @@ namespace Test
 
 			private static void EnsureConnections()
 			{
-				if (CityConnections == null)
+				if (Neighbors == null)
 				{
-					CityConnections = new Dictionary<CityName, CityName[]>();
-					CityConnections[CityName.Sibiu] = new CityName[]
+					Neighbors = new Dictionary<CityName, CityName[]>();
+					Neighbors[CityName.Sibiu] = new CityName[]
 					{
 						CityName.Fagaras,
 						CityName.RimnicuVilcea
 					};
-					CityConnections[CityName.Fagaras] = new CityName[]
+					Neighbors[CityName.Fagaras] = new CityName[]
 					{
 						CityName.Sibiu,
 						CityName.Bucharest
 					};
-					CityConnections[CityName.RimnicuVilcea] = new CityName[]
+					Neighbors[CityName.RimnicuVilcea] = new CityName[]
 					{
 						CityName.Sibiu,
 						CityName.Pitesti
 					};
-					CityConnections[CityName.Pitesti] = new CityName[]
+					Neighbors[CityName.Pitesti] = new CityName[]
 					{
 						CityName.RimnicuVilcea,
 						CityName.Bucharest
 					};
-					CityConnections[CityName.Bucharest] = new CityName[]
+					Neighbors[CityName.Bucharest] = new CityName[]
 					{
 						CityName.Fagaras,
 						CityName.Pitesti
@@ -155,5 +154,6 @@ namespace Test
 				}
 			}
 		}
+#endregion
 	}
 }
