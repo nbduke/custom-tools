@@ -21,8 +21,4 @@ namespace Tools.Algorithms.Search {
 	public delegate IEnumerable<Tuple<T, double>> WeightedChildGenerator<T>(T state);
 	public delegate bool NodePredicate<T>(PathNode<T> node);
 	public delegate NodeOption NodeAction<T>(PathNode<T> node);
-	public delegate void CustomPathMergeFunction<T>(
-		PathNode<T> leafNodeFromStart,
-		PathNode<T> leafNodeFromEnd);
-
 }

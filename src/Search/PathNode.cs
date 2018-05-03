@@ -108,58 +108,6 @@ namespace Tools.Algorithms.Search {
 		{
 			return State.GetHashCode();
 		}
-
-		/*
-		 * Reverses the child-parent relationships of all nodes on the path. The edge
-		 * weights between nodes are preserved. If the original root has nonzero weight,
-		 * then its weight is transferred to the new root after inversion.
-		 */
-		public void InvertPath()
-		{
-			var path = new List<PathNode<T>>(GetPathToRoot());
-			var edgeWeights = new List<double>();
-
-			for (int i = 0; i < path.Count - 1; ++i)
-			{
-				edgeWeights.Add(path[i].CumulativePathWeight - path[i + 1].CumulativePathWeight);
-			}
-
-			Parent = null;
-			CumulativePathLength = 1;
-			CumulativePathWeight = path[path.Count - 1].CumulativePathWeight; // the root weight
-
-			for (int i = 1; i < path.Count; ++i)
-			{
-				PathNode<T> node = path[i];
-				PathNode<T> parent = path[i - 1];
-
-				node.Parent = parent;
-				node.CumulativePathLength = parent.CumulativePathLength + 1;
-				node.CumulativePathWeight = parent.CumulativePathWeight + edgeWeights[i - 1];
-			}
-		}
-
-		/*
-		 * Sets the parent of this node's root to otherNode, adjusting the cumulative path
-		 * lengths and weights of each node on the path accordingly.
-		 */
-		public void JoinPath(PathNode<T> otherNode)
-		{
-			if (otherNode == null)
-				return;
-
-			foreach (PathNode<T> node in GetPathToRoot())
-			{
-				node.CumulativePathLength += otherNode.CumulativePathLength;
-				node.CumulativePathWeight += otherNode.CumulativePathWeight;
-
-				if (node.IsRoot)
-				{
-					node.Parent = otherNode;
-					break; // break or else GetPath will continue returning nodes in the joined path
-				}
-			}
-		}
 	}
 
 }
