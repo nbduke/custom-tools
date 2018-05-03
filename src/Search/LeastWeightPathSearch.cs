@@ -13,14 +13,20 @@ namespace Tools.Algorithms.Search {
 	 */
 	public class LeastWeightPathSearch<T>
 	{
-		private readonly WeightedChildGenerator<T> GetChildren;
+		private readonly ChildGenerator<T> GetChildren;
+		private readonly EdgeWeightCalculator<T> GetEdgeWeight;
 
-		public LeastWeightPathSearch(WeightedChildGenerator<T> getChildren)
+		public LeastWeightPathSearch(
+			ChildGenerator<T> getChildren,
+			EdgeWeightCalculator<T> getEdgeWeight)
 		{
 			if (getChildren == null)
 				throw new ArgumentNullException("getChildren");
+			if (getEdgeWeight == null)
+				throw new ArgumentNullException("getEdgeWeight");
 
 			GetChildren = getChildren;
+			GetEdgeWeight = getEdgeWeight;
 		}
 
 		public IEnumerable<T> FindPath(T start, T end)
@@ -58,12 +64,10 @@ namespace Tools.Algorithms.Search {
 					continue;
 
 				explored.Add(currentNode);
-				foreach (var childAndWeight in GetChildren(currentNode.State))
+				foreach (var child in GetChildren(currentNode.State))
 				{
-					var childNode = new PathNode<T>(
-						childAndWeight.Item1,
-						currentNode,
-						childAndWeight.Item2);
+					double weight = GetEdgeWeight(currentNode.State, child);
+					var childNode = new PathNode<T>(child, currentNode, weight);
 
 					if (!explored.Contains(childNode))
 					{

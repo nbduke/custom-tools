@@ -18,7 +18,8 @@ namespace Test
 			CityName[] expectedPath = { CityName.Sibiu, CityName.RimnicuVilcea, CityName.Pitesti, CityName.Bucharest };
 
 			var leastWeightPathSearch = new LeastWeightPathSearch<City>(
-				city => city.GetNeighboringCitiesWithDistances());
+				city => city.GetNeighboringCities(),
+				(parent, child) => parent.GetDistance(child));
 
 			// Act
 			var finalNode = leastWeightPathSearch.FindNode(start,
@@ -84,12 +85,20 @@ namespace Test
 				}
 			}
 
-			public IEnumerable<Tuple<City, double>> GetNeighboringCitiesWithDistances()
+			public double GetDistance(City toCity)
 			{
-				foreach (var neighbor in Neighbors[Name])
+				switch (Name)
 				{
-					yield return new Tuple<City, double>(
-						new City(neighbor), GetDistance(Name, neighbor));
+					case CityName.Sibiu:
+						return toCity.Name == CityName.Fagaras ? 99 : 80;
+					case CityName.Fagaras:
+						return 211;
+					case CityName.RimnicuVilcea:
+						return 97;
+					case CityName.Pitesti:
+						return 101;
+					default:
+						return 0;
 				}
 			}
 
@@ -102,23 +111,6 @@ namespace Test
 			public override int GetHashCode()
 			{
 				return Name.GetHashCode();
-			}
-
-			private static double GetDistance(CityName fromCity, CityName toCity)
-			{
-				switch (fromCity)
-				{
-					case CityName.Sibiu:
-						return toCity == CityName.Fagaras ? 99 : 80;
-					case CityName.Fagaras:
-						return 211;
-					case CityName.RimnicuVilcea:
-						return 97;
-					case CityName.Pitesti:
-						return 101;
-					default:
-						return 0;
-				}
 			}
 
 			private static void EnsureConnections()

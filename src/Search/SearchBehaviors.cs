@@ -18,7 +18,7 @@ namespace Tools.Algorithms.Search {
 	 * A set of delegates that define injectable behaviors for search algorithms.
 	 */
 	public delegate IEnumerable<T> ChildGenerator<T>(T state);
-	public delegate IEnumerable<Tuple<T, double>> WeightedChildGenerator<T>(T state);
+	public delegate double EdgeWeightCalculator<T>(T parent, T child);
 	public delegate bool NodePredicate<T>(PathNode<T> node);
 	public delegate NodeOption NodeAction<T>(PathNode<T> node);
 }
