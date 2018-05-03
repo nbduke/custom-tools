@@ -6,69 +6,56 @@ namespace Tools.Algorithms.Search {
 
 	/*
 	 * Bidirectional search is a breadth-first search starting from two nodes
-	 * simultaneously. It is guaranteed to find the shortest path between the two
+	 * simultaneously. One path proceeds forward, like all other search
+	 * algorithms; the other proceeds backward and must be reversed once a
+	 * common node is found in both paths.
+	 * 
+	 * This algorithm is guaranteed to find the shortest path between the two
 	 * nodes, if one exists.
 	 */
 	public class BidirectionalSearch<T>
 	{
 		private readonly ChildGenerator<T> GetForwardChildren;
 		private readonly ChildGenerator<T> GetReverseChildren;
-		private CustomPathMergeFunction<T> MergePaths;
+		private readonly Action<IEnumerable<T>> RepairReversePath;
 
 		/// <summary>
 		/// Creates a BidirectionalSearch for an undirected graph.
 		/// </summary>
 		/// <param name="getChildrenUndirected">the ChildGenerator for both search paths</param>
-		public BidirectionalSearch(ChildGenerator<T> getChildrenUndirected)
-			: this(getChildrenUndirected, getChildrenUndirected)
+		/// <param name="repairReversePath">an optional function that repairs links between
+		/// states in the reverse path. The function will be given the path in the final order,
+		/// starting with the node found in both paths</param>
+		public BidirectionalSearch(
+			ChildGenerator<T> getChildrenUndirected,
+			Action<IEnumerable<T>> repairReversePath = null)
+			: this(getChildrenUndirected, getChildrenUndirected, repairReversePath)
 		{
 		}
 
 		/// <summary>
 		/// Creates a BidirectionalSearch for a directed graph.
 		/// </summary>
-		/// <param name="getChildren">generates child states</param>
-		/// <param name="getParents">generates parent states
-		/// (the argument should be a child of all returned states)</param>
+		/// <param name="getForwardChildren">the ChildGenerator for the forward path</param>
+		/// <param name="getReverseChildren">the ChildGenerator for the reverse path.
+		/// When the path is reversed at the end, states returned by this function will
+		/// become parents of the state passed in.</param>
+		/// <param name="repairReversePath">an optional function that repairs links between
+		/// states in the reverse path. The function will be given the path in the final order,
+		/// starting with the node found in both paths</param>
 		public BidirectionalSearch(
-			ChildGenerator<T> getChildren,
-			ChildGenerator<T> getParents)
-			: this(getChildren, getParents, DefaultMergePaths)
+			ChildGenerator<T> getForwardChildren,
+			ChildGenerator<T> getReverseChildren,
+			Action<IEnumerable<T>> repairReversePath = null)
 		{
-		}
+			if (getForwardChildren == null)
+				throw new ArgumentNullException("getForwardChildren");
+			if (getReverseChildren == null)
+				throw new ArgumentNullException("getReverseChildren");
 
-		/// <summary>
-		/// Creates a BidirectionalSearch for a directed graph with a custom
-		/// function for merging the two search paths.
-		/// </summary>
-		/// <param name="getChildren">generates child states</param>
-		/// <param name="getParents">generates parent states
-		/// (the argument should be a child of all returned states)</param>
-		/// <param name="mergePaths">combines two search paths into one</param>
-		public BidirectionalSearch(
-			ChildGenerator<T> getChildren,
-			ChildGenerator<T> getParents,
-			CustomPathMergeFunction<T> mergePaths)
-		{
-			if (getChildren == null)
-				throw new ArgumentNullException("getChildren");
-			if (getParents == null)
-				throw new ArgumentNullException("getChildrenInverted");
-			if (mergePaths == null)
-				throw new ArgumentNullException("mergePaths");
-
-			GetForwardChildren = getChildren;
-			GetReverseChildren = getParents;
-			MergePaths = mergePaths;
-		}
-
-		private static void DefaultMergePaths(
-			PathNode<T> leafNodeFromStart,
-			PathNode<T> leafNodeFromEnd)
-		{
-			PathNode<T> goal = leafNodeFromEnd.GetRoot();
-			leafNodeFromEnd.Parent.InvertPath();
-			goal.JoinPath(leafNodeFromStart);
+			GetForwardChildren = getForwardChildren;
+			GetReverseChildren = getReverseChildren;
+			RepairReversePath = repairReversePath;
 		}
 
 		public IEnumerable<T> FindPath(T start, T end)
@@ -78,15 +65,6 @@ namespace Tools.Algorithms.Search {
 			else if (start.Equals(end))
 				return new T[] { start };
 
-			PathNode<T> terminalNode = BuildPath(start, end);
-			if (terminalNode == null)
-				return new T[] { };
-			else
-				return terminalNode.GetPath();
-		}
-
-		private PathNode<T> BuildPath(T start, T end)
-		{
 			var startNode = new PathNode<T>(start);
 			var endNode = new PathNode<T>(end);
 
@@ -99,7 +77,7 @@ namespace Tools.Algorithms.Search {
 			{
 				var childNode = new PathNode<T>(child, startNode);
 				if (child.Equals(end)) // check here if start and end are connected
-					return childNode;
+					return childNode.GetPath();
 				else
 					forwardFrontier.Enqueue(childNode);
 			}
@@ -114,8 +92,9 @@ namespace Tools.Algorithms.Search {
 
 			while (forwardFrontier.Count > 0 && reverseFrontier.Count > 0)
 			{
-				if (CheckForSolution(forwardFrontier, reverseFrontier))
-					return endNode;
+				var match = FindMatchingNodes(forwardFrontier, reverseFrontier);
+				if (match != null)
+					return ConstructSolution(match);
 
 				PathNode<T> forwardNode = forwardFrontier.Dequeue();
 				explored.Add(forwardNode);
@@ -126,8 +105,9 @@ namespace Tools.Algorithms.Search {
 						forwardFrontier.Enqueue(childNode);
 				}
 
-				if (CheckForSolution(forwardFrontier, reverseFrontier))
-					return endNode;
+				match = FindMatchingNodes(forwardFrontier, reverseFrontier);
+				if (match != null)
+					return ConstructSolution(match);
 
 				PathNode<T> reverseNode = reverseFrontier.Dequeue();
 				explored.Add(reverseNode);
@@ -143,7 +123,7 @@ namespace Tools.Algorithms.Search {
 			return null;
 		}
 
-		private bool CheckForSolution(
+		private static Tuple<PathNode<T>, PathNode<T>> FindMatchingNodes(
 			Queue<PathNode<T>> forwardFrontier,
 			Queue<PathNode<T>> reverseFrontier)
 		{
@@ -153,25 +133,27 @@ namespace Tools.Algorithms.Search {
 			if (forwardSet.Count > 0)
 			{
 				PathNode<T> forwardNode = forwardSet.First();
-				PathNode<T> reverseNode = null;
-
-				foreach (PathNode<T> node in reverseFrontier)
+				foreach (var reverseNode in reverseFrontier)
 				{
-					if (node.Equals(forwardNode))
-					{
-						reverseNode = node;
-						break;
-					}
-				}
-
-				if (reverseNode != null)
-				{
-					MergePaths(forwardNode, reverseNode);
-					return true; // solution found
+					if (reverseNode.Equals(forwardNode))
+						return new Tuple<PathNode<T>, PathNode<T>>(forwardNode, reverseNode);
 				}
 			}
 
-			return false; // no solution
+			return null; // no common nodes
+		}
+
+		private IEnumerable<T> ConstructSolution(Tuple<PathNode<T>, PathNode<T>> matchingNodes)
+		{
+			var nodeOnForwardPath = matchingNodes.Item1;
+			var nodeOnReversePath = matchingNodes.Item2;
+			var pathFromStart = nodeOnForwardPath.GetPath();
+			var pathToEnd = nodeOnReversePath.GetPath().Reverse();
+
+			if (RepairReversePath != null)
+				RepairReversePath(pathToEnd);
+
+			return pathFromStart.Concat(pathToEnd.Skip(1)); // skip the common node
 		}
 	}
 
