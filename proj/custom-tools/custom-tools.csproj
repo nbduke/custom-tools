@@ -42,6 +42,8 @@
     <Reference Include="System.Xml.Linq" />
   </ItemGroup>
   <ItemGroup>
+	<Compile Include="..\..\src\DataStructures\Arrangement.cs" />
+	<Compile Include="..\..\src\DataStructures\ArrangementEnumerator.cs" />
     <Compile Include="..\..\src\DataStructures\BinaryHeap.cs" />
     <Compile Include="..\..\src\DataStructures\CollectionExtensions.cs" />
     <Compile Include="..\..\src\DataStructures\Grid.cs" />
@@ -51,7 +53,6 @@
     <Compile Include="..\..\src\DataStructures\PrefixTreeDictionary.cs" />
     <Compile Include="..\..\src\DataStructures\PrefixTreeDictionaryVisitors.cs" />
     <Compile Include="..\..\src\DataStructures\PrefixTreeNode.cs" />
-    <Compile Include="..\..\src\Math\Arrangement.cs" />
     <Compile Include="..\..\src\Math\Combinatorics.cs" />
     <Compile Include="..\..\src\Math\RandomProvider.cs" />
     <Compile Include="..\..\src\Search\BacktrackingSearch.cs" />
