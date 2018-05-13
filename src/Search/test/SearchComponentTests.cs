@@ -5,8 +5,8 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using Tools.Algorithms.Search;
 
-namespace Test
-{
+namespace Test {
+
 	[TestClass]
 	public class SearchComponentTests
 	{

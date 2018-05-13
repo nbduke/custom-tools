@@ -14,9 +14,9 @@ namespace Tools.Algorithms.Search {
 	public class PathNode<T>
 	{
 		public readonly T State;
-		public PathNode<T> Parent { get; private set; }
-		public uint CumulativePathLength { get; private set; }
-		public double CumulativePathWeight { get; private set; }
+		public readonly PathNode<T> Parent;
+		public readonly uint CumulativePathLength;
+		public readonly double CumulativePathWeight;
 
 		/*
 		 * Constructs a root node (the first node in a path).
@@ -27,7 +27,7 @@ namespace Tools.Algorithms.Search {
 		}
 
 		/*
-		 * Constructs a node with zero weight on the incoming edge.
+		 * Constructs a node with zero weight on its incoming edge.
 		 */
 		public PathNode(T state, PathNode<T> parent)
 			: this(state, parent, 0)
@@ -63,26 +63,17 @@ namespace Tools.Algorithms.Search {
 			get { return Parent == null; }
 		}
 
-		public PathNode<T> GetRoot()
-		{
-			PathNode<T> currentNode = this;
-			while (!currentNode.IsRoot)
-				currentNode = currentNode.Parent;
-
-			return currentNode;
-		}
-
 		public IEnumerable<T> GetPath()
 		{
-			return GetPathToRoot().Select(node => node.State).Reverse();
+			return GetPathToRoot().Reverse();
 		}
 
-		private IEnumerable<PathNode<T>> GetPathToRoot()
+		public IEnumerable<T> GetPathToRoot()
 		{
 			PathNode<T> currentNode = this;
 			while (currentNode != null)
 			{
-				yield return currentNode;
+				yield return currentNode.State;
 				currentNode = currentNode.Parent;
 			}
 		}
@@ -98,10 +89,19 @@ namespace Tools.Algorithms.Search {
 			return false;
 		}
 
+		public bool Equals(PathNode<T> node)
+		{
+			return node != null && State.Equals(node.State);
+		}
+
+		public bool Equals(T state)
+		{
+			return State.Equals(state);
+		}
+
 		public override bool Equals(object obj)
 		{
-			PathNode<T> other = obj as PathNode<T>;
-			return other != null && State.Equals(other.State);
+			return Equals(obj as PathNode<T>);
 		}
 
 		public override int GetHashCode()

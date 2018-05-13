@@ -60,9 +60,12 @@ namespace Tools.Algorithms.Search {
 
 		public IEnumerable<T> FindPath(T start, T end)
 		{
-			if (start == null || end == null)
-				return new T[] { };
-			else if (start.Equals(end))
+			if (start == null)
+				throw new ArgumentNullException("start");
+			if (end == null)
+				throw new ArgumentNullException("end");
+
+			if (start.Equals(end))
 				return new T[] { start };
 
 			var startNode = new PathNode<T>(start);
@@ -101,6 +104,9 @@ namespace Tools.Algorithms.Search {
 				foreach (T child in GetForwardChildren(forwardNode.State))
 				{
 					var childNode = new PathNode<T>(child, forwardNode);
+					if (childNode.Equals(end))
+						return childNode.GetPath();
+
 					if (!explored.Contains(childNode) && !forwardFrontier.Contains(childNode))
 						forwardFrontier.Enqueue(childNode);
 				}
@@ -114,6 +120,15 @@ namespace Tools.Algorithms.Search {
 				foreach (T child in GetReverseChildren(reverseNode.State))
 				{
 					var childNode = new PathNode<T>(child, reverseNode);
+					if (childNode.Equals(start))
+					{
+						var pathToEnd = childNode.GetPathToRoot();
+						if (RepairReversePath != null)
+							RepairReversePath(pathToEnd);
+
+						return pathToEnd;
+					}
+
 					if (!explored.Contains(childNode) && !reverseFrontier.Contains(childNode))
 						reverseFrontier.Enqueue(childNode);
 				}
@@ -148,7 +163,7 @@ namespace Tools.Algorithms.Search {
 			var nodeOnForwardPath = matchingNodes.Item1;
 			var nodeOnReversePath = matchingNodes.Item2;
 			var pathFromStart = nodeOnForwardPath.GetPath();
-			var pathToEnd = nodeOnReversePath.GetPath().Reverse();
+			var pathToEnd = nodeOnReversePath.GetPathToRoot();
 
 			if (RepairReversePath != null)
 				RepairReversePath(pathToEnd);
