@@ -121,14 +121,15 @@ namespace Tools.DataStructures {
 
 #endregion
 
-#region ToArray
-
-		public static T[] ToArray<T>(this Tuple<T, T> tuple)
+		#region Generic IEnumerable
+		public static IEnumerable<T> Iterate<T>(this IEnumerator<T> enumerator)
 		{
-			return new T[] { tuple.Item1, tuple.Item2 };
+			while (enumerator.MoveNext())
+			{
+				yield return enumerator.Current;
+			}
 		}
-
-#endregion
+		#endregion
 	}
 
 }

@@ -48,9 +48,9 @@
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
+	<Compile Include="..\..\src\DataStructures\test\ArrangementUnitTests.cs" />
     <Compile Include="..\..\src\DataStructures\test\BinaryHeapComponentTests.cs" />
     <Compile Include="..\..\src\DataStructures\test\ExtensionsUnitTests.cs" />
-	<Compile Include="..\..\src\Math\test\ArrangementComponentTests.cs" />
 	<Compile Include="..\..\src\Search\test\SearchComponentTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
