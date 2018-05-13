@@ -92,6 +92,33 @@ namespace Test {
 				}
 			};
 		}
+
+		/*
+		 * Same as above, but the reverse child generator.
+		 */
+		public static ChildGenerator<int> ReverseTwoAsymmetricalPathsGraph()
+		{
+			return state =>
+			{
+				switch (state)
+				{
+					case 7:
+						return new int[] { 5, 6 };
+					case 6:
+						return new int[] { 4 };
+					case 5:
+						return new int[] { 3 };
+					case 4:
+						return new int[] { 2 };
+					case 3:
+						return new int[] { 1 };
+					case 2:
+						return new int[] { 1 };
+					default:
+						return new int[] { };
+				}
+			};
+		}
 	};
 
 }
