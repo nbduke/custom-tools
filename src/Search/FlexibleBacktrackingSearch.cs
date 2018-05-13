@@ -27,11 +27,10 @@ namespace Tools.Algorithms.Search {
 		/// <param name="getChildren">generates child states</param>
 		/// <param name="assumeChildrenNotInPath">if true, the algorithm will not check
 		/// whether each child is already in the current path. BEWARE: This is a performance
-		/// optimization for special cases. The algorithm is always correct when this is set
-		/// to false.</param>
+		/// optimization for special cases. If in doubt, leave this false.</param>
 		public FlexibleBacktrackingSearch(
 			ChildGenerator<T> getChildren,
-			bool assumeChildrenNotInPath = true)
+			bool assumeChildrenNotInPath = false)
 		{
 			if (getChildren == null)
 				throw new ArgumentNullException("getChildren");

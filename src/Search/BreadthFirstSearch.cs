@@ -20,8 +20,10 @@ namespace Tools.Algorithms.Search {
 
 		public IEnumerable<T> FindPath(T start, T end)
 		{
-			if (start == null || end == null)
-				return null;
+			if (start == null)
+				throw new ArgumentNullException("start");
+			if (end == null)
+				throw new ArgumentNullException("end");
 
 			PathNode<T> terminalNode = FindNode(start, node => node.Equals(end));
 			if (terminalNode == null)
@@ -33,16 +35,16 @@ namespace Tools.Algorithms.Search {
 		public PathNode<T> FindNode(
 			T start,
 			NodePredicate<T> nodePredicate,
-			uint maxSearchDistance = uint.MaxValue)
+			uint maxSearchDistance = uint.MaxValue - 1)
 		{
 			if (nodePredicate == null)
 				throw new ArgumentNullException("nodePredicate");
-			else if (maxSearchDistance == 0)
-				return null;
 
 			var startNode = new PathNode<T>(start);
 			if (nodePredicate(startNode))
 				return startNode;
+			else if (maxSearchDistance == 0)
+				return null;
 
 			var frontier = new Queue<PathNode<T>>();
 			var explored = new HashSet<PathNode<T>>();
@@ -59,7 +61,7 @@ namespace Tools.Algorithms.Search {
 					{
 						if (nodePredicate(childNode))
 							return childNode;
-						else if (childNode.CumulativePathLength < maxSearchDistance)
+						else if (childNode.CumulativePathLength < maxSearchDistance + 1)
 							frontier.Enqueue(childNode);
 					}
 				}

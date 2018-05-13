@@ -60,67 +60,61 @@ namespace Tools.Algorithms.Search {
 
 		public IEnumerable<T> FindPath(T start, T end)
 		{
-			if (start == null || end == null)
-				return new T[] { };
-			else if (start.Equals(end))
-				return new T[] { start };
+			if (start == null)
+				throw new ArgumentNullException("start");
+			if (end == null)
+				throw new ArgumentNullException("end");
 
-			var startNode = new PathNode<T>(start);
-			var endNode = new PathNode<T>(end);
+			if (start.Equals(end))
+				return new T[] { start };
 
 			var forwardFrontier = new Queue<PathNode<T>>();
 			var reverseFrontier = new Queue<PathNode<T>>();
 			var explored = new HashSet<PathNode<T>>();
 
-			// Pre-load the frontiers of the start and end states
-			foreach (T child in GetForwardChildren(start))
-			{
-				var childNode = new PathNode<T>(child, startNode);
-				if (child.Equals(end)) // check here if start and end are connected
-					return childNode.GetPath();
-				else
-					forwardFrontier.Enqueue(childNode);
-			}
-
-			foreach (T child in GetReverseChildren(end))
-			{
-				reverseFrontier.Enqueue(new PathNode<T>(child, endNode));
-			}
-
-			explored.Add(startNode);
-			explored.Add(endNode);
+			forwardFrontier.Enqueue(new PathNode<T>(start));
+			reverseFrontier.Enqueue(new PathNode<T>(end));
 
 			while (forwardFrontier.Count > 0 && reverseFrontier.Count > 0)
 			{
+				forwardFrontier = GetNextLayer(forwardFrontier, explored, GetForwardChildren);
 				var match = FindMatchingNodes(forwardFrontier, reverseFrontier);
 				if (match != null)
 					return ConstructSolution(match);
 
-				PathNode<T> forwardNode = forwardFrontier.Dequeue();
-				explored.Add(forwardNode);
-				foreach (T child in GetForwardChildren(forwardNode.State))
-				{
-					var childNode = new PathNode<T>(child, forwardNode);
-					if (!explored.Contains(childNode) && !forwardFrontier.Contains(childNode))
-						forwardFrontier.Enqueue(childNode);
-				}
-
+				reverseFrontier = GetNextLayer(reverseFrontier, explored, GetReverseChildren);
 				match = FindMatchingNodes(forwardFrontier, reverseFrontier);
 				if (match != null)
 					return ConstructSolution(match);
-
-				PathNode<T> reverseNode = reverseFrontier.Dequeue();
-				explored.Add(reverseNode);
-				foreach (T child in GetReverseChildren(reverseNode.State))
-				{
-					var childNode = new PathNode<T>(child, reverseNode);
-					if (!explored.Contains(childNode) && !reverseFrontier.Contains(childNode))
-						reverseFrontier.Enqueue(childNode);
-				}
 			}
 
 			// Path not found
-			return null;
+			return new T[] { };
+		}
+
+		private static Queue<PathNode<T>> GetNextLayer(
+			Queue<PathNode<T>> currentLayer,
+			HashSet<PathNode<T>> explored,
+			ChildGenerator<T> getChildren)
+		{
+			var nextLayer = new Queue<PathNode<T>>();
+			foreach (var currentNode in currentLayer)
+			{
+				explored.Add(currentNode);
+
+				foreach (var child in getChildren(currentNode.State))
+				{
+					var childNode = new PathNode<T>(child, currentNode);
+					if (!explored.Contains(childNode) &&
+						!currentLayer.Contains(childNode) &&
+						!nextLayer.Contains(childNode))
+					{
+						nextLayer.Enqueue(childNode);
+					}
+				}
+			}
+
+			return nextLayer;
 		}
 
 		private static Tuple<PathNode<T>, PathNode<T>> FindMatchingNodes(
@@ -136,7 +130,7 @@ namespace Tools.Algorithms.Search {
 				foreach (var reverseNode in reverseFrontier)
 				{
 					if (reverseNode.Equals(forwardNode))
-						return new Tuple<PathNode<T>, PathNode<T>>(forwardNode, reverseNode);
+						return Tuple.Create(forwardNode, reverseNode);
 				}
 			}
 
@@ -148,7 +142,7 @@ namespace Tools.Algorithms.Search {
 			var nodeOnForwardPath = matchingNodes.Item1;
 			var nodeOnReversePath = matchingNodes.Item2;
 			var pathFromStart = nodeOnForwardPath.GetPath();
-			var pathToEnd = nodeOnReversePath.GetPath().Reverse();
+			var pathToEnd = nodeOnReversePath.GetPathToRoot();
 
 			if (RepairReversePath != null)
 				RepairReversePath(pathToEnd);

@@ -21,16 +21,16 @@ namespace Tools.Algorithms.Search {
 		public PathNode<T> FindNode(
 			T start,
 			NodePredicate<T> nodePredicate,
-			uint maxSearchDistance = uint.MaxValue)
+			uint maxSearchDistance = uint.MaxValue - 1)
 		{
 			if (nodePredicate == null)
 				throw new ArgumentNullException("nodePredicate");
-			else if (maxSearchDistance == 0)
-				return null;
 
 			var startNode = new PathNode<T>(start);
 			if (nodePredicate(startNode))
 				return startNode;
+			else if (maxSearchDistance == 0)
+				return null;
 
 			var frontier = new Stack<PathNode<T>>();
 			var explored = new HashSet<PathNode<T>>();
@@ -47,7 +47,7 @@ namespace Tools.Algorithms.Search {
 					{
 						if (nodePredicate(childNode))
 							return childNode;
-						else if (childNode.CumulativePathLength < maxSearchDistance)
+						else if (childNode.CumulativePathLength < maxSearchDistance + 1)
 							frontier.Push(childNode);
 					}
 				}
