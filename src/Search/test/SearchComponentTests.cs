@@ -34,7 +34,7 @@ namespace Test {
 			var actualPath = finalNode.GetPath().Select(city => city.Name);
 
 			// Assert
-			Assert.IsTrue(expectedPath.SequenceEqual(actualPath), "The expected and actual sequences should match.");
+			CollectionAssert.AreEqual(expectedPath, actualPath.ToList());
 		}
 
 		[TestMethod]
@@ -52,7 +52,7 @@ namespace Test {
 			var actualPath = bidirectionalSearch.FindPath(start, end).Select(city => city.Name);
 
 			// Assert
-			Assert.IsTrue(expectedPath.SequenceEqual(actualPath), "The expected and actual sequences should match.");
+			CollectionAssert.AreEqual(expectedPath, actualPath.ToList());
 		}
 
 #region Helper classes
