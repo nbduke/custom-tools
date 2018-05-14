@@ -16,8 +16,7 @@ namespace Tools.Algorithms.Search {
 
 		public BacktrackingSearch(ChildGenerator<T> getChildren)
 		{
-			if (getChildren == null)
-				throw new ArgumentNullException("getChildren");
+			Validate.IsNotNull(getChildren, "getChildren");
 
 			GetChildren = getChildren;
 		}
@@ -27,9 +26,9 @@ namespace Tools.Algorithms.Search {
 			NodePredicate<T> nodePredicate,
 			uint maxSearchDistance = uint.MaxValue)
 		{
-			if (nodePredicate == null)
-				throw new ArgumentNullException("nodePredicate");
-			else if (maxSearchDistance == 0)
+			Validate.IsNotNull(nodePredicate, "nodePredicate");
+
+			if (maxSearchDistance == 0)
 				return null;
 
 			var startNode = new PathNode<T>(start);

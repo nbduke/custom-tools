@@ -48,10 +48,8 @@ namespace Tools.Algorithms.Search {
 			ChildGenerator<T> getReverseChildren,
 			Action<IEnumerable<T>> repairReversePath = null)
 		{
-			if (getForwardChildren == null)
-				throw new ArgumentNullException("getForwardChildren");
-			if (getReverseChildren == null)
-				throw new ArgumentNullException("getReverseChildren");
+			Validate.IsNotNull(getForwardChildren, "getForwardChildren");
+			Validate.IsNotNull(getReverseChildren, "getReverseChildren");
 
 			GetForwardChildren = getForwardChildren;
 			GetReverseChildren = getReverseChildren;
@@ -60,10 +58,8 @@ namespace Tools.Algorithms.Search {
 
 		public IEnumerable<T> FindPath(T start, T end)
 		{
-			if (start == null)
-				throw new ArgumentNullException("start");
-			if (end == null)
-				throw new ArgumentNullException("end");
+			Validate.IsNotNull(start, "start");
+			Validate.IsNotNull(end, "end");
 
 			if (start.Equals(end))
 				return new T[] { start };

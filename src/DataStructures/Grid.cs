@@ -39,8 +39,7 @@ namespace Tools.DataStructures {
 			GridOrder fillOrder = GridOrder.RowMajor)
 			: this(rows, columns)
 		{
-			if (items == null)
-				throw new ArgumentNullException("items");
+			Validate.IsNotNull(items, "items");
 
 			var enumerator = items.GetEnumerator();
 			VisitCellsInOrder(fillOrder,

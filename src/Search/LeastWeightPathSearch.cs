@@ -19,10 +19,8 @@ namespace Tools.Algorithms.Search {
 			ChildGenerator<T> getChildren,
 			EdgeWeightCalculator<T> getEdgeWeight)
 		{
-			if (getChildren == null)
-				throw new ArgumentNullException("getChildren");
-			if (getEdgeWeight == null)
-				throw new ArgumentNullException("getEdgeWeight");
+			Validate.IsNotNull(getChildren, "getChildren");
+			Validate.IsNotNull(getEdgeWeight, "getEdgeWeight");
 
 			GetChildren = getChildren;
 			GetEdgeWeight = getEdgeWeight;
@@ -30,10 +28,8 @@ namespace Tools.Algorithms.Search {
 
 		public IEnumerable<T> FindPath(T start, T end)
 		{
-			if (start == null)
-				throw new ArgumentNullException("start");
-			if (end == null)
-				throw new ArgumentNullException("end");
+			Validate.IsNotNull(start, "start");
+			Validate.IsNotNull(end, "end");
 
 			PathNode<T> terminalNode = FindNode(start, node => node.Equals(end));
 			if (terminalNode == null)
@@ -47,8 +43,7 @@ namespace Tools.Algorithms.Search {
 			NodePredicate<T> nodePredicate,
 			uint maxSearchDistance = uint.MaxValue - 1)
 		{
-			if (nodePredicate == null)
-				throw new ArgumentNullException("nodePredicate");
+			Validate.IsNotNull(nodePredicate, "nodePredicate");
 
 			var frontier = BinaryHeap<PathNode<T>>.CreateMinFirstHeap();
 			var explored = new HashSet<PathNode<T>>();

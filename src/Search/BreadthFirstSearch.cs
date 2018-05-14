@@ -12,18 +12,15 @@ namespace Tools.Algorithms.Search {
 
 		public BreadthFirstSearch(ChildGenerator<T> getChildren)
 		{
-			if (getChildren == null)
-				throw new ArgumentNullException("getChildren");
+			Validate.IsNotNull(getChildren, "getChildren");
 
 			GetChildren = getChildren;
 		}
 
 		public IEnumerable<T> FindPath(T start, T end)
 		{
-			if (start == null)
-				throw new ArgumentNullException("start");
-			if (end == null)
-				throw new ArgumentNullException("end");
+			Validate.IsNotNull(start, "start");
+			Validate.IsNotNull(end, "end");
 
 			PathNode<T> terminalNode = FindNode(start, node => node.Equals(end));
 			if (terminalNode == null)
@@ -37,8 +34,7 @@ namespace Tools.Algorithms.Search {
 			NodePredicate<T> nodePredicate,
 			uint maxSearchDistance = uint.MaxValue - 1)
 		{
-			if (nodePredicate == null)
-				throw new ArgumentNullException("nodePredicate");
+			Validate.IsNotNull(nodePredicate, "nodePredicate");
 
 			var startNode = new PathNode<T>(start);
 			if (nodePredicate(startNode))

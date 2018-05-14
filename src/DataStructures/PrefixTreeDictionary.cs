@@ -131,10 +131,8 @@ namespace Tools.DataStructures {
 		 */
 		public PrefixTreeNode PartialLookup(string prefix, PrefixTreeNode startNode)
 		{
-			if (prefix == null)
-				throw new ArgumentNullException("prefix");
-			else if (startNode == null)
-				throw new ArgumentNullException("startNode");
+			Validate.IsNotNull(prefix, "prefix");
+			Validate.IsNotNull(startNode, "startNode");
 
 			// Traverse the path from the root corresponding to the characters in prefix
 			PrefixTreeNode currentNode = startNode;
