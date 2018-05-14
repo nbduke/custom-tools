@@ -38,6 +38,7 @@ namespace Tools.DataStructures {
 			bool isPermutation)
 		{
 			Validate.IsNotNull(collection, "collection");
+
 			if (minimumSize > maximumSize)
 				throw new ArgumentException("minimumSize cannot exceed maximumSize");
 			if (maximumSize > (uint)collection.Count)
