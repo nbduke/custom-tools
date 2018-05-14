@@ -97,7 +97,7 @@ namespace Test {
 
 			// Assert
 			var expectedPath = new string[] { start };
-			Assert.IsTrue(expectedPath.SequenceEqual(path));
+			CollectionAssert.AreEqual(expectedPath, path.ToList());
 		}
 
 		[TestMethod]

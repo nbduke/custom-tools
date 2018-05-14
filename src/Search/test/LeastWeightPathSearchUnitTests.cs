@@ -88,7 +88,7 @@ namespace Test {
 
 			// Assert
 			var expectedPath = new string[] { start };
-			Assert.IsTrue(expectedPath.SequenceEqual(path));
+			CollectionAssert.AreEqual(expectedPath, path.ToList());
 		}
 
 		[TestMethod]
@@ -138,7 +138,7 @@ namespace Test {
 
 			// Assert
 			var expectedPath = new int[] { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 };
-			Assert.IsTrue(expectedPath.SequenceEqual(path));
+			CollectionAssert.AreEqual(expectedPath, path.ToList());
 		}
 
 		[TestMethod]
@@ -164,7 +164,7 @@ namespace Test {
 
 			// Assert
 			var expectedPath = new int[] { 1, 2, 4, 6, 7 };
-			Assert.IsTrue(expectedPath.SequenceEqual(path));
+			CollectionAssert.AreEqual(expectedPath, path.ToList());
 		}
 		#endregion
 
@@ -296,7 +296,7 @@ namespace Test {
 			Assert.AreEqual(expectedNode, node);
 
 			var expectedPath = new int[] { -3, -2, -1, 0 };
-			Assert.IsTrue(expectedPath.SequenceEqual(node.GetPath()));
+			CollectionAssert.AreEqual(expectedPath, node.GetPath().ToList());
 			Assert.AreEqual((uint)expectedPath.Length, node.CumulativePathLength);
 		}
 
