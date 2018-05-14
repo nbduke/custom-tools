@@ -14,8 +14,7 @@ namespace Tools.Math {
 		 */
 		public static ulong GetNumberOfCombinations(uint n, uint r)
 		{
-			if (r > n)
-				throw new ArgumentException("In nCr, r cannot exceed n.");
+			Validate.IsTrue(r <= n, "In nCr, r cannot exceed n.");
 
 			if (r > n / 2)
 			{
@@ -37,8 +36,7 @@ namespace Tools.Math {
 		 */
 		public static ulong GetNumberOfPermutations(uint n, uint r)
 		{
-			if (r > n)
-				throw new ArgumentException("In nPr, r cannot exceed n.");
+			Validate.IsTrue(r <= n, "In nPr, r cannot exceed n.");
 
 			if (r == n)
 				return Factorial(n); // n!
@@ -68,8 +66,7 @@ namespace Tools.Math {
 		 */
 		public static ulong FactorialRatio(uint n, uint r)
 		{
-			if (r > n)
-				throw new ArgumentException("FactorialRatio computes an integer ratio, so r cannot exceed n.");
+			Validate.IsTrue(r <= n, "FactorialRatio computes an integer ratio, so r cannot exceed n.");
 
 			if (n == r || n == 0)
 				return 1;

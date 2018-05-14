@@ -57,8 +57,7 @@ namespace Tools.Math {
 		/// </summary>
 		public static double GetDouble(double minValue, double maxValue)
 		{
-			if (minValue > maxValue)
-				throw new ArgumentException("minValue may not exceed maxValue.");
+			Validate.IsTrue(minValue <= maxValue, "minValue may not exceed maxValue.");
 
 			double diff = maxValue - minValue;
 			return GetUnitDouble() * diff + minValue;
@@ -79,8 +78,7 @@ namespace Tools.Math {
 		/// </summary>
 		public static T Select<T>(IList<T> items)
 		{
-			if (items.Count == 0)
-				throw new ArgumentException("The collection cannot be empty.");
+			Validate.IsTrue(items.Count > 0, "The collection cannot be empty.");
 
 			return items[GetInt(items.Count)];
 		}
@@ -94,10 +92,9 @@ namespace Tools.Math {
 		/// <returns>A list of items of length sampleSize</returns>
 		public static List<T> Sample<T>(IList<T> items, int sampleSize, bool withReplacement)
 		{
-			if (sampleSize <= 0 || (!withReplacement && sampleSize > items.Count))
-				throw new ArgumentException("Invalid sample size.");
-			else if (items.Count == 0)
-				throw new ArgumentException("The provided collection cannot be empty.");
+			Validate.IsTrue(sampleSize > 0 && (withReplacement || sampleSize <= items.Count),
+				"Invalid sample size");
+			Validate.IsTrue(items.Count > 0, "The provided collection cannot be empty");
 
 			List<T> result = new List<T>();
 			if (withReplacement)
@@ -135,10 +132,8 @@ namespace Tools.Math {
 		/// <returns>A list of items of length sampleSize</returns>
 		public static List<T> Sample<T>(IList<Tuple<T, double>> distribution, int sampleSize, bool preSorted)
 		{
-			if (sampleSize <= 0)
-				throw new ArgumentException("Invalid sample size.");
-			else if (distribution.Count == 0)
-				throw new ArgumentException("The provided collection cannot be empty.");
+			Validate.IsTrue(sampleSize > 0, "Invalid sample size");
+			Validate.IsTrue(distribution.Count > 0, "The provided collection cannot be empty");
 
 			IList<Tuple<T, double>> orderedDistribution = null;
 

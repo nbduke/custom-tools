@@ -40,8 +40,7 @@ namespace Tools.DataStructures {
 		 */
 		public bool Insert(string entry)
 		{
-			if (string.IsNullOrEmpty(entry))
-				throw new ArgumentException("The dictionary only holds nonempty strings.");
+			Validate.IsNotNullOrEmpty(entry);
 
 			// Create a path in the tree corresponding to the characters in entry
 			PrefixTreeNode currentNode = Root;
@@ -62,8 +61,7 @@ namespace Tools.DataStructures {
 
 		public int Delete(string entry)
 		{
-			if (string.IsNullOrEmpty(entry))
-				throw new ArgumentException("The dictionary only holds nonempty strings.");
+			Validate.IsNotNullOrEmpty(entry);
 
 			// Get the node that terminates the string, if in the dictionary
 			PrefixTreeNode matchingNode = Lookup(entry);
@@ -106,8 +104,7 @@ namespace Tools.DataStructures {
 		 */
 		public PrefixTreeNode Lookup(string entry)
 		{
-			if (string.IsNullOrEmpty(entry))
-				throw new ArgumentException("The dictionary only holds nonempty strings.");
+			Validate.IsNotNullOrEmpty(entry);
 
 			PrefixTreeNode matchingNode = PartialLookup(entry);
 			if (matchingNode == null || !matchingNode.EndOfWord)

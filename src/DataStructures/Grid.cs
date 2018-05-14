@@ -65,8 +65,8 @@ namespace Tools.DataStructures {
 
 		public Grid(int rows, int columns)
 		{
-			if (rows < 0 || columns < 0)
-				throw new ArgumentException("rows and columns must be nonnegative integers.");
+			Validate.IsTrue(rows >= 0 && columns >= 0,
+				"rows and columns must be nonnegative integers.");
 
 			Rows = rows;
 			Columns = columns;
@@ -103,8 +103,7 @@ namespace Tools.DataStructures {
 		 */
 		public IEnumerable<T> RowAt(int rowIndex)
 		{
-			if (rowIndex < 0 || rowIndex >= Rows)
-				throw new ArgumentException("Invalid row index.");
+			Validate.IsTrue(rowIndex >= 0 && rowIndex < Rows, "Invalid row index");
 
 			for (int i = 0; i < Columns; ++i)
 			{
@@ -117,8 +116,7 @@ namespace Tools.DataStructures {
 		 */
 		public IEnumerable<T> ColumnAt(int columnIndex)
 		{
-			if (columnIndex < 0 || columnIndex >= Columns)
-				throw new ArgumentException("Invalid column index.");
+			Validate.IsTrue(columnIndex >= 0 && columnIndex < Columns, "Invalid column index");
 
 			for (int i = 0; i < Rows; ++i)
 			{
