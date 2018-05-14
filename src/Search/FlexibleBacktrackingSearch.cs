@@ -32,8 +32,7 @@ namespace Tools.Algorithms.Search {
 			ChildGenerator<T> getChildren,
 			bool assumeChildrenNotInPath = false)
 		{
-			if (getChildren == null)
-				throw new ArgumentNullException("getChildren");
+			Validate.IsNotNull(getChildren, "getChildren");
 
 			GetChildren = getChildren;
 			AssumeChildrenNotInPath = assumeChildrenNotInPath;
@@ -44,9 +43,9 @@ namespace Tools.Algorithms.Search {
 			NodeAction<T> processNode,
 			uint maxSearchDistance = uint.MaxValue)
 		{
-			if (processNode == null)
-				throw new ArgumentNullException("processNode");
-			else if (maxSearchDistance == 0)
+			Validate.IsNotNull(processNode, "processNode");
+
+			if (maxSearchDistance == 0)
 				return;
 
 			var startNode = new PathNode<T>(start);

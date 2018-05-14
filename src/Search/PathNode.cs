@@ -40,8 +40,7 @@ namespace Tools.Algorithms.Search {
 		 */
 		public PathNode(T state, PathNode<T> parent, double weight)
 		{
-			if (state == null)
-				throw new ArgumentNullException("state");
+			Validate.IsNotNull(state, "state");
 
 			State = state;
 			Parent = parent;

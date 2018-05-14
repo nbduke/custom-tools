@@ -18,8 +18,7 @@ namespace Tools.DataStructures {
 
 		public static T Max<T>(this IEnumerable<T> items, Func<T, T, bool> lessThan)
 		{
-			if (lessThan == null)
-				throw new ArgumentNullException("lessThan");
+			Validate.IsNotNull(lessThan, "lessThan");
 
 			T max = items.First();
 			foreach (T item in items.Skip(1))
@@ -43,8 +42,7 @@ namespace Tools.DataStructures {
 
 		public static int ArgMax<T>(this IEnumerable<T> items, Func<T, T, bool> lessThan)
 		{
-			if (lessThan == null)
-				throw new ArgumentNullException("lessThan");
+			Validate.IsNotNull(lessThan, "lessThan");
 
 			int index = 0;
 			int argMax = index;
@@ -74,8 +72,7 @@ namespace Tools.DataStructures {
 
 		public static T Min<T>(this IEnumerable<T> items, Func<T, T, bool> lessThan)
 		{
-			if (lessThan == null)
-				throw new ArgumentNullException("lessThan");
+			Validate.IsNotNull(lessThan, "lessThan");
 
 			T min = items.First();
 			foreach (T item in items.Skip(1))
@@ -99,8 +96,7 @@ namespace Tools.DataStructures {
 
 		public static int ArgMin<T>(this IEnumerable<T> items, Func<T, T, bool> lessThan)
 		{
-			if (lessThan == null)
-				throw new ArgumentNullException("lessThan");
+			Validate.IsNotNull(lessThan, "lessThan");
 
 			int index = 0;
 			int argMin = index;

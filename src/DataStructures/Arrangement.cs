@@ -13,8 +13,7 @@ namespace Tools.DataStructures {
 
 		public Arrangement(IEnumerable<T> collection)
 		{
-			if (collection == null)
-				throw new ArgumentNullException("collection");
+			Validate.IsNotNull(collection, "collection");
 
 			Collection = new List<T>(collection);
 		}

@@ -12,8 +12,7 @@ namespace Tools.Algorithms.Search {
 
 		public DepthFirstSearch(ChildGenerator<T> getChildren)
 		{
-			if (getChildren == null)
-				throw new ArgumentNullException("getChildren");
+			Validate.IsNotNull(getChildren, "getChildren");
 
 			GetChildren = getChildren;
 		}
@@ -23,8 +22,7 @@ namespace Tools.Algorithms.Search {
 			NodePredicate<T> nodePredicate,
 			uint maxSearchDistance = uint.MaxValue - 1)
 		{
-			if (nodePredicate == null)
-				throw new ArgumentNullException("nodePredicate");
+			Validate.IsNotNull(nodePredicate, "nodePredicate");
 
 			var startNode = new PathNode<T>(start);
 			if (nodePredicate(startNode))
