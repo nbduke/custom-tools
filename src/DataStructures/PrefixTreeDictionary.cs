@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 
 namespace Tools.DataStructures {
@@ -15,12 +16,15 @@ namespace Tools.DataStructures {
 	 * the tree, then "cat" and "car" share the nodes C and A, and A would have
 	 * two child nodes: R and T.
 	 */
-	public class PrefixTreeDictionary : IDictionary<string>
+	public class PrefixTreeDictionary : ICollection<string>
 	{
 		public int Count { get; private set; }
-		public int UniqueCount { get; private set; }
+		public bool IsReadOnly
+		{
+			get { return false; }
+		}
 
-		private PrefixTreeNode Root { get; set; }
+		private PrefixTreeNode Root;
 
 		public PrefixTreeDictionary()
 		{
@@ -29,155 +33,120 @@ namespace Tools.DataStructures {
 
 		public void Clear()
 		{
-			Root = new PrefixTreeNode('\0', null); // arbitrary character
+			Root = new PrefixTreeNode();
 			Count = 0;
-			UniqueCount = 0;
 		}
 
-		/*
-		 * Inserts a word into the dictionary. Duplicate entries are accepted and
-		 * will increase Count but not UniqueCount.
-		 */
-		public bool Insert(string entry)
+		public void Add(string entry)
 		{
 			Validate.IsNotNullOrEmpty(entry);
 
-			// Create a path in the tree corresponding to the characters in entry
+			// Traverse the path from the root to the node corresponding to the last
+			// character in entry, adding nodes as needed
 			PrefixTreeNode currentNode = Root;
 			foreach (char c in entry)
 			{
-				currentNode.AddChild(c);
-				currentNode = currentNode.GetChild(c);
+				currentNode = currentNode.GetOrAddChild(c);
 			}
 
-			if (!currentNode.EndOfWord)
-				UniqueCount++;
-
-			Count++;
-			currentNode.WordCount++;
-
-			return true;
+			if (!currentNode.IsEndOfWord)
+			{
+				currentNode.IsEndOfWord = true;
+				++Count;
+			}
 		}
 
-		public int Delete(string entry)
+		public bool Remove(string entry)
 		{
 			Validate.IsNotNullOrEmpty(entry);
 
-			// Get the node that terminates the string, if in the dictionary
-			PrefixTreeNode matchingNode = Lookup(entry);
-			if (matchingNode == null)
-				return 0; // word is not in dictionary
+			var endOfEntry = Root.GetDescendantImpl(entry);
+			if (endOfEntry != null && endOfEntry.IsEndOfWord)
+			{
+				endOfEntry.IsEndOfWord = false;
+				--Count;
+				Prune(endOfEntry);
 
-			int wordCount = matchingNode.WordCount;
-			matchingNode.WordCount = 0;
-			Count -= wordCount;
-			UniqueCount--;
-
-			DeleteHelper(matchingNode);
-
-			return wordCount;
+				return true;
+			}
+			else
+			{
+				return false;
+			}
 		}
 
 		/*
-		 * Traverses the path from node to Root, deleting all leaf nodes that are not the
-		 * end of a word.
+		 * Traverses the path from node to the root, removing all leaf nodes that are
+		 * not the end of a word.
 		 */
-		private void DeleteHelper(PrefixTreeNode node)
+		private void Prune(PrefixTreeNode node)
 		{
-			PrefixTreeNode currentNode = node;
-			while (currentNode.Parent != null && !currentNode.HasChildren && !currentNode.EndOfWord)
+			while (!node.IsRoot && node.IsLeaf && !node.IsEndOfWord)
 			{
-				PrefixTreeNode parent = currentNode.Parent;
-				parent.RemoveChild(currentNode.Character);
-				currentNode = parent;
+				var parent = (PrefixTreeNode)node.Parent;
+				parent.RemoveChild(node.Character);
+				node = parent;
 			}
 		}
 
 		public bool Contains(string entry)
 		{
-			return Lookup(entry) != null;
+			var endOfEntry = FindNode(entry);
+			return endOfEntry != null && endOfEntry.IsEndOfWord;
 		}
 
-		/*
-		 * Returns the tree node that terminates the given word or null if the word
-		 * is not in the dictionary.
-		 */
-		public PrefixTreeNode Lookup(string entry)
+		/// <summary>
+		/// Finds the node that terminates the given prefix, if it exists
+		/// </summary>
+		/// <param name="prefix">the prefix string</param>
+		public IPrefixTreeNode FindNode(string prefix)
 		{
-			Validate.IsNotNullOrEmpty(entry);
+			return Root.GetDescendant(prefix);
+		}
 
-			PrefixTreeNode matchingNode = PartialLookup(entry);
-			if (matchingNode == null || !matchingNode.EndOfWord)
-				return null;
+		public IEnumerator<string> GetEnumerator()
+		{
+			return new PrefixTreeEnumerator(Root);
+		}
+
+		IEnumerator IEnumerable.GetEnumerator()
+		{
+			return GetEnumerator();
+		}
+
+		/// <summary>
+		/// Throws NotImplementedException.
+		/// </summary>
+		public void CopyTo(string[] array, int arrayIndex)
+		{
+			throw new NotImplementedException();
+		}
+
+		/// <summary>
+		/// Returns an enumerable of words that begin with a given prefix
+		/// </summary>
+		/// <param name="prefix">the prefix</param>
+		public IEnumerable<string> GetWordsWithPrefix(string prefix)
+		{
+			var endOfPrefix = FindNode(prefix);
+			if (endOfPrefix != null)
+			{
+				var enumerator = new PrefixTreeEnumerator(endOfPrefix, prefix);
+				return enumerator.Iterate();
+			}
 			else
-				return matchingNode;
-		}
-
-		/*
-		 * Performs a prefix lookup starting at the root. Whereas Lookup only returns
-		 * a node that terminates an entry in the dictionary, PartialLookup returns a
-		 * node as long as the given prefix exists in the dictionary.
-		 */
-		public PrefixTreeNode PartialLookup(string prefix)
-		{
-			return PartialLookup(prefix, Root);
-		}
-
-		/*
-		 * Performs a prefix lookup using startNode as the root.
-		 */
-		public PrefixTreeNode PartialLookup(string prefix, PrefixTreeNode startNode)
-		{
-			Validate.IsNotNull(prefix, "prefix");
-			Validate.IsNotNull(startNode, "startNode");
-
-			// Traverse the path from the root corresponding to the characters in prefix
-			PrefixTreeNode currentNode = startNode;
-			foreach (char c in prefix)
 			{
-				currentNode = currentNode.GetChild(c);
-
-				if (currentNode == null)
-					return null; // prefix is not in dictionary
+				return new string[] { };
 			}
-
-			return currentNode;
 		}
 
-		/*
-		 * Returns a list of entries in the dictionary that begin with the given prefix.
-		 */
-		public List<string> GetWordsWithPrefix(string prefix)
+		/// <summary>
+		/// Applies a visitor object to the root of the tree.
+		/// </summary>
+		/// <param name="visitor">the visitor</param>
+		public void VisitTree(IVisitor<IPrefixTreeNode> visitor)
 		{
-			List<string> result = new List<string>();
-			PrefixTreeNode matchingNode = PartialLookup(prefix);
-
-			if (matchingNode == null)
-				return result;
-
-			CollectWordsVisitor visitor = new CollectWordsVisitor(result, prefix);
-			VisitNodesInSubtree(visitor, matchingNode);
-
-			return result;
-		}
-
-		/*
-		 * Applies the given visitor to all nodes in the tree.
-		 */
-		public void VisitAllNodes(IVisitor<PrefixTreeNode> visitor)
-		{
-			VisitNodesInSubtree(visitor, Root);
-		}
-
-		/*
-		 * Applies the given visitor to all nodes in the subtree rooted at the given node.
-		 */
-		public void VisitNodesInSubtree(IVisitor<PrefixTreeNode> visitor, PrefixTreeNode subtreeRoot)
-		{
-			foreach (PrefixTreeNode startNode in subtreeRoot.GetChildren())
-			{
-				visitor.Visit(startNode);
-			}
+			Root.Accept(visitor);
 		}
 	}
 

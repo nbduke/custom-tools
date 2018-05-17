@@ -2,67 +2,103 @@
 
 namespace Tools.DataStructures {
 
-	/*
-	 * PrefixTreeNode is a single node in a PrefixTreeDictionary. It stores a
-	 * single character, a list of child nodes, and a count of entries that
-	 * terminate in this node.
-	 */
-	public class PrefixTreeNode
+	class PrefixTreeNode : IPrefixTreeNode
 	{
 		public char Character { get; set; }
-		public int WordCount { get; set; }
-		public bool EndOfWord
+		public bool IsEndOfWord { get; set; }
+		public bool IsRoot
 		{
-			get { return WordCount > 0; }
+			get { return Parent == null; }
 		}
-		public bool HasChildren
+		public bool IsLeaf
 		{
-			get { return Children.Count > 0; }
+			get { return _Children.Count == 0; }
 		}
-		public readonly PrefixTreeNode Parent;
+		public IEnumerable<IPrefixTreeNode> Children
+		{
+			get { return _Children.Values; }
+		}
+		public IPrefixTreeNode Parent { get; }
 
-		private readonly SortedList<char, PrefixTreeNode> Children;
+		private readonly SortedList<char, PrefixTreeNode> _Children;
+
+		/*
+		 * Constructs a root PrefixTreeNode.
+		 */
+		public PrefixTreeNode()
+			: this('\0', null)
+		{
+		}
 
 		public PrefixTreeNode(char character, PrefixTreeNode parent)
 		{
 			Character = character;
-			WordCount = 0;
 			Parent = parent;
-			Children = new SortedList<char, PrefixTreeNode>();
+			IsEndOfWord = false;
+			_Children = new SortedList<char, PrefixTreeNode>();
 		}
 
-		public void AddChild(char c)
+		/*
+		 * Gets the child node for the given character, if it exists, and
+		 * creates one otherwise. In either case, the child node is returned.
+		 */
+		public PrefixTreeNode GetOrAddChild(char c)
 		{
-			if (!Children.ContainsKey(c))
-				Children.Add(c, new PrefixTreeNode(c, this));
+			var child = GetChildImpl(c);
+			if (child == null)
+			{
+				child = new PrefixTreeNode(c, this);
+				_Children.Add(c, child);
+			}
+
+			return child;
 		}
 
 		public void RemoveChild(char c)
 		{
-			Children.Remove(c);
+			_Children.Remove(c);
 		}
 
-		public PrefixTreeNode GetChild(char c)
+		public IPrefixTreeNode GetChild(char c)
 		{
-			try
-			{
-				return Children[c];
-			}
-			catch (KeyNotFoundException)
-			{
+			return GetChildImpl(c);
+		}
+
+		public PrefixTreeNode GetChildImpl(char c)
+		{
+			if (_Children.TryGetValue(c, out PrefixTreeNode child))
+				return child;
+			else
 				return null;
-			}
 		}
 
-		public IEnumerable<PrefixTreeNode> GetChildren()
+		public IPrefixTreeNode GetDescendant(string s)
 		{
-			return Children.Values;
+			return GetDescendantImpl(s);
+		}
+
+		public PrefixTreeNode GetDescendantImpl(string s)
+		{
+			var currentNode = this;
+			foreach (char c in s)
+			{
+				currentNode = currentNode.GetChildImpl(c);
+				if (currentNode == null)
+					return null;
+			}
+
+			return currentNode;
+		}
+
+		public void Accept(IVisitor<IPrefixTreeNode> visitor)
+		{
+			Validate.IsNotNull(visitor, "visitor");
+			visitor.Visit(this);
 		}
 
 		public override bool Equals(object obj)
 		{
-			PrefixTreeNode other = obj as PrefixTreeNode;
-			return this == other;
+			return obj is PrefixTreeNode other && Character == other.Character;
 		}
 
 		public override int GetHashCode()
@@ -73,21 +109,6 @@ namespace Tools.DataStructures {
 		public override string ToString()
 		{
 			return Character.ToString();
-		}
-
-		public static bool operator==(PrefixTreeNode a, PrefixTreeNode b)
-		{
-			if (object.ReferenceEquals(a, b))
-				return true;
-			else if (((object)a == null) || ((object)b == null))
-				return false;
-			else
-				return a.Character == b.Character;
-		}
-
-		public static bool operator!=(PrefixTreeNode a, PrefixTreeNode b)
-		{
-			return !(a == b);
 		}
 	}
 

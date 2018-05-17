@@ -1,37 +1,48 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
 namespace Tools.DataStructures {
 
-	/*
-	 * Prints words in a PrefixTreeDictionary.
-	 */
-	public class PrintWordsVisitor : IVisitor<PrefixTreeNode>
+	/// <summary>
+	/// Prints words in a PrefixTreeDictionary to an output stream
+	/// </summary>
+	public class PrintWordsVisitor : IVisitor<IPrefixTreeNode>
 	{
 		private readonly TextWriter OutputStream;
 		private readonly StringBuilder CurrentString;
 
+		/// <summary>
+		/// Constructs a PrintWordsVisitor that writes to the console.
+		/// </summary>
 		public PrintWordsVisitor()
 			: this(Console.Out)
 		{
 		}
 
+		/// <summary>
+		/// Constructs a PrintWordsVisitor that writes to an output stream.
+		/// </summary>
+		/// <param name="outputStream">the output stream</param>
 		public PrintWordsVisitor(TextWriter outputStream)
 		{
+			Validate.IsNotNull(outputStream, "outputStream");
 			OutputStream = outputStream;
 			CurrentString = new StringBuilder();
 		}
 
-		public void Visit(PrefixTreeNode item)
+		/// <summary>
+		/// Prints all words in the subtree rooted at a node
+		/// </summary>
+		/// <param name="item">the node</param>
+		public void Visit(IPrefixTreeNode item)
 		{
 			CurrentString.Append(item.Character);
 
-			if (item.EndOfWord)
+			if (item.IsEndOfWord)
 				OutputStream.WriteLine(CurrentString.ToString());
 
-			foreach (var child in item.GetChildren())
+			foreach (var child in item.Children)
 			{
 				Visit(child);
 			}
@@ -41,52 +52,10 @@ namespace Tools.DataStructures {
 	}
 
 
-	/*
-	 * Generates a list of words in a PrefixTreeDictionary.
-	 */
-	public class CollectWordsVisitor : IVisitor<PrefixTreeNode>
-	{
-		public readonly List<string> Words;
-
-		private readonly StringBuilder CurrentString;
-
-		public CollectWordsVisitor()
-			: this(new List<string>())
-		{
-		}
-
-		public CollectWordsVisitor(List<string> collection)
-			: this(collection, string.Empty)
-		{
-		}
-
-		public CollectWordsVisitor(List<string> collection, string wordsWithPrefix)
-		{
-			Words = collection;
-			CurrentString = new StringBuilder(wordsWithPrefix);
-		}
-
-		public void Visit(PrefixTreeNode item)
-		{
-			CurrentString.Append(item.Character);
-
-			if (item.EndOfWord)
-				Words.Add(CurrentString.ToString());
-
-			foreach (var child in item.GetChildren())
-			{
-				Visit(child);
-			}
-
-			CurrentString.Length--;
-		}
-	}
-
-
-	/*
-	 * Counts all nodes in a PrefixTreeDictionary.
-	 */
-	public class CountNodesVisitor : IVisitor<PrefixTreeNode>
+	/// <summary>
+	/// Counts nodes in a PrefixTreeDictionary
+	/// </summary>
+	public class CountNodesVisitor : IVisitor<IPrefixTreeNode>
 	{
 		public int Count { get; private set; }
 
@@ -95,11 +64,15 @@ namespace Tools.DataStructures {
 			Count = 0;
 		}
 
-		public void Visit(PrefixTreeNode item)
+		/// <summary>
+		/// Counts all nodes in the subtree rooted at a node
+		/// </summary>
+		/// <param name="item">the node</param>
+		public void Visit(IPrefixTreeNode item)
 		{
 			++Count;
 
-			foreach (var child in item.GetChildren())
+			foreach (var child in item.Children)
 			{
 				Visit(child);
 			}
