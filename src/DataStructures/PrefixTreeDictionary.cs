@@ -4,18 +4,19 @@ using System.Collections.Generic;
 
 namespace Tools.DataStructures {
 
-	/*
-	 * PrefixTreeDictionary is a collection of strings that groups elements
-	 * by common prefixes. This allows for prefix-based queries. The dictionary
-	 * is represented as a tree whose nodes are characters and whose edges
-	 * represent concatenation.
-	 * 
-	 * For example, the string "cat" would be represented by the nodes C->A->T.
-	 * 
-	 * Moreover, the nodes of common prefixes are shared. If "car" is also in
-	 * the tree, then "cat" and "car" share the nodes C and A, and A would have
-	 * two child nodes: R and T.
-	 */
+	/// <summary>
+	/// PrefixTreeDictionary is a collection of unique strings that groups
+	/// elements by common prefixes and supports prefix-based queries.
+	/// </summary>
+	/// <remarks>
+	/// The dictionary is represented as a tree where nodes are characters and
+	/// edges represent concatenation. For example, the string "cat" would be
+	/// represented by the nodes C->A->T.
+	/// 
+	/// Moreover, the nodes of common prefixes are shared.If "car" is also in
+	/// the tree, then "cat" and "car" share the nodes C and A, and A would have
+	/// two child nodes: R and T.
+	/// </remarks>
 	public class PrefixTreeDictionary : ICollection<string>
 	{
 		public int Count { get; private set; }
@@ -31,20 +32,27 @@ namespace Tools.DataStructures {
 			Clear();
 		}
 
+		/// <summary>
+		/// Removes all entries from the dictionary.
+		/// </summary>
 		public void Clear()
 		{
 			Root = new PrefixTreeNode();
 			Count = 0;
 		}
 
-		public void Add(string entry)
+		/// <summary>
+		/// Adds a word to the dictionary.
+		/// </summary>
+		/// <param name="word">the word</param>
+		public void Add(string word)
 		{
-			Validate.IsNotNullOrEmpty(entry);
+			Validate.IsNotNullOrEmpty(word);
 
 			// Traverse the path from the root to the node corresponding to the last
-			// character in entry, adding nodes as needed
+			// character in the word, adding nodes as needed
 			PrefixTreeNode currentNode = Root;
-			foreach (char c in entry)
+			foreach (char c in word)
 			{
 				currentNode = currentNode.GetOrAddChild(c);
 			}
@@ -56,16 +64,19 @@ namespace Tools.DataStructures {
 			}
 		}
 
-		public bool Remove(string entry)
+		/// <summary>
+		/// Removes a word from the dictionary.
+		/// </summary>
+		/// <param name="word">the word</param>
+		/// <returns>true if the word is in the dictionary</returns>
+		public bool Remove(string word)
 		{
-			Validate.IsNotNullOrEmpty(entry);
-
-			var endOfEntry = Root.GetDescendantImpl(entry);
-			if (endOfEntry != null && endOfEntry.IsEndOfWord)
+			var endOfWord = Root.GetDescendantImpl(word);
+			if (endOfWord != null && endOfWord.IsEndOfWord)
 			{
-				endOfEntry.IsEndOfWord = false;
+				endOfWord.IsEndOfWord = false;
 				--Count;
-				Prune(endOfEntry);
+				Prune(endOfWord);
 
 				return true;
 			}
@@ -89,16 +100,31 @@ namespace Tools.DataStructures {
 			}
 		}
 
-		public bool Contains(string entry)
+		/// <summary>
+		/// Checks if a word is in the dictionary.
+		/// </summary>
+		/// <param name="word">the word</param>
+		/// <returns>true if the word is in the dictionary</returns>
+		public bool Contains(string word)
 		{
-			var endOfEntry = FindNode(entry);
-			return endOfEntry != null && endOfEntry.IsEndOfWord;
+			var endOfWord = FindNode(word);
+			return endOfWord != null && endOfWord.IsEndOfWord;
 		}
 
 		/// <summary>
-		/// Finds the node that terminates the given prefix, if it exists
+		/// Checks if a prefix is in the dictionary. A prefix need not be a word.
 		/// </summary>
-		/// <param name="prefix">the prefix string</param>
+		/// <param name="prefix">the prefix</param>
+		/// <returns>true if the prefix is in the dictionary</returns>
+		public bool ContainsPrefix(string prefix)
+		{
+			return FindNode(prefix) != null;
+		}
+
+		/// <summary>
+		/// Finds the node that terminates a prefix, if it exists.
+		/// </summary>
+		/// <param name="prefix">the prefix</param>
 		public IPrefixTreeNode FindNode(string prefix)
 		{
 			return Root.GetDescendant(prefix);
@@ -114,16 +140,16 @@ namespace Tools.DataStructures {
 			return GetEnumerator();
 		}
 
-		/// <summary>
-		/// Throws NotImplementedException.
-		/// </summary>
 		public void CopyTo(string[] array, int arrayIndex)
 		{
-			throw new NotImplementedException();
+			foreach (string word in this)
+			{
+				array[arrayIndex++] = word;
+			}
 		}
 
 		/// <summary>
-		/// Returns an enumerable of words that begin with a given prefix
+		/// Returns an enumerable of words that begin with a given prefix.
 		/// </summary>
 		/// <param name="prefix">the prefix</param>
 		public IEnumerable<string> GetWordsWithPrefix(string prefix)

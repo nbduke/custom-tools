@@ -15,14 +15,14 @@ namespace Tools.DataStructures {
 		IEnumerable<IPrefixTreeNode> Children { get; }
 
 		/// <summary>
-		/// Returns the child node corresponding to a character, if it exists
+		/// Returns the child node corresponding to a character, if it exists.
 		/// </summary>
 		/// <param name="c">the character</param>
 		IPrefixTreeNode GetChild(char c);
 
 		/// <summary>
 		/// Returns the descendant node corresponding to the last character
-		/// in a string, if it exists
+		/// in a string, if it exists.
 		/// </summary>
 		/// <param name="s">the string</param>
 		IPrefixTreeNode GetDescendant(string s);

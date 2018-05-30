@@ -79,6 +79,8 @@ namespace Tools.DataStructures {
 
 		public PrefixTreeNode GetDescendantImpl(string s)
 		{
+			Validate.IsNotNull(s, "s");
+
 			var currentNode = this;
 			foreach (char c in s)
 			{
