@@ -8,10 +8,6 @@ using Tools.DataStructures;
 
 namespace Test {
 
-	// TODO need component tests too! Use CountingNodeVisitor to validate tree structure:
-	//		- Shared prefixes
-	//		- Pruning on remove
-
 	[TestClass]
 	public class PrefixTreeDictionaryUnitTests
 	{

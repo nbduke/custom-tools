@@ -1,11 +1,15 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 
-namespace Tools.DataStructures {
+namespace Tools.DataStructures
+{
 
+	/*
+	 * An enumerator over words in a PrefixTreeDictionary. Current points
+	 * to a word, and each call to MoveNext advances Current to the next
+	 * word in lexicographic order.
+	 */
 	class PrefixTreeEnumerator : IEnumerator<string>
 	{
 		private IPrefixTreeNode CurrentNode;
@@ -21,7 +25,7 @@ namespace Tools.DataStructures {
 			WordBuilder = new StringBuilder(prefix);
 			NodeEnumeratorStack = new Stack<IEnumerator<IPrefixTreeNode>>();
 			NodeEnumeratorStack.Push(CurrentNode.Children.GetEnumerator());
-			CheckInitialPrefix = true;
+			CheckInitialPrefix = prefix.Length > 0;
 		}
 
 		public string Current

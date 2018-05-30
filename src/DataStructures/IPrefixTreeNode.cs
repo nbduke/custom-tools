@@ -21,8 +21,9 @@ namespace Tools.DataStructures {
 		IPrefixTreeNode GetChild(char c);
 
 		/// <summary>
-		/// Returns the descendant node corresponding to the last character
-		/// in a string, if it exists.
+		/// Returns the descendant node on the path whose characters correspond
+		/// to a string, if it exists. The first character of the string is
+		/// considered to be a child of this node.
 		/// </summary>
 		/// <param name="s">the string</param>
 		IPrefixTreeNode GetDescendant(string s);

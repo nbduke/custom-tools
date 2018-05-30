@@ -13,7 +13,7 @@ namespace Tools.DataStructures {
 	/// edges represent concatenation. For example, the string "cat" would be
 	/// represented by the nodes C->A->T.
 	/// 
-	/// Moreover, the nodes of common prefixes are shared.If "car" is also in
+	/// Moreover, the nodes of common prefixes are shared. If "car" is also in
 	/// the tree, then "cat" and "car" share the nodes C and A, and A would have
 	/// two child nodes: R and T.
 	/// </remarks>
