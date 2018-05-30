@@ -49,10 +49,11 @@
     <Compile Include="..\..\src\DataStructures\CollectionExtensions.cs" />
     <Compile Include="..\..\src\DataStructures\Grid.cs" />
     <Compile Include="..\..\src\DataStructures\GridCell.cs" />
-    <Compile Include="..\..\src\DataStructures\IDictionary.cs" />
+	<Compile Include="..\..\src\DataStructures\IPrefixTreeNode.cs" />
     <Compile Include="..\..\src\DataStructures\IVisitor.cs" />
     <Compile Include="..\..\src\DataStructures\PrefixTreeDictionary.cs" />
     <Compile Include="..\..\src\DataStructures\PrefixTreeDictionaryVisitors.cs" />
+	<Compile Include="..\..\src\DataStructures\PrefixTreeEnumerator.cs" />
     <Compile Include="..\..\src\DataStructures\PrefixTreeNode.cs" />
     <Compile Include="..\..\src\Math\Combinatorics.cs" />
     <Compile Include="..\..\src\Math\RandomProvider.cs" />

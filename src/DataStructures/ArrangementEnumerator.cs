@@ -115,7 +115,7 @@ namespace Tools.DataStructures {
 			while (IndexEnumeratorStack.Count > 0)
 			{
 				var currentEnumerator = IndexEnumeratorStack.Peek();
-				bool moveUpStack = false;
+				bool increaseDepth = false;
 
 				while (currentEnumerator.MoveNext())
 				{
@@ -136,13 +136,13 @@ namespace Tools.DataStructures {
 						else
 						{
 							// We need to move on to the next index and continue building from there
-							moveUpStack = true;
+							increaseDepth = true;
 							break;
 						}
 					}
 				}
 
-				if (!moveUpStack)
+				if (!increaseDepth)
 				{
 					IndexEnumeratorStack.Pop();
 					if (IndexStack.Count > 0)
