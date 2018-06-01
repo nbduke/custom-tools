@@ -188,7 +188,6 @@ namespace Tools.Math {
 			}
 		}
 
-#region Helper methods
 		private static void CheckThreadLocalMember()
 		{
 			if (Local == null)
@@ -202,7 +201,6 @@ namespace Tools.Math {
 				Local = new Random(seed);
 			}
 		}
-#endregion
 	}
 
 }

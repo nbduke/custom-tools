@@ -3,10 +3,9 @@ using System.Collections.Generic;
 
 namespace Tools.Algorithms.Search {
 
-	/*
-	 * NodeOption specifies behaviors at each node for a backtracking search
-	 * algorithm.
-	 */
+	/// <summary>
+	/// Specifies behaviors at each node for a backtracking search algorithm.
+	/// </summary>
 	public enum NodeOption
 	{
 		Stop,

@@ -3,9 +3,10 @@ using System.Collections.Generic;
 
 namespace Tools.Algorithms.Search {
 
-	/*
-	 * Implements a depth-first search of a graph.
-	 */
+	/// <summary>
+	/// Implements a depth-first search of a graph.
+	/// </summary>
+	/// <typeparam name="T">the type of nodes in the graph</typeparam>
 	public class DepthFirstSearch<T>
 	{
 		private readonly ChildGenerator<T> GetChildren;

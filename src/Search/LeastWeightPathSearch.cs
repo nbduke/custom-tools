@@ -5,11 +5,12 @@ using Tools.DataStructures;
 
 namespace Tools.Algorithms.Search {
 
-	/*
-	 * Least-weight path search (a.k.a. uniform cost search) explores nodes
-	 * in order by ascending cumulative path weight, allowing it to find the
-	 * least-total-weight path between two nodes.
-	 */
+	/// <summary>
+	/// Least-weight path search (a.k.a. uniform cost search) explores nodes
+	/// in order by ascending cumulative path weight, allowing it to find the
+	/// least-total-weight path between two nodes.
+	/// </summary>
+	/// <typeparam name="T">the type of nodes in the graph</typeparam>
 	public class LeastWeightPathSearch<T>
 	{
 		private readonly ChildGenerator<T> GetChildren;

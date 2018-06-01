@@ -1,8 +1,8 @@
 ﻿namespace Tools.DataStructures {
 
-	/*
-	 * An ordered pair that uniquely locates a cell in a grid (a 2D array).
-	 */
+	/// <summary>
+	/// An ordered pair that uniquely locates a cell in a grid (a 2D array).
+	/// </summary>
 	public struct GridCell
 	{
 		public int Row { get; set; }

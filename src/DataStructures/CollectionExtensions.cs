@@ -4,13 +4,12 @@ using System.Linq;
 
 namespace Tools.DataStructures {
 
-	/*
-	 * Contains useful extension methods for collection data types.
-	 */
+	/// <summary>
+	/// Contains useful extension methods for collection data types.
+	/// </summary>
 	public static class CollectionExtensions
 	{
-#region Max
-
+		#region Max
 		public static T Max<T>(this IEnumerable<T> items, IComparer<T> comparer)
 		{
 			return Max(items, (a, b) => comparer.Compare(a, b) < 0);
@@ -30,16 +29,28 @@ namespace Tools.DataStructures {
 			return max;
 		}
 
+		/// <summary>
+		/// Returns the index of the maximum-valued item in a collection.
+		/// </summary>
+		/// <param name="items">the collection</param>
 		public static int ArgMax<T>(this IEnumerable<T> items) where T : IComparable, IComparable<T>
 		{
 			return ArgMax(items, (a, b) => a.CompareTo(b) < 0);
 		}
 
+		/// <summary>
+		/// Returns the index of the maximum-valued item in a collection.
+		/// </summary>
+		/// <param name="items">the collection</param>
 		public static int ArgMax<T>(this IEnumerable<T> items, IComparer<T> comparer)
 		{
 			return ArgMax(items, (a, b) => comparer.Compare(a, b) < 0);
 		}
 
+		/// <summary>
+		/// Returns the index of the maximum-valued item in a collection.
+		/// </summary>
+		/// <param name="items">the collection</param>
 		public static int ArgMax<T>(this IEnumerable<T> items, Func<T, T, bool> lessThan)
 		{
 			Validate.IsNotNull(lessThan, "lessThan");
@@ -60,11 +71,9 @@ namespace Tools.DataStructures {
 
 			return argMax;
 		}
+		#endregion
 
-#endregion
-
-#region Min
-
+		#region Min
 		public static T Min<T>(this IEnumerable<T> items, IComparer<T> comparer)
 		{
 			return Min(items, (a, b) => comparer.Compare(a, b) < 0);
@@ -84,16 +93,28 @@ namespace Tools.DataStructures {
 			return min;
 		}
 
+		/// <summary>
+		/// Returns the index of the minimum-valued item in a collection.
+		/// </summary>
+		/// <param name="items">the collection</param>
 		public static int ArgMin<T>(this IEnumerable<T> items) where T : IComparable, IComparable<T>
 		{
 			return ArgMin(items, (a, b) => a.CompareTo(b) < 0);
 		}
 
+		/// <summary>
+		/// Returns the index of the minimum-valued item in a collection.
+		/// </summary>
+		/// <param name="items">the collection</param>
 		public static int ArgMin<T>(this IEnumerable<T> items, IComparer<T> comparer)
 		{
 			return ArgMin(items, (a, b) => comparer.Compare(a, b) < 0);
 		}
 
+		/// <summary>
+		/// Returns the index of the minimum-valued item in a collection.
+		/// </summary>
+		/// <param name="items">the collection</param>
 		public static int ArgMin<T>(this IEnumerable<T> items, Func<T, T, bool> lessThan)
 		{
 			Validate.IsNotNull(lessThan, "lessThan");
@@ -114,8 +135,7 @@ namespace Tools.DataStructures {
 
 			return argMin;
 		}
-
-#endregion
+		#endregion
 
 		#region Generic IEnumerable
 		public static IEnumerable<T> Iterate<T>(this IEnumerator<T> enumerator)

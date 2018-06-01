@@ -4,28 +4,23 @@ using System.Linq;
 
 namespace Tools.DataStructures {
 
-	/*
-	 * Specifies the partial ordering of elements in a heap. This
-	 * determines the element at the top of the heap.
-	 */
+	/// <summary>
+	/// Specifies the partial ordering of elements in a heap.
+	/// </summary>
 	public enum HeapOrder
 	{
 		MinFirst,
 		MaxFirst
 	}
 
-	/*
-	 * A priority-based heap in which each node has at most two children. The heap is
-	 * implemented as an array with the Top at index 0. The heap order is configurable
-	 * at construction.
-	 */
+	/// <summary>
+	/// A priority-based heap in which each node has at most two children.
+	/// </summary>
 	public class BinaryHeap<T> : IEnumerable<T>
 	{
-#region Support classes
-
-		/*
-		 * A tuple consisting of an element in the heap and its real-valued priority.
-		 */
+		/// <summary>
+		/// A tuple consisting of an element in the heap and its real-valued priority.
+		/// </summary>
 		public class Handle
 		{
 			public T Value { get; set; }
@@ -37,8 +32,6 @@ namespace Tools.DataStructures {
 				Priority = priority;
 			}
 		}
-
-		#endregion
 
 		public readonly HeapOrder Order;
 		public int Count
@@ -109,8 +102,6 @@ namespace Tools.DataStructures {
 			return Data.Select(handle => handle.Value).GetEnumerator();
 		}
 
-#region Helper methods
-
 		IEnumerator IEnumerable.GetEnumerator()
 		{
 			return this.GetEnumerator();
@@ -177,8 +168,6 @@ namespace Tools.DataStructures {
 			Data[p] = Data[q];
 			Data[q] = temp;
 		}
-
-#endregion
 	}
 
 }

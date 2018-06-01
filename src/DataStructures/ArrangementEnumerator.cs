@@ -5,14 +5,14 @@ using System.Linq;
 
 namespace Tools.DataStructures {
 
-	/// <summary>
-	/// Represents an enumerator of permutations or combinations (a.k.a.
-	/// arrangements) of a collection. Current points to an arrangement of
-	/// items, and each call to MoveNext advances Current to the next
-	/// arrangement in lexicographic order. The original collection is the
-	/// first (or "sorted") element in the total ordering, and all items are
-	/// considered to be distinct.
-	/// </summary>
+	/*
+	 * Represents an enumerator of permutations or combinations (a.k.a.
+	 * arrangements) of a collection. Current points to an arrangement of
+	 * items, and each call to MoveNext advances Current to the next
+	 * arrangement in lexicographic order. The original collection is the
+	 * first (or "sorted") element in the total ordering, and all items are
+	 * considered to be distinct.
+	*/
 	class ArrangementEnumerator<T> : IEnumerator<List<T>>
 	{
 		private readonly List<T> Collection;
@@ -23,14 +23,6 @@ namespace Tools.DataStructures {
 		private Stack<IEnumerator<int>> IndexEnumeratorStack;
 		private List<T> _Current;
 
-		/// <summary>
-		/// Creates an ArrangementEnumerator.
-		/// </summary>
-		/// <param name="collection">the original collection</param>
-		/// <param name="minimumSize">the minimum size of an arrangement</param>
-		/// <param name="maximumSize">the maximum size of an arrangement</param>
-		/// <param name="isPermutation">if true, enumerate permutations. Otherwise,
-		/// enumerate combinations</param>
 		public ArrangementEnumerator(
 			List<T> collection,
 			uint minimumSize,

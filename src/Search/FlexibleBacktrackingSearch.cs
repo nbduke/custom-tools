@@ -2,18 +2,19 @@
 
 namespace Tools.Algorithms.Search {
 
-	/*
-	 * Like BacktrackingSearch, FlexibleBacktrackingSearch is a memory-optimized
-	 * depth-first search. Rather than terminating when a particular node is found,
-	 * however, FlexibleBacktrackingSearch enables searching over arbitrary regions
-	 * of the graph, applying a customizable action at each node.
-	 * 
-	 * The NodeAction given to the Search method allows one of the following behaviors at
-	 * each node:
-	 *		Stop:					the algorithm terminates (identical to BacktrackingSearch)
-	 *		Continue:				the algorithm extends the search path through the current node
-	 *		BacktrackAndContinue:	the algorithm backtracks to the node's parent and continues with its next child
-	 */
+	/// <summary>
+	/// Like BacktrackingSearch, FlexibleBacktrackingSearch is a memory-optimized
+	/// depth-first search, but rather than terminating when a particular node is found,
+	/// FlexibleBacktrackingSearch enables searching over arbitrary regions of the graph,
+	/// applying a customizable action at each node.
+	/// </summary>
+	/// <remarks>
+	/// The NodeAction given to the Search method allows one of the following behaviors at
+	/// each node:
+	///		Stop:					the algorithm terminates (identical to BacktrackingSearch)
+	///		Continue:				the algorithm extends the search path through the current node
+	///		BacktrackAndContinue:	the algorithm backtracks to the node's parent and continues with its next child
+	/// </remarks>
 	public class FlexibleBacktrackingSearch<T>
 	{
 		private readonly ChildGenerator<T> GetChildren;
