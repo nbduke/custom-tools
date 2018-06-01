@@ -4,13 +4,13 @@ using System.Linq;
 
 namespace Tools.Algorithms.Search {
 
-	/*
-	 * PathNode encapsulates a single node in a path of a graph whose nodes
-	 * are represented by the template type T. The path is maintained by
-	 * links from each node to its parent node (the preceding node on the
-	 * path). PathNode also keeps track of information such as the
-	 * cumulative path length and weight.
-	 */
+	/// <summary>
+	/// PathNode encapsulates a single node in a path of a graph. The path is
+	/// maintained by links from each node to its parent node (the preceding
+	/// node on the path). PathNode also keeps track of the cumulative path
+	/// length and weight.
+	/// </summary>
+	/// <typeparam name="T">the type of nodes in the graph</typeparam>
 	public class PathNode<T>
 	{
 		public readonly T State;
@@ -18,26 +18,31 @@ namespace Tools.Algorithms.Search {
 		public readonly uint CumulativePathLength;
 		public readonly double CumulativePathWeight;
 
-		/*
-		 * Constructs a root node (the first node in a path).
-		 */
+		/// <summary>
+		/// Constructs a root node (the first node in a path).
+		/// </summary>
+		/// <param name="state">the state associated with the node</param>
 		public PathNode(T state)
 			: this(state, null)
 		{
 		}
 
-		/*
-		 * Constructs a node with zero weight on its incoming edge.
-		 */
+		/// <summary>
+		/// Constructs a node with zero weight on its incoming edge.
+		/// </summary>
+		/// <param name="state">the state associated with the node</param>
+		/// <param name="parent">the node's parent</param>
 		public PathNode(T state, PathNode<T> parent)
 			: this(state, parent, 0)
 		{
 		}
 
-		/*
-		 * Constructs a node with the given parent and the given weight on
-		 * its incoming edge.
-		 */
+		/// <summary>
+		/// Constructs a node with a parent and a weight on its incoming edge.
+		/// </summary>
+		/// <param name="state">the state associated with the node</param>
+		/// <param name="parent">the node's parent</param>
+		/// <param name="weight">the edge weight</param>
 		public PathNode(T state, PathNode<T> parent, double weight)
 		{
 			Validate.IsNotNull(state, "state");

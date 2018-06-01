@@ -2,12 +2,12 @@
 
 namespace Tools.Algorithms.Search {
 
-	/*
-	 * Backtracking search is a memory-optimized depth-first search. Instead of keeping
-	 * track of the explored set and frontier, only elements on the current search path
-	 * are kept in memory. The memory savings come at the expense of potentially
-	 * exploring redundant sub-paths.
-	 */
+	/// <summary>
+	/// Backtracking search is a memory-optimized depth-first search.<para/>
+	/// Instead of keeping track of the explored set and frontier, only elements
+	/// on the current search path are kept in memory. The memory savings come at
+	/// the expense of potentially exploring redundant sub-paths.
+	/// </summary>
 	public class BacktrackingSearch<T>
 	{
 		private readonly ChildGenerator<T> GetChildren;

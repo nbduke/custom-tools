@@ -4,19 +4,19 @@ using System.Collections.Generic;
 
 namespace Tools.DataStructures {
 
-	/*
-	 * Specifies the traversal order over a grid.
-	 */
+	/// <summary>
+	/// Specifies the traversal order over a grid.
+	/// </summary>
 	public enum GridOrder
 	{
 		RowMajor,
 		ColumnMajor
 	}
 
-	/*
-	 * Grid is a wrapper around a 2D array of any type. It provides useful functions for
-	 * iterating over and searching the array.
-	 */
+	/// <summary>
+	/// Grid is a wrapper around a 2D array that provides useful functions for iterating
+	/// over and searching the array.
+	/// </summary>
 	public class Grid<T> : IEnumerable<T>
 	{
 		public readonly int Rows;
@@ -32,6 +32,14 @@ namespace Tools.DataStructures {
 
 		private readonly T[,] Data;
 
+		/// <summary>
+		/// Creates a grid and fills it with a collection.
+		/// </summary>
+		/// <param name="rows">the number of rows to create</param>
+		/// <param name="columns">the number of columns to create</param>
+		/// <param name="items">the collection</param>
+		/// <param name="fillOrder">the order in which items should be moved from the
+		/// collection to the grid</param>
 		public Grid(
 			int rows,
 			int columns,
@@ -53,6 +61,12 @@ namespace Tools.DataStructures {
 				throw new ArgumentException("The grid is too small to hold all of the given items.");
 		}
 
+		/// <summary>
+		/// Creates a grid and initializes every cell with a value.
+		/// </summary>
+		/// <param name="rows">the number of rows to create</param>
+		/// <param name="columns">the number of columns to create</param>
+		/// <param name="fillValue">the value to use</param>
 		public Grid(int rows, int columns, T fillValue)
 			: this(rows, columns)
 		{
@@ -63,6 +77,11 @@ namespace Tools.DataStructures {
 				});
 		}
 
+		/// <summary>
+		/// Creates an empty grid.
+		/// </summary>
+		/// <param name="rows">the number of rows to create</param>
+		/// <param name="columns">the number of columns to create</param>
 		public Grid(int rows, int columns)
 		{
 			Validate.IsTrue(rows >= 0 && columns >= 0,
@@ -87,10 +106,11 @@ namespace Tools.DataStructures {
 			set { Data[row, column] = value; }
 		}
 
-		/*
-		 * Returns a copy of the grid flattened into a 1D array. The GridOrder
-		 * determines the order in which elements are moved from the grid to the array.
-		 */
+		/// <summary>
+		/// Returns a copy of the grid flattened into a 1D array. The GridOrder parameter
+		/// determines the order in which elements are moved from the grid to the array.
+		/// </summary>
+		/// <param name="order">the GridOrder to use</param>
 		public List<T> Flatten(GridOrder order)
 		{
 			List<T> result = new List<T>();
@@ -98,9 +118,10 @@ namespace Tools.DataStructures {
 			return result;
 		}
 
-		/*
-		 * Returns an enumerable over the row at the given index.
-		 */
+		/// <summary>
+		/// Returns an enumerable over a row.
+		/// </summary>
+		/// <param name="rowIndex">the index of the desired row</param>
 		public IEnumerable<T> RowAt(int rowIndex)
 		{
 			Validate.IsTrue(rowIndex >= 0 && rowIndex < Rows, "Invalid row index");
@@ -111,9 +132,10 @@ namespace Tools.DataStructures {
 			}
 		}
 
-		/*
-		 * Returns an enumerable over the column at the given index
-		 */
+		/// <summary>
+		/// Returns an enumerable over a column.
+		/// </summary>
+		/// <param name="columnIndex">the index of the desired column</param>
 		public IEnumerable<T> ColumnAt(int columnIndex)
 		{
 			Validate.IsTrue(columnIndex >= 0 && columnIndex < Columns, "Invalid column index");
@@ -124,11 +146,12 @@ namespace Tools.DataStructures {
 			}
 		}
 
-		/*
-		 * Returns an enumerable over the items that neighbor the given cell. A cell is a
-		 * neighbor if it touches the given cell on any side or corner. If excludeDiagonals
-		 * is true, cells touching the corners are excluded.
-		 */
+		/// <summary>
+		/// Returns an enumerable over the items in cells that neighbor a given cell. Two
+		/// cells are neighbors if they touch on any side or corner.
+		/// </summary>
+		/// <param name="cell">the cell whose neighbors will be returned</param>
+		/// <param name="excludeDiagonals">if true, cells that touch on a corner are ignored</param>
 		public IEnumerable<T> GetNeighbors(GridCell cell, bool excludeDiagonals = false)
 		{
 			foreach (var cellNeighbor in GetCellNeighbors(cell, excludeDiagonals))
@@ -137,9 +160,12 @@ namespace Tools.DataStructures {
 			}
 		}
 
-		/*
-		 * Returns an enumerable over the cells that neighbor the given cell.
-		 */
+		/// <summary>
+		/// Returns an enumerable over the cells that neighbor a given cell. Two cells are
+		/// neighbors if they touch on any side or corner.
+		/// </summary>
+		/// <param name="cell">the cell whose neighbors will be returned</param>
+		/// <param name="excludeDiagonals">if true, cells that touch on a corner are ignored</param>
 		public IEnumerable<GridCell> GetCellNeighbors(GridCell cell, bool excludeDiagonals = false)
 		{
 			for (int row = cell.Row - 1; row <= cell.Row + 1; ++row)
@@ -159,9 +185,9 @@ namespace Tools.DataStructures {
 			}
 		}
 
-		/*
-		 * Returns an enumerable over the grid that iterates in row-major order.
-		 */
+		/// <summary>
+		/// Returns an enumerable over the grid that iterates in row-major order.
+		/// </summary>
 		public IEnumerator<T> GetEnumerator()
 		{
 			for (int row = 0; row < Rows; ++row)
@@ -178,10 +204,11 @@ namespace Tools.DataStructures {
 			return GetEnumerator();
 		}
 
-		/*
-		 * Applies an action to each cell in the grid, iterating according to the
-		 * given GridOrder.
-		 */
+		/// <summary>
+		/// Applies an action to each cell in the grid.
+		/// </summary>
+		/// <param name="order">the order in which to iterate over cells</param>
+		/// <param name="visit">the action to apply</param>
 		public void VisitCellsInOrder(GridOrder order, Action<GridCell> visit)
 		{
 			if (order == GridOrder.RowMajor)

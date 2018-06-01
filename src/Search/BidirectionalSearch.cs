@@ -4,15 +4,14 @@ using System.Linq;
 
 namespace Tools.Algorithms.Search {
 
-	/*
-	 * Bidirectional search is a breadth-first search starting from two nodes
-	 * simultaneously. One path proceeds forward, like all other search
-	 * algorithms; the other proceeds backward and must be reversed once a
-	 * common node is found in both paths.
-	 * 
-	 * This algorithm is guaranteed to find the shortest path between the two
-	 * nodes, if one exists.
-	 */
+	/// <summary>
+	/// Bidirectional search is a breadth-first search starting from two nodes
+	/// simultaneously.<para/>
+	/// One path proceeds forward, like all other search algorithms; the other
+	/// proceeds backward and must be reversed once a common node is found in both
+	/// paths. The algorithm is guaranteed to find the shortest path between the two
+	/// nodes, if one exists.
+	/// </summary>
 	public class BidirectionalSearch<T>
 	{
 		private readonly ChildGenerator<T> GetForwardChildren;

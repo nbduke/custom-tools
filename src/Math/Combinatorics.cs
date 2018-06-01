@@ -1,17 +1,17 @@
-﻿using System;
+﻿namespace Tools.Math {
 
-namespace Tools.Math {
-
-	/*
-	 * Combinatorics exposes helper functions for calculating factorials,
-	 * combinations, and permutations.
-	 */
+	/// <summary>
+	/// Exposes helper functions for calculating factorials, combinations,
+	/// and permutations.
+	/// </summary>
 	public static class Combinatorics
 	{
-		/*
-		 * Computes the number of combinations of n choosing r (i.e. nCr) from
-		 * a set without replacement.
-		 */
+		/// <summary>
+		/// Computes nCr, the number of ways to choose r items from n
+		/// without replacement.
+		/// </summary>
+		/// <param name="n">the total number of items</param>
+		/// <param name="r">the number of items to choose</param>
 		public static ulong GetNumberOfCombinations(uint n, uint r)
 		{
 			Validate.IsTrue(r <= n, "In nCr, r cannot exceed n.");
@@ -30,10 +30,12 @@ namespace Tools.Math {
 			}
 		}
 
-		/*
-		 * Computes the number of permutations of n choosing r (i.e. nPr) from
-		 * a set without replacement.
-		 */
+		/// <summary>
+		/// Computes nPr, the number of ways to arrange r items chosen from n
+		/// without replacement.
+		/// </summary>
+		/// <param name="n">the total number of items</param>
+		/// <param name="r">the number of items to choose</param>
 		public static ulong GetNumberOfPermutations(uint n, uint r)
 		{
 			Validate.IsTrue(r <= n, "In nPr, r cannot exceed n.");
@@ -44,31 +46,25 @@ namespace Tools.Math {
 				return FactorialRatio(n, n - r); // n!/(n - r)!
 		}
 
-		/*
-		 * Returns the factorial of x (i.e. x!).
-		 */
+		/// <summary>
+		/// Returns x!, the factorial of x.
+		/// </summary>
+		/// <param name="x">a nonnegative number</param>
 		public static ulong Factorial(uint x)
 		{
-			if (x <= 1)
-				return 1;
-
-			ulong value = x;
-			while (--x > 1)
-			{
-				value *= x;
-			}
-
-			return value;
+			return FactorialRatio(x, 1);
 		}
 
-		/*
-		 * Returns the ratio of the factorial of n to the factorial of r (i.e. n!/r!).
-		 */
+		/// <summary>
+		/// Returns n!/r!, the integer ratio of the factorials of n and r.
+		/// </summary>
+		/// <param name="n">a nonnegative number</param>
+		/// <param name="r">a nonnegative number</param>
 		public static ulong FactorialRatio(uint n, uint r)
 		{
-			Validate.IsTrue(r <= n, "FactorialRatio computes an integer ratio, so r cannot exceed n.");
-
-			if (n == r || n == 0)
+			if (r > n)
+				return 0;
+			else if (n == r || n == 0)
 				return 1;
 
 			ulong value = n;

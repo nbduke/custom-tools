@@ -55,7 +55,7 @@ namespace Test {
 			CollectionAssert.AreEqual(expectedPath, actualPath.ToList());
 		}
 
-#region Helper classes
+		#region Helper classes
 		private enum CityName
 		{
 			Sibiu,
@@ -146,6 +146,6 @@ namespace Test {
 				}
 			}
 		}
-#endregion
+		#endregion
 	}
 }
