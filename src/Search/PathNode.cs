@@ -84,7 +84,7 @@ namespace Tools.Algorithms.Search {
 
 		public bool PathContains(T state)
 		{
-			foreach (var otherState in GetPath())
+			foreach (var otherState in GetPathToRoot())
 			{
 				if (otherState.Equals(state))
 					return true;
