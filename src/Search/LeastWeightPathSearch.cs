@@ -46,13 +46,16 @@ namespace Tools.Algorithms.Search {
 		{
 			Validate.IsNotNull(nodePredicate, "nodePredicate");
 
-			var frontier = BinaryHeap<PathNode<T>>.CreateMinFirstHeap();
+			var frontier = new Heap<PathNode<T>>((a, b) =>
+			{
+				return a.CumulativePathWeight <= b.CumulativePathWeight ? -1 : 1;
+			});
 			var explored = new HashSet<PathNode<T>>();
-			frontier.Enqueue(new PathNode<T>(start), 0);
+			frontier.Push(new PathNode<T>(start));
 
 			while (frontier.Count > 0)
 			{
-				PathNode<T> currentNode = frontier.Dequeue().Value;
+				PathNode<T> currentNode = frontier.Pop();
 				if (nodePredicate(currentNode))
 					return currentNode;
 				else if (currentNode.CumulativePathLength >= maxSearchDistance + 1)
@@ -64,20 +67,27 @@ namespace Tools.Algorithms.Search {
 					double weight = GetEdgeWeight(currentNode.State, child);
 					var childNode = new PathNode<T>(child, currentNode, weight);
 
-					if (!explored.Contains(childNode))
+					if (!explored.Contains(childNode) &&
+						IsNotInFrontierOrFoundBetterPath(childNode, frontier))
 					{
-						double priorPathWeight = 0;
-						if (!frontier.TryGetPriority(childNode, ref priorPathWeight) ||
-							 priorPathWeight > childNode.CumulativePathWeight)
-						{
-							frontier.Enqueue(childNode, childNode.CumulativePathWeight);
-						}
+						frontier.Push(childNode);
 					}
 				}
 			}
 
 			// Path not found
 			return null;
+		}
+
+		private bool IsNotInFrontierOrFoundBetterPath(PathNode<T> newNode, Heap<PathNode<T>> frontier)
+		{
+			foreach (var node in frontier)
+			{
+				if (node.Equals(newNode))
+					return newNode.CumulativePathWeight <= node.CumulativePathWeight;
+			}
+
+			return true; // newNode is not in the frontier
 		}
 	}
 

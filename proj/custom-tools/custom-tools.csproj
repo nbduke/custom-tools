@@ -45,10 +45,10 @@
 	<Compile Include="..\..\src\Common\Validate.cs" />
 	<Compile Include="..\..\src\DataStructures\Arrangement.cs" />
 	<Compile Include="..\..\src\DataStructures\ArrangementEnumerator.cs" />
-    <Compile Include="..\..\src\DataStructures\BinaryHeap.cs" />
     <Compile Include="..\..\src\DataStructures\CollectionExtensions.cs" />
     <Compile Include="..\..\src\DataStructures\Grid.cs" />
     <Compile Include="..\..\src\DataStructures\GridCell.cs" />
+	<Compile Include="..\..\src\DataStructures\Heap.cs" />
 	<Compile Include="..\..\src\DataStructures\IPrefixTreeNode.cs" />
     <Compile Include="..\..\src\DataStructures\IVisitor.cs" />
     <Compile Include="..\..\src\DataStructures\PrefixTreeDictionary.cs" />
