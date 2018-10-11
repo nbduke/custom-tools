@@ -31,10 +31,10 @@ namespace Test {
 				return;
 			}
 
-			var actualPath = finalNode.GetPath().Select(city => city.Name);
+			var actualPath = finalNode.GetPath().Select(city => city.Name).ToList();
 
 			// Assert
-			CollectionAssert.AreEqual(expectedPath, actualPath.ToList());
+			CollectionAssert.AreEqual(expectedPath, actualPath);
 		}
 
 		[TestMethod]
@@ -104,8 +104,7 @@ namespace Test {
 
 			public override bool Equals(object obj)
 			{
-				City other = obj as City;
-				return other != null && Name == other.Name;
+				return obj is City other && Name == other.Name;
 			}
 
 			public override int GetHashCode()
