@@ -51,7 +51,7 @@
 	<Compile Include="..\..\src\DataStructures\test\ArrangementUnitTests.cs" />
     <Compile Include="..\..\src\DataStructures\test\ExtensionsUnitTests.cs" />
 	<Compile Include="..\..\src\DataStructures\test\fake\FakeVisitor.cs" />
-	<Compile Include="..\..\src\DataStructures\test\HeapComponentTests.cs" />
+	<Compile Include="..\..\src\DataStructures\test\HeapUnitTests.cs" />
 	<Compile Include="..\..\src\DataStructures\test\PrefixTreeDictionaryComponentTests.cs" />
 	<Compile Include="..\..\src\DataStructures\test\PrefixTreeDictionaryUnitTests.cs" />
 	<Compile Include="..\..\src\Search\test\BidirectionalSearchUnitTests.cs" />
