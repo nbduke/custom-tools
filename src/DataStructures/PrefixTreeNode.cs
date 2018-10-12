@@ -8,18 +8,26 @@ namespace Tools.DataStructures {
 		public bool IsEndOfWord { get; set; }
 		public bool IsRoot
 		{
-			get { return Parent == null; }
+			get { return _Parent == null; }
+		}
+		public int ChildrenCount
+		{
+			get { return _Children.Count; }
 		}
 		public bool IsLeaf
 		{
-			get { return _Children.Count == 0; }
+			get { return ChildrenCount == 0; }
+		}
+		public IPrefixTreeNode Parent
+		{
+			get { return _Parent; }
 		}
 		public IEnumerable<IPrefixTreeNode> Children
 		{
 			get { return _Children.Values; }
 		}
-		public IPrefixTreeNode Parent { get; }
 
+		private readonly PrefixTreeNode _Parent;
 		private readonly SortedList<char, PrefixTreeNode> _Children;
 
 		/*
@@ -33,7 +41,7 @@ namespace Tools.DataStructures {
 		public PrefixTreeNode(char character, PrefixTreeNode parent)
 		{
 			Character = character;
-			Parent = parent;
+			_Parent = parent;
 			IsEndOfWord = false;
 			_Children = new SortedList<char, PrefixTreeNode>();
 		}

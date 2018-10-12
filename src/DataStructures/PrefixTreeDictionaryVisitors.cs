@@ -32,19 +32,20 @@ namespace Tools.DataStructures {
 		}
 
 		/// <summary>
-		/// Prints all words in the subtree rooted at a node
+		/// Prints all words in the subtree rooted at a node.
 		/// </summary>
-		/// <param name="item">the node</param>
-		public void Visit(IPrefixTreeNode item)
+		/// <param name="node">the node</param>
+		public void Visit(IPrefixTreeNode node)
 		{
-			CurrentString.Append(item.Character);
+			if (!node.IsRoot)
+				CurrentString.Append(node.Character);
 
-			if (item.IsEndOfWord)
+			if (node.IsEndOfWord)
 				OutputStream.WriteLine(CurrentString.ToString());
 
-			foreach (var child in item.Children)
+			foreach (var child in node.Children)
 			{
-				Visit(child);
+				child.Accept(this);
 			}
 
 			CurrentString.Length--;
@@ -53,7 +54,7 @@ namespace Tools.DataStructures {
 
 
 	/// <summary>
-	/// Counts nodes in a PrefixTreeDictionary
+	/// Counts nodes in a PrefixTreeDictionary.
 	/// </summary>
 	public class CountNodesVisitor : IVisitor<IPrefixTreeNode>
 	{
@@ -65,7 +66,7 @@ namespace Tools.DataStructures {
 		}
 
 		/// <summary>
-		/// Counts all nodes in the subtree rooted at a node
+		/// Counts all nodes in the subtree rooted at a node.
 		/// </summary>
 		/// <param name="item">the node</param>
 		public void Visit(IPrefixTreeNode item)
@@ -74,7 +75,7 @@ namespace Tools.DataStructures {
 
 			foreach (var child in item.Children)
 			{
-				Visit(child);
+				child.Accept(this);
 			}
 		}
 	}

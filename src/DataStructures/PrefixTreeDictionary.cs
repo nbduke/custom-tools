@@ -87,16 +87,21 @@ namespace Tools.DataStructures {
 		}
 
 		/*
-		 * Traverses the path from node to the root, removing all leaf nodes that are
-		 * not the end of a word.
+		 * Traverses the path from a leaf node to the root, removing all leaf nodes
+		 * that are not the end of a word.
 		 */
 		private void Prune(PrefixTreeNode node)
 		{
-			while (!node.IsRoot && node.IsLeaf && !node.IsEndOfWord)
+			if (node.IsLeaf)
 			{
-				var parent = (PrefixTreeNode)node.Parent;
-				parent.RemoveChild(node.Character);
-				node = parent;
+				char childCharacterToRemove = node.Character;
+				while (!node.IsRoot && !node.IsEndOfWord && node.ChildrenCount <= 1)
+				{
+					childCharacterToRemove = node.Character;
+					node = (PrefixTreeNode)node.Parent;
+				}
+
+				node.RemoveChild(childCharacterToRemove);
 			}
 		}
 

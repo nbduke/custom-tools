@@ -25,7 +25,7 @@ namespace Tools.DataStructures
 			WordBuilder = new StringBuilder(prefix);
 			NodeEnumeratorStack = new Stack<IEnumerator<IPrefixTreeNode>>();
 			NodeEnumeratorStack.Push(CurrentNode.Children.GetEnumerator());
-			CheckInitialPrefix = prefix.Length > 0;
+			CheckInitialPrefix = CurrentNode.IsEndOfWord;
 		}
 
 		public string Current
@@ -43,8 +43,7 @@ namespace Tools.DataStructures
 			if (CheckInitialPrefix)
 			{
 				CheckInitialPrefix = false;
-				if (CurrentNode.IsEndOfWord)
-					return true;
+				return true;
 			}
 
 			while (NodeEnumeratorStack.Count > 0)
