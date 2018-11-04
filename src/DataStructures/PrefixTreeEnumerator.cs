@@ -72,7 +72,6 @@ namespace Tools.DataStructures
 
 				if (!increaseDepth)
 				{
-					CurrentNode = CurrentNode.Parent;
 					NodeEnumeratorStack.Pop();
 
 					if (WordBuilder.Length > 0)
