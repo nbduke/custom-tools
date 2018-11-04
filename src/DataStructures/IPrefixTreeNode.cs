@@ -9,9 +9,7 @@ namespace Tools.DataStructures {
 	{
 		char Character { get; }
 		bool IsEndOfWord { get; }
-		bool IsRoot { get; }
 		bool IsLeaf { get; }
-		IPrefixTreeNode Parent { get; }
 		IEnumerable<IPrefixTreeNode> Children { get; }
 
 		/// <summary>

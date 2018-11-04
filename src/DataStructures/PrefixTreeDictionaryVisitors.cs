@@ -37,9 +37,6 @@ namespace Tools.DataStructures {
 		/// <param name="node">the node</param>
 		public void Visit(IPrefixTreeNode node)
 		{
-			if (!node.IsRoot)
-				CurrentString.Append(node.Character);
-
 			if (node.IsEndOfWord)
 				OutputStream.WriteLine(CurrentString.ToString());
 

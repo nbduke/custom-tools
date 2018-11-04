@@ -349,7 +349,7 @@ namespace Test {
 		}
 
 		[TestMethod]
-		public void ContainsPrefix_PrefixIsEmpty_ReturnsTrue()
+		public void ContainsPrefix_PrefixIsEmpty_ReturnsFalse()
 		{
 			// Arrange
 			var dictionary = new PrefixTreeDictionary();
@@ -358,7 +358,7 @@ namespace Test {
 			bool result = dictionary.ContainsPrefix(string.Empty);
 
 			// Assert
-			Assert.IsTrue(result);
+			Assert.IsFalse(result);
 		}
 
 		[TestMethod]
@@ -455,7 +455,7 @@ namespace Test {
 		}
 
 		[TestMethod]
-		public void FindNode_PrefixIsEmpty_ReturnsRootNode()
+		public void FindNode_PrefixIsEmpty_ReturnsNull()
 		{
 			// Arrange
 			var dictionary = new PrefixTreeDictionary();
@@ -464,7 +464,7 @@ namespace Test {
 			var node = dictionary.FindNode(string.Empty);
 
 			// Assert
-			Assert.IsTrue(node.IsRoot);
+			Assert.IsNull(node);
 		}
 
 		[TestMethod]
@@ -493,9 +493,7 @@ namespace Test {
 
 			// Assert
 			Assert.IsTrue(node.IsEndOfWord);
-
-			string stringFromPath = ReconstructStringFromPath(node);
-			Assert.AreEqual(anyString, stringFromPath);
+			Assert.AreEqual(anyString.Last(), node.Character);
 		}
 
 		[TestMethod]
@@ -512,9 +510,7 @@ namespace Test {
 
 			// Assert
 			Assert.IsFalse(node.IsEndOfWord);
-
-			string stringFromPath = ReconstructStringFromPath(node);
-			Assert.AreEqual(prefix, stringFromPath);
+			Assert.AreEqual(prefix.Last(), node.Character);
 		}
 		#endregion
 
@@ -525,12 +521,8 @@ namespace Test {
 			// Arrange
 			var dictionary = new PrefixTreeDictionary();
 
-			// ACt
-			int count = 0;
-			foreach(string word in dictionary)
-			{
-				++count;
-			}
+			// Act
+			int count = dictionary.Count();
 
 			// Assert
 			Assert.AreEqual(0, count);
@@ -726,39 +718,24 @@ namespace Test {
 		}
 
 		[TestMethod]
-		public void VisitTree_AnyVisitor_VisitsTheRoot()
+		public void VisitTree_AnyVisitor_VisitsAllChildrenOfTheRoot()
 		{
 			// Arrange
 			var dictionary = new PrefixTreeDictionary();
+			dictionary.Add("cat");
+			dictionary.Add("able");
 			var visitor = new FakeVisitor<IPrefixTreeNode>();
 
 			// Act
 			dictionary.VisitTree(visitor);
 
 			// Assert
-			Assert.IsTrue(visitor.LastVisited.IsRoot);
+			var actualVistedCharacters = new List<char>(
+				visitor.Visited.Reverse().Select(node => node.Character));
+			var expectedVisitedCharacters = new char[] { 'a', 'c' };
+			CollectionAssert.AreEqual(expectedVisitedCharacters, actualVistedCharacters);
 		}
 		#endregion
-
-
-		private static string ReconstructStringFromPath(IPrefixTreeNode node)
-		{
-			var nodeList = new List<IPrefixTreeNode>();
-			while (!node.IsRoot)
-			{
-				nodeList.Add(node);
-				node = node.Parent;
-			}
-			nodeList.Reverse();
-
-			StringBuilder stringBuilder = new StringBuilder();
-			foreach (var item in nodeList)
-			{
-				stringBuilder.Append(item.Character);
-			}
-
-			return stringBuilder.ToString();
-		}
 	}
 
 }

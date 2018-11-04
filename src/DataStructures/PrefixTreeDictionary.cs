@@ -71,13 +71,25 @@ namespace Tools.DataStructures {
 		/// <returns>true if the word is in the dictionary</returns>
 		public bool Remove(string word)
 		{
-			var endOfWord = Root.GetDescendantImpl(word);
-			if (endOfWord != null && endOfWord.IsEndOfWord)
-			{
-				endOfWord.IsEndOfWord = false;
-				--Count;
-				Prune(endOfWord);
+			Validate.IsNotNull(word, "word");
 
+			PrefixTreeNode currentNode = Root;
+			var nodeStack = new Stack<PrefixTreeNode>();
+			nodeStack.Push(currentNode);
+
+			foreach (char c in word)
+			{
+				currentNode = currentNode.GetChildImpl(c);
+				if (currentNode == null)
+					return false;
+				nodeStack.Push(currentNode);
+			}
+
+			if (currentNode.IsEndOfWord)
+			{
+				currentNode.IsEndOfWord = false;
+				--Count;
+				Prune(nodeStack);
 				return true;
 			}
 			else
@@ -90,18 +102,21 @@ namespace Tools.DataStructures {
 		 * Traverses the path from a leaf node to the root, removing all leaf nodes
 		 * that are not the end of a word.
 		 */
-		private void Prune(PrefixTreeNode node)
+		private void Prune(Stack<PrefixTreeNode> path)
 		{
-			if (node.IsLeaf)
+			PrefixTreeNode nodeToPrune = path.Pop();
+			if (nodeToPrune.IsLeaf)
 			{
-				char childCharacterToRemove = node.Character;
-				while (!node.IsRoot && !node.IsEndOfWord && node.ChildrenCount <= 1)
+				PrefixTreeNode parent = path.Pop();
+				while (parent.ChildrenCount <= 1 &&
+					   !parent.IsEndOfWord &&
+					   path.Count > 0)
 				{
-					childCharacterToRemove = node.Character;
-					node = (PrefixTreeNode)node.Parent;
+					nodeToPrune = parent;
+					parent = path.Pop();
 				}
 
-				node.RemoveChild(childCharacterToRemove);
+				parent.RemoveChild(nodeToPrune.Character);
 			}
 		}
 
@@ -132,7 +147,11 @@ namespace Tools.DataStructures {
 		/// <param name="prefix">the prefix</param>
 		public IPrefixTreeNode FindNode(string prefix)
 		{
-			return Root.GetDescendant(prefix);
+			var node = Root.GetDescendant(prefix);
+			if (node == Root)
+				return null;
+			else
+				return node;
 		}
 
 		public IEnumerator<string> GetEnumerator()
@@ -172,12 +191,17 @@ namespace Tools.DataStructures {
 		}
 
 		/// <summary>
-		/// Applies a visitor object to the root of the tree.
+		/// Applies a visitor object to all nodes in the tree.
 		/// </summary>
 		/// <param name="visitor">the visitor</param>
 		public void VisitTree(IVisitor<IPrefixTreeNode> visitor)
 		{
-			Root.Accept(visitor);
+			Validate.IsNotNull(visitor, "visitor");
+
+			foreach (var child in Root.Children)
+			{
+				visitor.Visit(child);
+			}
 		}
 	}
 

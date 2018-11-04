@@ -6,10 +6,6 @@ namespace Tools.DataStructures {
 	{
 		public char Character { get; set; }
 		public bool IsEndOfWord { get; set; }
-		public bool IsRoot
-		{
-			get { return _Parent == null; }
-		}
 		public int ChildrenCount
 		{
 			get { return _Children.Count; }
@@ -18,30 +14,24 @@ namespace Tools.DataStructures {
 		{
 			get { return ChildrenCount == 0; }
 		}
-		public IPrefixTreeNode Parent
-		{
-			get { return _Parent; }
-		}
 		public IEnumerable<IPrefixTreeNode> Children
 		{
 			get { return _Children.Values; }
 		}
 
-		private readonly PrefixTreeNode _Parent;
 		private readonly SortedList<char, PrefixTreeNode> _Children;
 
 		/*
 		 * Constructs a root PrefixTreeNode.
 		 */
 		public PrefixTreeNode()
-			: this('\0', null)
+			: this('\0')
 		{
 		}
 
-		public PrefixTreeNode(char character, PrefixTreeNode parent)
+		public PrefixTreeNode(char character)
 		{
 			Character = character;
-			_Parent = parent;
 			IsEndOfWord = false;
 			_Children = new SortedList<char, PrefixTreeNode>();
 		}
@@ -55,7 +45,7 @@ namespace Tools.DataStructures {
 			var child = GetChildImpl(c);
 			if (child == null)
 			{
-				child = new PrefixTreeNode(c, this);
+				child = new PrefixTreeNode(c);
 				_Children.Add(c, child);
 			}
 

@@ -1,14 +1,15 @@
+using System.Collections.Generic;
 using Tools.DataStructures;
 
 namespace Test {
 
 	class FakeVisitor<T> : IVisitor<T>
 	{
-		public T LastVisited;
+		public Stack<T> Visited = new Stack<T>();
 
 		public void Visit(T item)
 		{
-			LastVisited = item;
+			Visited.Push(item);
 		}
 	};
 

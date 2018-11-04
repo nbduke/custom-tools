@@ -16,7 +16,7 @@ namespace Test {
 			dictionary.Add(word);
 
 			int nodes = CountNodes(dictionary);
-			Assert.AreEqual(word.Length + 1 /*account for the root*/, nodes);
+			Assert.AreEqual(word.Length, nodes);
 		}
 
 		[TestMethod]
@@ -28,7 +28,7 @@ namespace Test {
 			dictionary.Add(word);
 
 			int nodes = CountNodes(dictionary);
-			Assert.AreEqual(word.Length + 1, nodes);
+			Assert.AreEqual(word.Length, nodes);
 		}
 
 		[TestMethod]
@@ -41,7 +41,7 @@ namespace Test {
 			dictionary.Add(word);
 
 			int nodes = CountNodes(dictionary);
-			Assert.AreEqual(word.Length + 1, nodes);
+			Assert.AreEqual(word.Length, nodes);
 		}
 
 		[TestMethod]
@@ -54,13 +54,13 @@ namespace Test {
 			dictionary.Add(newWord);
 
 			int nodes = CountNodes(dictionary);
-			Assert.AreEqual(word.Length + newWord.Length + 1, nodes);
+			Assert.AreEqual(word.Length + newWord.Length, nodes);
 		}
 		#endregion
 
 		#region Remove - node deletion
 		[TestMethod]
-		public void Remove_WordIsOnlyWordInDictionary_RemovesAllButTheRootNode()
+		public void Remove_WordIsOnlyWordInDictionary_RemovesAllNodes()
 		{
 			var dictionary = new PrefixTreeDictionary();
 			string word = "fox";
@@ -68,7 +68,7 @@ namespace Test {
 
 			dictionary.Remove(word);
 			int nodes = CountNodes(dictionary);
-			Assert.AreEqual(1, nodes);
+			Assert.AreEqual(0, nodes);
 		}
 
 		[TestMethod]
@@ -81,7 +81,7 @@ namespace Test {
 
 			dictionary.Remove(word);
 			int nodes = CountNodes(dictionary);
-			Assert.AreEqual(prefix.Length + 1, nodes);
+			Assert.AreEqual(prefix.Length, nodes);
 		}
 
 		[TestMethod]
@@ -95,7 +95,7 @@ namespace Test {
 
 			dictionary.Remove(word);
 			int nodes = CountNodes(dictionary);
-			Assert.AreEqual(longerWord.Length + 1, nodes);
+			Assert.AreEqual(longerWord.Length, nodes);
 		}
 
 		[TestMethod]
@@ -109,7 +109,7 @@ namespace Test {
 
 			dictionary.Remove(word);
 			int nodes = CountNodes(dictionary);
-			Assert.AreEqual(prefix.Length + 1, nodes);
+			Assert.AreEqual(prefix.Length, nodes);
 		}
 		#endregion
 
