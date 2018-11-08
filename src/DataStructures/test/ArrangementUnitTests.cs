@@ -175,20 +175,18 @@ namespace Test
 		public void GetCombinations_SizeIsOne_ReturnsElementsFromCollectionOneAtATime()
 		{
 			// Arrange
-			var arrangement = new Arrangement<char>("beef");
-			var expectedCombinations = new string[]
-			{
-				"b", "e", "e", "f"
-			};
+			string collection = "beef";
+			var arrangement = new Arrangement<char>(collection);
 
 			// Act
 			var combinations = arrangement.GetCombinations(1).ToList();
 
 			// Assert
-			Assert.AreEqual(expectedCombinations.Length, combinations.Count);
-			for (int i = 0; i < combinations.Count && i < expectedCombinations.Length; ++i)
+			Assert.AreEqual(collection.Length, combinations.Count);
+			for (int i = 0; i < combinations.Count && i < collection.Length; ++i)
 			{
-				CollectionAssert.AreEqual(expectedCombinations[i].ToCharArray(), combinations[i]);
+				Assert.AreEqual(1, combinations[i].Count);
+				Assert.AreEqual(collection[i], combinations[i][0]);
 			}
 		}
 
@@ -347,24 +345,18 @@ namespace Test
 		public void GetPermutations_SizeIsOne_ReturnsElementsFromCollectionOneAtATime()
 		{
 			// Arrange
-			var arrangement = new Arrangement<int>(new int[] { 1, 1, 2, 3, 5 });
-			var expectedPermutations = new int[][]
-			{
-				new int[]{ 1 },
-				new int[]{ 1 },
-				new int[]{ 2 },
-				new int[]{ 3 },
-				new int[]{ 5 },
-			};
+			int[] collection = new int[] { 1, 1, 2, 3, 5 };
+			var arrangement = new Arrangement<int>(collection);
 
 			// Act
 			var permutations = arrangement.GetPermutations(1).ToList();
 
 			// Assert
-			Assert.AreEqual(expectedPermutations.Length, permutations.Count);
-			for (int i = 0; i < permutations.Count && i < expectedPermutations.Length; ++i)
+			Assert.AreEqual(collection.Length, permutations.Count);
+			for (int i = 0; i < permutations.Count && i < collection.Length; ++i)
 			{
-				CollectionAssert.AreEqual(expectedPermutations[i], permutations[i]);
+				Assert.AreEqual(1, permutations[i].Count);
+				Assert.AreEqual(collection[i], permutations[i][0]);
 			}
 		}
 

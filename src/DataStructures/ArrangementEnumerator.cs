@@ -18,9 +18,9 @@ namespace Tools.DataStructures {
 		private readonly List<T> Collection;
 		private readonly uint MinSize;
 		private readonly uint MaxSize;
-		private readonly bool IsPermutation;
 		private Stack<int> IndexStack;
 		private Stack<IEnumerator<int>> IndexEnumeratorStack;
+		private BitArray IsInPermutation;
 		private List<T> _Current;
 
 		public ArrangementEnumerator(
@@ -37,9 +37,11 @@ namespace Tools.DataStructures {
 			Collection = collection;
 			MinSize = minimumSize;
 			MaxSize = maximumSize;
-			IsPermutation = isPermutation;
 			IndexStack = new Stack<int>();
 			IndexEnumeratorStack = new Stack<IEnumerator<int>>();
+
+			if (isPermutation)
+				IsInPermutation = new BitArray(collection.Count);
 
 			Reset();
 		}
@@ -68,6 +70,9 @@ namespace Tools.DataStructures {
 
 		public void Reset()
 		{
+			if (IsInPermutation != null)
+				IsInPermutation.SetAll(false);
+
 			IndexStack.Clear();
 			IndexEnumeratorStack.Clear();
 			IndexEnumeratorStack.Push(GetNextIndices(-1).GetEnumerator());
@@ -112,25 +117,19 @@ namespace Tools.DataStructures {
 				while (currentEnumerator.MoveNext())
 				{
 					int currentIndex = currentEnumerator.Current;
+					IndexStack.Push(currentIndex);
+					IndexEnumeratorStack.Push(GetNextIndices(currentIndex).GetEnumerator());
 
-					// For permutations, make sure we haven't tried this index yet (combinations
-					// never generate redundant indices)
-					if (!(IsPermutation && IndexStack.Contains(currentIndex)))
+					if (CurrentSize >= MinSize)
 					{
-						IndexStack.Push(currentIndex);
-						IndexEnumeratorStack.Push(GetNextIndices(currentIndex).GetEnumerator());
-
-						if (CurrentSize >= MinSize)
-						{
-							// We've found the next arrangement
-							return true;
-						}
-						else
-						{
-							// We need to move on to the next index and continue building from there
-							increaseDepth = true;
-							break;
-						}
+						// We've found the next arrangement
+						return true;
+					}
+					else
+					{
+						// We need to move on to the next index and continue building from there
+						increaseDepth = true;
+						break;
 					}
 				}
 
@@ -152,10 +151,28 @@ namespace Tools.DataStructures {
 		 */
 		private IEnumerable<int> GetNextIndices(int currentIndex)
 		{
-			// Every index leads to every other index in a permutation, but in a
-			// combination, only indices after the current one are reachable.
-			int nextIndex = IsPermutation ? 0 : currentIndex + 1;
-			for (int i = nextIndex; i < Collection.Count; ++i)
+			if (IsInPermutation != null)
+				return GetNextIndicesForPermutations();
+			else
+				return GetNextIndicesForCombinations(currentIndex);
+		}
+
+		private IEnumerable<int> GetNextIndicesForPermutations()
+		{
+			for (int i = 0; i < Collection.Count; ++i)
+			{
+				if (!IsInPermutation[i])
+				{
+					IsInPermutation[i] = true;
+					yield return i;
+					IsInPermutation[i] = false;
+				}
+			}
+		}
+
+		private IEnumerable<int> GetNextIndicesForCombinations(int currentIndex)
+		{
+			for (int i = currentIndex + 1; i < Collection.Count; ++i)
 			{
 				yield return i;
 			}
