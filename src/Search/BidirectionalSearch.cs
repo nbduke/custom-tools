@@ -63,12 +63,12 @@ namespace Tools.Algorithms.Search {
 			if (start.Equals(end))
 				return new T[] { start };
 
-			var forwardFrontier = new Queue<PathNode<T>>();
-			var reverseFrontier = new Queue<PathNode<T>>();
+			var forwardFrontier = new HashSet<PathNode<T>>();
+			var reverseFrontier = new HashSet<PathNode<T>>();
 			var explored = new HashSet<PathNode<T>>();
 
-			forwardFrontier.Enqueue(new PathNode<T>(start));
-			reverseFrontier.Enqueue(new PathNode<T>(end));
+			forwardFrontier.Add(new PathNode<T>(start));
+			reverseFrontier.Add(new PathNode<T>(end));
 
 			while (forwardFrontier.Count > 0 && reverseFrontier.Count > 0)
 			{
@@ -87,12 +87,12 @@ namespace Tools.Algorithms.Search {
 			return new T[] { };
 		}
 
-		private static Queue<PathNode<T>> GetNextLayer(
-			Queue<PathNode<T>> currentLayer,
+		private static HashSet<PathNode<T>> GetNextLayer(
+			HashSet<PathNode<T>> currentLayer,
 			HashSet<PathNode<T>> explored,
 			ChildGenerator<T> getChildren)
 		{
-			var nextLayer = new Queue<PathNode<T>>();
+			var nextLayer = new HashSet<PathNode<T>>();
 			foreach (var currentNode in currentLayer)
 			{
 				explored.Add(currentNode);
@@ -104,7 +104,7 @@ namespace Tools.Algorithms.Search {
 						!currentLayer.Contains(childNode) &&
 						!nextLayer.Contains(childNode))
 					{
-						nextLayer.Enqueue(childNode);
+						nextLayer.Add(childNode);
 					}
 				}
 			}
@@ -113,23 +113,20 @@ namespace Tools.Algorithms.Search {
 		}
 
 		private static Tuple<PathNode<T>, PathNode<T>> FindMatchingNodes(
-			Queue<PathNode<T>> forwardFrontier,
-			Queue<PathNode<T>> reverseFrontier)
+			HashSet<PathNode<T>> forwardFrontier,
+			HashSet<PathNode<T>> reverseFrontier)
 		{
-			var forwardSet = new HashSet<PathNode<T>>(forwardFrontier);
-			forwardSet.IntersectWith(reverseFrontier);
+			PathNode<T> forwardMatch = forwardFrontier.FirstOrDefault(node => reverseFrontier.Contains(node));
 
-			if (forwardSet.Count > 0)
+			if (forwardMatch != null)
 			{
-				PathNode<T> forwardNode = forwardSet.First();
-				foreach (var reverseNode in reverseFrontier)
-				{
-					if (reverseNode.Equals(forwardNode))
-						return Tuple.Create(forwardNode, reverseNode);
-				}
+				PathNode<T> reverseMatch = reverseFrontier.First(node => node.Equals(forwardMatch));
+				return Tuple.Create(forwardMatch, reverseMatch);
 			}
-
-			return null; // no common nodes
+			else
+			{
+				return null;
+			}
 		}
 
 		private IEnumerable<T> ConstructSolution(Tuple<PathNode<T>, PathNode<T>> matchingNodes)
