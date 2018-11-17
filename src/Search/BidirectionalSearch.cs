@@ -66,34 +66,55 @@ namespace Tools.Algorithms.Search {
 			var forwardFrontier = new HashSet<PathNode<T>>();
 			var reverseFrontier = new HashSet<PathNode<T>>();
 			var explored = new HashSet<PathNode<T>>();
+			IEnumerable<T> solution = null;
 
 			forwardFrontier.Add(new PathNode<T>(start));
 			reverseFrontier.Add(new PathNode<T>(end));
 
 			while (forwardFrontier.Count > 0 && reverseFrontier.Count > 0)
 			{
-				forwardFrontier = GetNextLayer(forwardFrontier, explored, GetForwardChildren);
-				var match = FindMatchingNodes(forwardFrontier, reverseFrontier);
-				if (match != null)
-					return ConstructSolution(match);
+				UpdateFrontier(
+					ref forwardFrontier,
+					reverseFrontier,
+					explored,
+					GetForwardChildren,
+					(forwardNode, reverseNode) =>
+					{
+						solution = ConstructSolution(forwardNode, reverseNode);
+					}
+				);
 
-				reverseFrontier = GetNextLayer(reverseFrontier, explored, GetReverseChildren);
-				match = FindMatchingNodes(forwardFrontier, reverseFrontier);
-				if (match != null)
-					return ConstructSolution(match);
+				if (solution != null)
+					return solution;
+
+				UpdateFrontier(
+					ref reverseFrontier,
+					forwardFrontier,
+					explored,
+					GetReverseChildren,
+					(reverseNode, forwardNode) =>
+					{
+						solution = ConstructSolution(forwardNode, reverseNode);
+					}
+				);
+
+				if (solution != null)
+					return solution;
 			}
 
 			// Path not found
 			return new T[] { };
 		}
 
-		private static HashSet<PathNode<T>> GetNextLayer(
-			HashSet<PathNode<T>> currentLayer,
+		private static void UpdateFrontier(
+			ref HashSet<PathNode<T>> currentFrontier,
+			HashSet<PathNode<T>> otherFrontier,
 			HashSet<PathNode<T>> explored,
-			ChildGenerator<T> getChildren)
+			ChildGenerator<T> getChildren,
+			Action<PathNode<T>, PathNode<T>> onMatchFound)
 		{
-			var nextLayer = new HashSet<PathNode<T>>();
-			foreach (var currentNode in currentLayer)
+			var nextFrontier = new HashSet<PathNode<T>>();
+			foreach (var currentNode in currentFrontier)
 			{
 				explored.Add(currentNode);
 
@@ -101,40 +122,29 @@ namespace Tools.Algorithms.Search {
 				{
 					var childNode = new PathNode<T>(child, currentNode);
 					if (!explored.Contains(childNode) &&
-						!currentLayer.Contains(childNode) &&
-						!nextLayer.Contains(childNode))
+						!currentFrontier.Contains(childNode))
 					{
-						nextLayer.Add(childNode);
+						if (otherFrontier.Contains(childNode))
+						{
+							var matchingNode = otherFrontier.First(node => node.Equals(childNode));
+							onMatchFound(childNode, matchingNode);
+							return;
+						}
+						else
+						{
+							nextFrontier.Add(childNode);
+						}
 					}
 				}
 			}
 
-			return nextLayer;
+			currentFrontier = nextFrontier;
 		}
 
-		private static Tuple<PathNode<T>, PathNode<T>> FindMatchingNodes(
-			HashSet<PathNode<T>> forwardFrontier,
-			HashSet<PathNode<T>> reverseFrontier)
+		private IEnumerable<T> ConstructSolution(PathNode<T> forwardPathNode, PathNode<T> reversePathNode)
 		{
-			PathNode<T> forwardMatch = forwardFrontier.FirstOrDefault(node => reverseFrontier.Contains(node));
-
-			if (forwardMatch != null)
-			{
-				PathNode<T> reverseMatch = reverseFrontier.First(node => node.Equals(forwardMatch));
-				return Tuple.Create(forwardMatch, reverseMatch);
-			}
-			else
-			{
-				return null;
-			}
-		}
-
-		private IEnumerable<T> ConstructSolution(Tuple<PathNode<T>, PathNode<T>> matchingNodes)
-		{
-			var nodeOnForwardPath = matchingNodes.Item1;
-			var nodeOnReversePath = matchingNodes.Item2;
-			var pathFromStart = nodeOnForwardPath.GetPath();
-			var pathToEnd = nodeOnReversePath.GetPathToRoot();
+			var pathFromStart = forwardPathNode.GetPath();
+			var pathToEnd = reversePathNode.GetPathToRoot();
 
 			if (RepairReversePath != null)
 				RepairReversePath(pathToEnd);
