@@ -46,6 +46,7 @@
 	<Compile Include="..\..\src\DataStructures\Arrangement.cs" />
 	<Compile Include="..\..\src\DataStructures\ArrangementEnumerator.cs" />
     <Compile Include="..\..\src\DataStructures\CollectionExtensions.cs" />
+	<Compile Include="..\..\src\DataStructures\Counter.cs" />
     <Compile Include="..\..\src\DataStructures\Grid.cs" />
     <Compile Include="..\..\src\DataStructures\GridCell.cs" />
 	<Compile Include="..\..\src\DataStructures\Heap.cs" />

@@ -49,6 +49,7 @@
   </ItemGroup>
   <ItemGroup>
 	<Compile Include="..\..\src\DataStructures\test\ArrangementUnitTests.cs" />
+	<Compile Include="..\..\src\DataStructures\test\CounterUnitTests.cs" />
     <Compile Include="..\..\src\DataStructures\test\ExtensionsUnitTests.cs" />
 	<Compile Include="..\..\src\DataStructures\test\fake\FakeVisitor.cs" />
 	<Compile Include="..\..\src\DataStructures\test\HeapUnitTests.cs" />
