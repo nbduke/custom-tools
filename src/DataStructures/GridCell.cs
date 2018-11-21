@@ -9,7 +9,6 @@
 		public int Column { get; set; }
 
 		public GridCell(int row, int column)
-			: this()
 		{
 			Row = row;
 			Column = column;
@@ -17,10 +16,7 @@
 
 		public override bool Equals(object obj)
 		{
-			if (obj == null)
-				return false;
-
-			return obj is GridCell && this == (GridCell)obj;
+			return (obj is GridCell other) && this == other;
 		}
 
 		public override int GetHashCode()
