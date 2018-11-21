@@ -33,32 +33,25 @@ namespace Tools.DataStructures {
 		private readonly T[,] Data;
 
 		/// <summary>
-		/// Creates a grid and fills it with a collection.
+		/// Constructs a copy of another grid.
 		/// </summary>
-		/// <param name="rows">the number of rows to create</param>
-		/// <param name="columns">the number of columns to create</param>
-		/// <param name="items">the collection</param>
-		/// <param name="fillOrder">the order in which items should be moved from the
-		/// collection to the grid</param>
-		public Grid(
-			int rows,
-			int columns,
-			IEnumerable<T> items,
-			GridOrder fillOrder = GridOrder.RowMajor)
-			: this(rows, columns)
+		/// <remarks>
+		/// If T is a value type, this does a deep copy. Otherwise, the references
+		/// in `other` are copied to this grid.
+		/// </remarks>
+		/// <param name="other">the other grid</param>
+		public Grid(Grid<T> other)
 		{
-			Validate.IsNotNull(items, "items");
+			Validate.IsNotNull(other, "other");
 
-			var enumerator = items.GetEnumerator();
-			VisitCellsInOrder(fillOrder,
-				(cell) =>
-				{
-					if (enumerator.MoveNext())
-						this[cell] = enumerator.Current;
-				});
+			Rows = other.Rows;
+			Columns = other.Columns;
+			Data = new T[Rows, Columns];
 
-			if (enumerator.MoveNext())
-				throw new ArgumentException("The grid is too small to hold all of the given items.");
+			other.VisitCellsInOrder(GridOrder.RowMajor, cell =>
+			{
+				this[cell] = other[cell];
+			});
 		}
 
 		/// <summary>
@@ -70,11 +63,10 @@ namespace Tools.DataStructures {
 		public Grid(int rows, int columns, T fillValue)
 			: this(rows, columns)
 		{
-			VisitCellsInOrder(GridOrder.RowMajor,
-				(cell) =>
-				{
-					this[cell] = fillValue;
-				});
+			VisitCellsInOrder(GridOrder.RowMajor, cell =>
+			{
+				this[cell] = fillValue;
+			});
 		}
 
 		/// <summary>
@@ -92,18 +84,40 @@ namespace Tools.DataStructures {
 			Data = new T[Rows, Columns];
 		}
 
+		/// <summary>
+		/// Gets or sets the item at a certain cell.
+		/// </summary>
+		/// <param name="cell">the target cell</param>
 		public T this[GridCell cell]
 		{
-			get { return this[cell.Row, cell.Column]; }
+			get
+			{
+				return this[cell.Row, cell.Column];
+			}
 
-			set { this[cell.Row, cell.Column] = value; }
+			set
+			{
+				this[cell.Row, cell.Column] = value;
+			}
 		}
 
+		/// <summary>
+		/// Gets or sets the item at a certain cell.
+		/// </summary>
+		/// <param name="row">the row of the target cell</param>
+		/// <param name="column">the column of the target cell</param>
+		/// <returns></returns>
 		public T this[int row, int column]
 		{
-			get { return Data[row, column]; }
+			get
+			{
+				return Data[row, column];
+			}
 
-			set { Data[row, column] = value; }
+			set
+			{
+				Data[row, column] = value;
+			}
 		}
 
 		/// <summary>
@@ -114,7 +128,7 @@ namespace Tools.DataStructures {
 		public List<T> Flatten(GridOrder order)
 		{
 			List<T> result = new List<T>();
-			VisitCellsInOrder(order, (cell) => { result.Add(this[cell]); });
+			VisitCellsInOrder(order, cell => { result.Add(this[cell]); });
 			return result;
 		}
 
