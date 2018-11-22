@@ -476,9 +476,9 @@ namespace Test
 		}
 		#endregion
 
-		#region VisitCellsInOrder
+		#region GetCellsInOrder
 		[TestMethod]
-		public void VisitCellsInOrder_OrderIsRowMajor_VisitsCellsInRowMajorOrder()
+		public void GetCellsInOrder_OrderIsRowMajor_EnumeratesCellsInRowMajorOrder()
 		{
 			// Arrange
 			var grid = new Grid<int>(2, 2);
@@ -486,7 +486,7 @@ namespace Test
 			// Act & Assert
 			int row = 0;
 			int col = 0;
-			grid.VisitCellsInOrder(GridOrder.RowMajor, cell =>
+			foreach (var cell in grid.GetCellsInOrder(GridOrder.RowMajor))
 			{
 				var expectedCell = new GridCell(row, col);
 				Assert.AreEqual(expectedCell, cell);
@@ -497,11 +497,11 @@ namespace Test
 					col = 0;
 					++row;
 				}
-			});
+			}
 		}
 
 		[TestMethod]
-		public void VisitCellsInOrder_OrderIsColumnMajor_VisitsCellsInColumnMajorOrder()
+		public void GetCellsInOrder_OrderIsColumnMajor_VisitsCellsInColumnMajorOrder()
 		{
 			// Arrange
 			var grid = new Grid<int>(4, 3);
@@ -509,7 +509,7 @@ namespace Test
 			// Act & Assert
 			int row = 0;
 			int col = 0;
-			grid.VisitCellsInOrder(GridOrder.ColumnMajor, cell =>
+			foreach (var cell in grid.GetCellsInOrder(GridOrder.ColumnMajor))
 			{
 				var expectedCell = new GridCell(row, col);
 				Assert.AreEqual(expectedCell, cell);
@@ -520,7 +520,7 @@ namespace Test
 					row = 0;
 					++col;
 				}
-			});
+			}
 		}
 		#endregion
 

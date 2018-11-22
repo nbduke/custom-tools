@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Tools.DataStructures {
 
@@ -33,6 +34,36 @@ namespace Tools.DataStructures {
 		private readonly T[,] Data;
 
 		/// <summary>
+		/// Creates an empty grid.
+		/// </summary>
+		/// <param name="rows">the number of rows to create</param>
+		/// <param name="columns">the number of columns to create</param>
+		public Grid(int rows, int columns)
+		{
+			Validate.IsTrue(rows >= 0 && columns >= 0,
+				"rows and columns must be nonnegative integers.");
+
+			Rows = rows;
+			Columns = columns;
+			Data = new T[Rows, Columns];
+		}
+
+		/// <summary>
+		/// Creates a grid and initializes every cell with a value.
+		/// </summary>
+		/// <param name="rows">the number of rows to create</param>
+		/// <param name="columns">the number of columns to create</param>
+		/// <param name="fillValue">the value to use</param>
+		public Grid(int rows, int columns, T fillValue)
+			: this(rows, columns)
+		{
+			foreach (var cell in GetCellsInOrder(GridOrder.RowMajor))
+			{
+				this[cell] = fillValue;
+			}
+		}
+
+		/// <summary>
 		/// Constructs a copy of another grid.
 		/// </summary>
 		/// <remarks>
@@ -48,40 +79,10 @@ namespace Tools.DataStructures {
 			Columns = other.Columns;
 			Data = new T[Rows, Columns];
 
-			other.VisitCellsInOrder(GridOrder.RowMajor, cell =>
+			foreach (var cell in other.GetCellsInOrder(GridOrder.RowMajor))
 			{
 				this[cell] = other[cell];
-			});
-		}
-
-		/// <summary>
-		/// Creates a grid and initializes every cell with a value.
-		/// </summary>
-		/// <param name="rows">the number of rows to create</param>
-		/// <param name="columns">the number of columns to create</param>
-		/// <param name="fillValue">the value to use</param>
-		public Grid(int rows, int columns, T fillValue)
-			: this(rows, columns)
-		{
-			VisitCellsInOrder(GridOrder.RowMajor, cell =>
-			{
-				this[cell] = fillValue;
-			});
-		}
-
-		/// <summary>
-		/// Creates an empty grid.
-		/// </summary>
-		/// <param name="rows">the number of rows to create</param>
-		/// <param name="columns">the number of columns to create</param>
-		public Grid(int rows, int columns)
-		{
-			Validate.IsTrue(rows >= 0 && columns >= 0,
-				"rows and columns must be nonnegative integers.");
-
-			Rows = rows;
-			Columns = columns;
-			Data = new T[Rows, Columns];
+			}
 		}
 
 		/// <summary>
@@ -121,15 +122,13 @@ namespace Tools.DataStructures {
 		}
 
 		/// <summary>
-		/// Returns a copy of the grid flattened into a 1D array. The GridOrder parameter
-		/// determines the order in which elements are moved from the grid to the array.
+		/// Returns a copy of the grid flattened into a 1D list. The GridOrder parameter
+		/// determines the order in which elements are moved from the grid to the list.
 		/// </summary>
 		/// <param name="order">the GridOrder to use</param>
 		public List<T> Flatten(GridOrder order)
 		{
-			List<T> result = new List<T>();
-			VisitCellsInOrder(order, cell => { result.Add(this[cell]); });
-			return result;
+			return new List<T>(GetCellsInOrder(order).Select(cell => this[cell]));
 		}
 
 		/// <summary>
@@ -204,12 +203,9 @@ namespace Tools.DataStructures {
 		/// </summary>
 		public IEnumerator<T> GetEnumerator()
 		{
-			for (int row = 0; row < Rows; ++row)
+			foreach (var cell in GetCellsInOrder(GridOrder.RowMajor))
 			{
-				for (int column = 0; column < Columns; ++column)
-				{
-					yield return this[row, column];
-				}
+				yield return this[cell];
 			}
 		}
 
@@ -219,11 +215,10 @@ namespace Tools.DataStructures {
 		}
 
 		/// <summary>
-		/// Applies an action to each cell in the grid.
+		/// Returns an enumerable over cells that enumerates in the order specified.
 		/// </summary>
-		/// <param name="order">the order in which to iterate over cells</param>
-		/// <param name="visit">the action to apply</param>
-		public void VisitCellsInOrder(GridOrder order, Action<GridCell> visit)
+		/// <param name="order">the order</param>
+		public IEnumerable<GridCell> GetCellsInOrder(GridOrder order)
 		{
 			if (order == GridOrder.RowMajor)
 			{
@@ -231,7 +226,7 @@ namespace Tools.DataStructures {
 				{
 					for (int column = 0; column < Columns; ++column)
 					{
-						visit(new GridCell(row, column));
+						yield return new GridCell(row, column);
 					}
 				}
 			}
@@ -241,7 +236,7 @@ namespace Tools.DataStructures {
 				{
 					for (int row = 0; row < Rows; ++row)
 					{
-						visit(new GridCell(row, column));
+						yield return new GridCell(row, column);
 					}
 				}
 			}
