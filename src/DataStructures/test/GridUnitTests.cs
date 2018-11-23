@@ -476,20 +476,24 @@ namespace Test
 		}
 		#endregion
 
-		#region GetCellsInOrder
+		#region GetItemLocationPairs
 		[TestMethod]
-		public void GetCellsInOrder_OrderIsRowMajor_EnumeratesCellsInRowMajorOrder()
+		public void GetItemLocationPairs_OrderIsRowMajor_ReturnsItemsAndTheirCellsInRowMajorOrder()
 		{
 			// Arrange
 			var grid = new Grid<int>(2, 2);
+			FillIntegerGrid(grid);
 
 			// Act & Assert
 			int row = 0;
 			int col = 0;
-			foreach (var cell in grid.GetCellsInOrder(GridOrder.RowMajor))
+			foreach (var pair in grid.GetItemLocationPairs(GridOrder.RowMajor))
 			{
 				var expectedCell = new GridCell(row, col);
-				Assert.AreEqual(expectedCell, cell);
+				var expectedValue = grid[expectedCell];
+
+				Assert.AreEqual(expectedCell, pair.Key);
+				Assert.AreEqual(expectedValue, pair.Value);
 
 				++col;
 				if (col == grid.Columns)
@@ -501,18 +505,22 @@ namespace Test
 		}
 
 		[TestMethod]
-		public void GetCellsInOrder_OrderIsColumnMajor_VisitsCellsInColumnMajorOrder()
+		public void GetItemLocationPairs_OrderIsColumnMajor_ReturnsItemsAndTheirCellsInColumnMajorOrder()
 		{
 			// Arrange
 			var grid = new Grid<int>(4, 3);
+			FillIntegerGrid(grid);
 
 			// Act & Assert
 			int row = 0;
 			int col = 0;
-			foreach (var cell in grid.GetCellsInOrder(GridOrder.ColumnMajor))
+			foreach (var pair in grid.GetItemLocationPairs(GridOrder.ColumnMajor))
 			{
 				var expectedCell = new GridCell(row, col);
-				Assert.AreEqual(expectedCell, cell);
+				var expectedValue = grid[expectedCell];
+
+				Assert.AreEqual(expectedCell, pair.Key);
+				Assert.AreEqual(expectedValue, pair.Value);
 
 				++row;
 				if (row == grid.Rows)

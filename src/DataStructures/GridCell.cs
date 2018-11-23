@@ -5,8 +5,8 @@
 	/// </summary>
 	public struct GridCell
 	{
-		public int Row { get; set; }
-		public int Column { get; set; }
+		public int Row;
+		public int Column;
 
 		public GridCell(int row, int column)
 		{

@@ -57,7 +57,7 @@ namespace Tools.DataStructures {
 		public Grid(int rows, int columns, T fillValue)
 			: this(rows, columns)
 		{
-			foreach (var cell in GetCellsInOrder(GridOrder.RowMajor))
+			foreach (var cell in GetCellsInOrder())
 			{
 				this[cell] = fillValue;
 			}
@@ -79,9 +79,9 @@ namespace Tools.DataStructures {
 			Columns = other.Columns;
 			Data = new T[Rows, Columns];
 
-			foreach (var cell in other.GetCellsInOrder(GridOrder.RowMajor))
+			foreach (var pair in other.GetItemLocationPairs())
 			{
-				this[cell] = other[cell];
+				this[pair.Key] = pair.Value;
 			}
 		}
 
@@ -122,11 +122,11 @@ namespace Tools.DataStructures {
 		}
 
 		/// <summary>
-		/// Returns a copy of the grid flattened into a 1D list. The GridOrder parameter
-		/// determines the order in which elements are moved from the grid to the list.
+		/// Returns a copy of the grid flattened into a 1D list.
 		/// </summary>
-		/// <param name="order">the GridOrder to use</param>
-		public List<T> Flatten(GridOrder order)
+		/// <param name="order">the order in which to move items from the grid to the
+		/// list (default is row-major)</param>
+		public List<T> Flatten(GridOrder order = GridOrder.RowMajor)
 		{
 			return new List<T>(GetCellsInOrder(order).Select(cell => this[cell]));
 		}
@@ -161,13 +161,14 @@ namespace Tools.DataStructures {
 
 		/// <summary>
 		/// Returns an enumerable over the items in cells that neighbor a given cell. Two
-		/// cells are neighbors if they touch on any side or corner.
+		/// cells are neighbors if they touch on any side or corner. Items are returned
+		/// in row-major order.
 		/// </summary>
 		/// <param name="cell">the cell whose neighbors will be returned</param>
 		/// <param name="excludeDiagonals">if true, cells that touch on a corner are ignored</param>
 		public IEnumerable<T> GetNeighbors(GridCell cell, bool excludeDiagonals = false)
 		{
-			foreach (var cellNeighbor in GetCellNeighbors(cell, excludeDiagonals))
+			foreach (var cellNeighbor in GetNeighborCells(cell, excludeDiagonals))
 			{
 				yield return this[cellNeighbor];
 			}
@@ -175,11 +176,12 @@ namespace Tools.DataStructures {
 
 		/// <summary>
 		/// Returns an enumerable over the cells that neighbor a given cell. Two cells are
-		/// neighbors if they touch on any side or corner.
+		/// neighbors if they touch on any side or corner. Cells are returned in row-major
+		/// order.
 		/// </summary>
 		/// <param name="cell">the cell whose neighbors will be returned</param>
 		/// <param name="excludeDiagonals">if true, cells that touch on a corner are ignored</param>
-		public IEnumerable<GridCell> GetCellNeighbors(GridCell cell, bool excludeDiagonals = false)
+		public IEnumerable<GridCell> GetNeighborCells(GridCell cell, bool excludeDiagonals = false)
 		{
 			for (int row = cell.Row - 1; row <= cell.Row + 1; ++row)
 			{
@@ -199,7 +201,21 @@ namespace Tools.DataStructures {
 		}
 
 		/// <summary>
-		/// Returns an enumerable over the grid that iterates in row-major order.
+		/// Returns an enumerable of the grid's contents and their locations (cells)
+		/// in a particular order.
+		/// </summary>
+		/// <param name="order">the enumeration order (default is row-major)</param>
+		public IEnumerable<KeyValuePair<GridCell, T>> GetItemLocationPairs(
+			GridOrder order = GridOrder.RowMajor)
+		{
+			foreach (var cell in GetCellsInOrder(order))
+			{
+				yield return new KeyValuePair<GridCell, T>(cell, this[cell]);
+			}
+		}
+
+		/// <summary>
+		/// Returns an enumerator over the grid's contents in row-major order.
 		/// </summary>
 		public IEnumerator<T> GetEnumerator()
 		{
@@ -214,35 +230,35 @@ namespace Tools.DataStructures {
 			return GetEnumerator();
 		}
 
-		/// <summary>
-		/// Returns an enumerable over cells that enumerates in the order specified.
-		/// </summary>
-		/// <param name="order">the order</param>
-		public IEnumerable<GridCell> GetCellsInOrder(GridOrder order)
+		/*
+		 * Returns an enumerable of cells in the order specified.
+		 */
+		private IEnumerable<GridCell> GetCellsInOrder(GridOrder order = GridOrder.RowMajor)
 		{
-			if (order == GridOrder.RowMajor)
+			switch (order)
 			{
-				for (int row = 0; row < Rows; ++row)
-				{
-					for (int column = 0; column < Columns; ++column)
-					{
-						yield return new GridCell(row, column);
-					}
-				}
-			}
-			else if (order == GridOrder.ColumnMajor)
-			{
-				for (int column = 0; column < Columns; ++column)
-				{
+				case GridOrder.RowMajor:
 					for (int row = 0; row < Rows; ++row)
 					{
-						yield return new GridCell(row, column);
+						for (int column = 0; column < Columns; ++column)
+						{
+							yield return new GridCell(row, column);
+						}
 					}
-				}
-			}
-			else
-			{
-				throw new ArgumentException("Unrecognized GridOrder.");
+					break;
+
+				case GridOrder.ColumnMajor:
+					for (int column = 0; column < Columns; ++column)
+					{
+						for (int row = 0; row < Rows; ++row)
+						{
+							yield return new GridCell(row, column);
+						}
+					}
+					break;
+
+				default:
+					throw new ArgumentException("Unknown GridOrder");
 			}
 		}
 	}
