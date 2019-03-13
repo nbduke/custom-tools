@@ -1,4 +1,3 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -26,6 +25,17 @@ namespace Tools.DataStructures {
 			get
 			{
 				return Counts.Values.Sum();
+			}
+		}
+
+		/// <summary>
+		/// Returns the number of unique items in the Counter.
+		/// </summary>
+		public int UniqueCount
+		{
+			get
+			{
+				return Counts.Count;
 			}
 		}
 

@@ -135,6 +135,50 @@ namespace Test
 		}
 		#endregion
 
+		#region UniqueCount
+		[TestMethod]
+		public void UniqueCount_CounterIsEmpty_ReturnsZero()
+		{
+			// Arrange
+			var counter = new Counter<int>();
+
+			// Act
+			int uniqueCount = counter.UniqueCount;
+
+			// Assert
+			Assert.AreEqual(0, uniqueCount);
+		}
+
+		[TestMethod]
+		public void UniqueCount_CounterContainsItemWithZeroCount_ReturnsOne()
+		{
+			// Arrange
+			var counter = new Counter<string>();
+			counter["foo"] = 0;
+
+			// Act
+			int uniqueCount = counter.UniqueCount;
+
+			// Assert
+			Assert.AreEqual(1, uniqueCount);
+		}
+
+		[TestMethod]
+		public void UniqueCount_CounterContainsItemsWithNonzeroCount_ReturnsNumberOfItems()
+		{
+			// Arrange
+			var counter = new Counter<char>();
+			counter['a'] = 1;
+			counter['b'] = 60;
+
+			// Act
+			int uniqueCount = counter.UniqueCount;
+
+			// Assert
+			Assert.AreEqual(2, uniqueCount);
+		}
+		#endregion
+
 		#region Increment
 		[TestMethod]
 		public void Increment_ArgumentIsNull_ThrowsArgumentNullException()
