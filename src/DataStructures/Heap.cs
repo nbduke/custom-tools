@@ -5,7 +5,7 @@ using System.Collections.Generic;
 namespace Tools.DataStructures {
 
 	/// <summary>
-	/// A heap where the top element is the least in the partial ordering
+	/// A heap where the top item is the least in the partial ordering
 	/// specified by the heap's comparator.
 	/// </summary>
 	/// <remarks>
@@ -24,30 +24,58 @@ namespace Tools.DataStructures {
 
 		private readonly List<T> Data;
 		private readonly Comparison<T> Compare;
+		private readonly int? MaxCapacity;
 
-		public Heap()
-			: this(Comparer<T>.Default)
+		/// <summary>
+		/// Constructs a heap with the default comparer for T.
+		/// </summary>
+		/// <param name="maxCapacity">(optional) specifies the capacity at which
+		/// pushing new items will cause the least item to be evicted</param>
+		public Heap(int? maxCapacity = null)
+			: this(Comparer<T>.Default, maxCapacity)
 		{
 		}
 
-		public Heap(Comparison<T> comparison)
+		/// <summary>
+		/// Constructs a heap whose items are ordered by a comparison function.
+		/// </summary>
+		/// <param name="comparison">the comparison function</param>
+		/// <param name="maxCapacity">(optional) specifies the capacity at which
+		/// pushing new items will cause the least item to be evicted</param>
+		public Heap(Comparison<T> comparison, int? maxCapacity = null)
 		{
 			Validate.IsNotNull(comparison, "comparison");
 			Compare = comparison;
+			MaxCapacity = maxCapacity;
 			Data = new List<T>();
 		}
 
-		public Heap(IComparer<T> comparer)
+		/// <summary>
+		/// Constructs a heap whose items are ordered by a comparer object.
+		/// </summary>
+		/// <param name="comparer">the comparer object</param>
+		/// <param name="maxCapacity">(optional) specifies the capacity at which
+		/// pushing new items will cause the least item to be evicted</param>
+		public Heap(IComparer<T> comparer, int? maxCapacity = null)
 		{
 			Validate.IsNotNull(comparer, "comparer");
 			Compare = comparer.Compare;
+			MaxCapacity = maxCapacity;
 			Data = new List<T>();
 		}
 
+		/// <summary>
+		/// Pushes a new item onto the heap. If the heap is at its maximum capacity,
+		/// the least item after pushing will be evicted.
+		/// </summary>
+		/// <param name="item">the item</param>
 		public void Push(T item)
 		{
 			Data.Add(item);
 			HeapifyBottomUp(Count - 1);
+
+			if (MaxCapacity.HasValue && Count > MaxCapacity)
+				Pop();
 		}
 
 		public T Pop()

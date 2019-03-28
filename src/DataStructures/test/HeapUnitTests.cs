@@ -74,6 +74,23 @@ namespace Test
 		}
 
 		[TestMethod]
+		public void Count_AfterPushingWhenHeapIsAtMaxCapacity_ReturnsMaxCapacity()
+		{
+			// Arrange
+			int maxCapacity = 2;
+			var heap = new Heap<int>(maxCapacity);
+			heap.Push(1);
+			heap.Push(5);
+
+			// Act
+			heap.Push(2);
+			int count = heap.Count;
+
+			// Assert
+			Assert.AreEqual(maxCapacity, count);
+		}
+
+		[TestMethod]
 		public void Count_AfterPoppingAllElements_ReturnsZero()
 		{
 			// Arrange
@@ -153,6 +170,23 @@ namespace Test
 
 			// Assert
 			Assert.AreEqual(lesser, top);
+		}
+
+		[TestMethod]
+		public void Top_AfterPushingWhenHeapIsAtMaxCapacity_ReturnsSecondLeastElementOfTheEntireSet()
+		{
+			// Arrange
+			var heap = new Heap<int>(3);
+			heap.Push(50);
+			heap.Push(21);
+			heap.Push(45);
+
+			// Act
+			heap.Push(39);
+			int top = heap.Top;
+
+			// Assert
+			Assert.AreEqual(39, top);
 		}
 		#endregion
 
