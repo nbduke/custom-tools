@@ -46,10 +46,7 @@ namespace Tools.Algorithms.Search {
 		{
 			Validate.IsNotNull(nodePredicate, "nodePredicate");
 
-			var frontier = new Heap<PathNode<T>>((a, b) =>
-			{
-				return a.CumulativePathWeight <= b.CumulativePathWeight ? -1 : 1;
-			});
+			var frontier = new Heap<PathNode<T>>(n => n.CumulativePathWeight);
 			var explored = new HashSet<PathNode<T>>();
 			frontier.Push(new PathNode<T>(start));
 

@@ -24,20 +24,6 @@ namespace Test
 			// Assert
 			Assert.ThrowsException<ArgumentNullException>(action);
 		}
-
-		[TestMethod]
-		public void Constructor_WithNullComparer_ThrowsArgumentNullException()
-		{
-			// Act
-			Action action = () =>
-			{
-				IComparer<int> c = null;
-				var heap = new Heap<int>(c);
-			};
-
-			// Assert
-			Assert.ThrowsException<ArgumentNullException>(action);
-		}
 		#endregion
 
 		#region Count and Push
@@ -55,7 +41,7 @@ namespace Test
 		}
 
 		[TestMethod]
-		public void Count_AfterPushingSomeElements_ReturnsNumberOfElementsPushed()
+		public void Count_AfterPushingSomeItems_ReturnsNumberOfItemsPushed()
 		{
 			// Arrange
 			var heap = new Heap<int>();
@@ -91,7 +77,7 @@ namespace Test
 		}
 
 		[TestMethod]
-		public void Count_AfterPoppingAllElements_ReturnsZero()
+		public void Count_AfterPoppingAllItems_ReturnsZero()
 		{
 			// Arrange
 			var heap = new Heap<int>();
@@ -124,7 +110,7 @@ namespace Test
 		}
 
 		[TestMethod]
-		public void Top_AfterPushingOneElement_ReturnsThatElement()
+		public void Top_AfterPushingOneItem_ReturnsThatItem()
 		{
 			// Arrange
 			var heap = new Heap<double>();
@@ -139,7 +125,7 @@ namespace Test
 		}
 
 		[TestMethod]
-		public void Top_AfterPushingTwoElementsWithDefaultComparer_ReturnsLesserElement()
+		public void Top_AfterPushingTwoItemsWithDefaultComparer_ReturnsLesserItem()
 		{
 			// Arrange
 			var heap = new Heap<double>();
@@ -156,7 +142,7 @@ namespace Test
 		}
 
 		[TestMethod]
-		public void Top_AfterPushingTwoElementsWithCustomComparer_ReturnsLesserElementAccordingToComparer()
+		public void Top_AfterPushingTwoItemsWithCustomComparison_ReturnsLesserItemAccordingToComparer()
 		{
 			// Arrange
 			var heap = new Heap<string>((a, b) => a.Length - b.Length); // compared by length
@@ -173,7 +159,24 @@ namespace Test
 		}
 
 		[TestMethod]
-		public void Top_AfterPushingWhenHeapIsAtMaxCapacity_ReturnsSecondLeastElementOfTheEntireSet()
+		public void Top_AfterPushingTwoItemsWithKeySelector_ReturnsItemWithLesserKey()
+		{
+			// Arrange
+			var heap = new Heap<DateTime>(date => date.Minute); // compared by minute component
+			DateTime lesser = new DateTime(2019, 3, 28, 10, 15, 32);
+			DateTime greater = new DateTime(1991, 9, 10, 11, 29, 0);
+			heap.Push(lesser);
+			heap.Push(greater);
+
+			// Act
+			DateTime top = heap.Top;
+
+			// Assert
+			Assert.AreEqual(lesser, top);
+		}
+
+		[TestMethod]
+		public void Top_AfterPushingWhenHeapIsAtMaxCapacity_ReturnsSecondLeastItemOfTheEntireSet()
 		{
 			// Arrange
 			var heap = new Heap<int>(3);
@@ -208,7 +211,7 @@ namespace Test
 		}
 
 		[TestMethod]
-		public void Pop_AfterPushingOneElement_RemovesAndReturnsThatElement()
+		public void Pop_AfterPushingOneItem_RemovesAndReturnsThatItem()
 		{
 			// Arrange
 			var heap = new Heap<char>();
@@ -224,7 +227,7 @@ namespace Test
 		}
 
 		[TestMethod]
-		public void Pop_AfterPushingSomeElements_RemovesAndReturnsTheLeastElement()
+		public void Pop_AfterPushingSomeItems_RemovesAndReturnsTheLeastItem()
 		{
 			// Arrange
 			var heap = new Heap<int>();
@@ -244,7 +247,7 @@ namespace Test
 		}
 
 		[TestMethod]
-		public void Pop_AllElements_ElementsAreRemovedInIncreasingOrder()
+		public void Pop_AllItems_ItemsAreRemovedInIncreasingOrder()
 		{
 			// Arrange
 			Heap<int> heap = new Heap<int>();
@@ -271,7 +274,7 @@ namespace Test
 
 		#region Clear
 		[TestMethod]
-		public void Clear_WithAnyHeap_RemovesAllElements()
+		public void Clear_WithAnyHeap_RemovesAllItems()
 		{
 			// Arrange
 			var heap = new Heap<int>();

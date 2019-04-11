@@ -32,8 +32,24 @@ namespace Tools.DataStructures {
 		/// <param name="maxCapacity">(optional) specifies the capacity at which
 		/// pushing new items will cause the least item to be evicted</param>
 		public Heap(int? maxCapacity = null)
-			: this(Comparer<T>.Default, maxCapacity)
 		{
+			MaxCapacity = maxCapacity;
+			Compare = Comparer<T>.Default.Compare;
+			Data = new List<T>();
+		}
+
+		/// <summary>
+		/// Constructs a heap whose items are ordered by the default comparer for
+		/// their keys.
+		/// </summary>
+		/// <param name="keySelector">a function that returns a comparable key for an item</param>
+		/// <param name="maxCapacity">(optional) specifies the capacity at which
+		/// pushing new items will cause the least item to be evicted</param>
+		public Heap(Func<T, IComparable> keySelector, int? maxCapacity = null)
+			: this(maxCapacity)
+		{
+			Validate.IsNotNull(keySelector, "keySelector");
+			Compare = (a, b) => keySelector(a).CompareTo(keySelector(b));
 		}
 
 		/// <summary>
@@ -43,11 +59,10 @@ namespace Tools.DataStructures {
 		/// <param name="maxCapacity">(optional) specifies the capacity at which
 		/// pushing new items will cause the least item to be evicted</param>
 		public Heap(Comparison<T> comparison, int? maxCapacity = null)
+			: this(maxCapacity)
 		{
 			Validate.IsNotNull(comparison, "comparison");
 			Compare = comparison;
-			MaxCapacity = maxCapacity;
-			Data = new List<T>();
 		}
 
 		/// <summary>
@@ -57,11 +72,10 @@ namespace Tools.DataStructures {
 		/// <param name="maxCapacity">(optional) specifies the capacity at which
 		/// pushing new items will cause the least item to be evicted</param>
 		public Heap(IComparer<T> comparer, int? maxCapacity = null)
+			: this(maxCapacity)
 		{
 			Validate.IsNotNull(comparer, "comparer");
 			Compare = comparer.Compare;
-			MaxCapacity = maxCapacity;
-			Data = new List<T>();
 		}
 
 		/// <summary>
