@@ -11,12 +11,20 @@ namespace Tools.DataStructures {
 	{
 		private readonly IReadOnlyList<T> DataSource;
 
+		/// <summary>
+		/// Creates an Arrangement from data copied from an enumerable source.
+		/// </summary>
+		/// <param name="dataSource">the data source</param>
 		public Arrangement(IEnumerable<T> dataSource)
 		{
 			Validate.IsNotNull(dataSource, "dataSource");
 			DataSource = new List<T>(dataSource);
 		}
 
+		/// <summary>
+		/// Creates an Arrangement in-place from a read-only data source.
+		/// </summary>
+		/// <param name="dataSource">the data source</param>
 		public Arrangement(IReadOnlyList<T> dataSource)
 		{
 			Validate.IsNotNull(dataSource, "dataSource");
@@ -28,6 +36,9 @@ namespace Tools.DataStructures {
 			get { return DataSource.Count; }
 		}
 
+		/// <summary>
+		/// Returns an enumerable of unordered pairs of items.
+		/// </summary>
 		public IEnumerable<Tuple<T, T>> GetPairs()
 		{
 			for (int i = 0; i < DataSource.Count - 1; ++i)
@@ -39,6 +50,9 @@ namespace Tools.DataStructures {
 			}
 		}
 
+		/// <summary>
+		/// Returns an enumerable of ordered pairs of items.
+		/// </summary>
 		public IEnumerable<Tuple<T, T>> GetOrderedPairs()
 		{
 			for (int i = 0; i < DataSource.Count; ++i)
@@ -51,38 +65,61 @@ namespace Tools.DataStructures {
 			}
 		}
 
+		/// <summary>
+		/// Returns an enumerable of combinations of a fixed size.
+		/// </summary>
+		/// <param name="size">the size of combinations to return</param>
 		public IEnumerable<List<T>> GetCombinations(uint size)
 		{
 			return GetCombinations(size, size);
 		}
 
+		/// <summary>
+		/// Returns an enumerable of combinations whose sizes fall within a given range.
+		/// </summary>
+		/// <param name="minimumSize">the minimum combination size</param>
+		/// <param name="maximumSize">the maximum combination size</param>
 		public IEnumerable<List<T>> GetCombinations(uint minimumSize, uint maximumSize)
 		{
 			var enumerator = new ArrangementEnumerator<T>(
 				DataSource,
 				minimumSize,
 				maximumSize,
-				false /*isPermutation*/);
+				false /*isPermutation*/
+			);
 			return enumerator.Iterate();
 		}
 
+		/// <summary>
+		/// Returns an enumerable of permutations of the entire data source.
+		/// </summary>
 		public IEnumerable<List<T>> GetPermutations()
 		{
 			return GetPermutations((uint)DataSource.Count);
 		}
 
+		/// <summary>
+		/// Returns an enumerable of permutations of a fixed size.
+		/// </summary>
+		/// <param name="size">the size of permutations to return</param>
 		public IEnumerable<List<T>> GetPermutations(uint size)
 		{
 			return GetPermutations(size, size);
 		}
 
+		/// <summary>
+		/// Returns an enumerable of permutations whose sizes fall within a given range.
+		/// </summary>
+		/// <param name="minimumSize">the minimum permutation size</param>
+		/// <param name="maximumSize">the maximum permutation size</param>
 		public IEnumerable<List<T>> GetPermutations(uint minimumSize, uint maximumSize)
 		{
 			var enumerator = new ArrangementEnumerator<T>(
 				DataSource,
 				minimumSize,
 				maximumSize,
-				true /*isPermutation*/);
+				true /*isPermutation*/
+			);
 			return enumerator.Iterate();
 		}
 	}
