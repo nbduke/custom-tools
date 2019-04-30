@@ -55,8 +55,10 @@ namespace Tools.Algorithms.Search {
 				PathNode<T> currentNode = frontier.Pop();
 				if (nodePredicate(currentNode))
 					return currentNode;
-				else if (currentNode.CumulativePathLength >= maxSearchDistance + 1 ||
-					explored.Contains(currentNode))
+				else if (
+					currentNode.CumulativePathLength >= maxSearchDistance + 1 ||
+					explored.Contains(currentNode)
+				)
 					continue;
 
 				explored.Add(currentNode);
