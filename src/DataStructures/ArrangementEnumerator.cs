@@ -15,7 +15,7 @@ namespace Tools.DataStructures {
 	*/
 	class ArrangementEnumerator<T> : IEnumerator<List<T>>
 	{
-		private readonly List<T> Collection;
+		private readonly IReadOnlyList<T> DataSource;
 		private readonly uint MinSize;
 		private readonly uint MaxSize;
 		private Stack<int> IndexStack;
@@ -24,24 +24,24 @@ namespace Tools.DataStructures {
 		private List<T> _Current;
 
 		public ArrangementEnumerator(
-			List<T> collection,
+			IReadOnlyList<T> dataSource,
 			uint minimumSize,
 			uint maximumSize,
 			bool isPermutation)
 		{
-			Validate.IsNotNull(collection, "collection");
+			Validate.IsNotNull(dataSource, "dataSource");
 			Validate.IsTrue(minimumSize <= maximumSize, "minimumSize cannot exceed maximumSize");
-			Validate.IsTrue(maximumSize <= (uint)collection.Count,
+			Validate.IsTrue(maximumSize <= (uint)dataSource.Count,
 				"maximumSize cannot exceed the collection size");
 
-			Collection = collection;
+			DataSource = dataSource;
 			MinSize = minimumSize;
 			MaxSize = maximumSize;
 			IndexStack = new Stack<int>();
 			IndexEnumeratorStack = new Stack<IEnumerator<int>>();
 
 			if (isPermutation)
-				IsInPermutation = new BitArray(collection.Count);
+				IsInPermutation = new BitArray(dataSource.Count);
 
 			Reset();
 		}
@@ -51,7 +51,7 @@ namespace Tools.DataStructures {
 			get
 			{
 				if (_Current == null)
-					_Current = new List<T>(IndexStack.Reverse().Select(i => Collection[i]));
+					_Current = new List<T>(IndexStack.Reverse().Select(i => DataSource[i]));
 
 				return _Current;
 			}
@@ -159,7 +159,7 @@ namespace Tools.DataStructures {
 
 		private IEnumerable<int> GetNextIndicesForPermutations()
 		{
-			for (int i = 0; i < Collection.Count; ++i)
+			for (int i = 0; i < DataSource.Count; ++i)
 			{
 				if (!IsInPermutation[i])
 				{
@@ -172,7 +172,7 @@ namespace Tools.DataStructures {
 
 		private IEnumerable<int> GetNextIndicesForCombinations(int currentIndex)
 		{
-			for (int i = currentIndex + 1; i < Collection.Count; ++i)
+			for (int i = currentIndex + 1; i < DataSource.Count; ++i)
 			{
 				yield return i;
 			}
