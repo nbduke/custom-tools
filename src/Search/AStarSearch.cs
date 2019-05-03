@@ -5,20 +5,30 @@ using Tools.DataStructures;
 
 namespace Tools.Algorithms.Search {
 
+	/// <summary>
+	/// A* search explores nodes in order by ascending estimated total path
+	/// weight. The total path weight for a node N is the cumulative path
+	/// weight from the start to N plus the estimated weight from N to the
+	/// goal.<para/>
+	/// Algorithm correctness requires that the weight estimate be admissible
+	/// and consistent; that is, it must never overestimate the weight, and it
+	/// must satisfy the triangle rule.
+	/// </summary>
+	/// <typeparam name="T">the type of nodes in the graph</typeparam>
 	public class AStarSearch<T>
 	{
 		private readonly Func<T, IEnumerable<Tuple<T, double>>> GetWeightedChildren;
-		private readonly Func<T, double> EstimateGoalCost;
+		private readonly Func<T, double> EstimateGoalWeight;
 
 		public AStarSearch(
 			Func<T, IEnumerable<Tuple<T, double>>> getWeightedChildren,
-			Func<T, double> estimateGoalCost
+			Func<T, double> estimateGoalWeight
 		)
 		{
 			Validate.IsNotNull(getWeightedChildren, "getWeightedChildren");
-			Validate.IsNotNull(estimateGoalCost, "estimateGoalCost");
+			Validate.IsNotNull(estimateGoalWeight, "estimateGoalWeight");
 			GetWeightedChildren = getWeightedChildren;
-			EstimateGoalCost = estimateGoalCost;
+			EstimateGoalWeight = estimateGoalWeight;
 		}
 
 		public IEnumerable<T> FindPath(T start, T end)
@@ -66,7 +76,7 @@ namespace Tools.Algorithms.Search {
 
 					if (!explored.Contains(childNode))
 					{
-						double costEstimate = childNode.CumulativePathWeight + EstimateGoalCost(child);
+						double costEstimate = childNode.CumulativePathWeight + EstimateGoalWeight(child);
 						frontier.Push(new Tuple<PathNode<T>, double>(childNode, costEstimate));
 					}
 				}

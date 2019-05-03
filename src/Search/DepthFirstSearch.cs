@@ -18,6 +18,18 @@ namespace Tools.Algorithms.Search {
 			GetChildren = getChildren;
 		}
 
+		public IEnumerable<T> FindPath(T start, T end)
+		{
+			Validate.IsNotNull(start, "start");
+			Validate.IsNotNull(end, "end");
+
+			PathNode<T> terminalNode = FindNode(start, node => node.Equals(end));
+			if (terminalNode == null)
+				return new T[] { };
+			else
+				return terminalNode.GetPath();
+		}
+
 		public PathNode<T> FindNode(
 			T start,
 			NodePredicate<T> nodePredicate,
