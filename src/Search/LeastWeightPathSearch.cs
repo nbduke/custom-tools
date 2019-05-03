@@ -55,7 +55,10 @@ namespace Tools.Algorithms.Search {
 				PathNode<T> currentNode = frontier.Pop();
 				if (nodePredicate(currentNode))
 					return currentNode;
-				else if (currentNode.CumulativePathLength >= maxSearchDistance + 1)
+				else if (
+					currentNode.CumulativePathLength >= maxSearchDistance + 1 ||
+					explored.Contains(currentNode)
+				)
 					continue;
 
 				explored.Add(currentNode);
@@ -64,27 +67,13 @@ namespace Tools.Algorithms.Search {
 					double weight = GetEdgeWeight(currentNode.State, child);
 					var childNode = new PathNode<T>(child, currentNode, weight);
 
-					if (!explored.Contains(childNode) &&
-						IsNotInFrontierOrFoundBetterPath(childNode, frontier))
-					{
+					if (!explored.Contains(childNode))
 						frontier.Push(childNode);
-					}
 				}
 			}
 
 			// Path not found
 			return null;
-		}
-
-		private bool IsNotInFrontierOrFoundBetterPath(PathNode<T> newNode, Heap<PathNode<T>> frontier)
-		{
-			foreach (var node in frontier)
-			{
-				if (node.Equals(newNode))
-					return newNode.CumulativePathWeight <= node.CumulativePathWeight;
-			}
-
-			return true; // newNode is not in the frontier
 		}
 	}
 

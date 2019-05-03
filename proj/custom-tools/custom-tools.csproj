@@ -58,6 +58,7 @@
     <Compile Include="..\..\src\DataStructures\PrefixTreeNode.cs" />
     <Compile Include="..\..\src\Math\Combinatorics.cs" />
     <Compile Include="..\..\src\Math\RandomProvider.cs" />
+	<Compile Include="..\..\src\Search\AStarSearch.cs" />
     <Compile Include="..\..\src\Search\BacktrackingSearch.cs" />
     <Compile Include="..\..\src\Search\BidirectionalSearch.cs" />
     <Compile Include="..\..\src\Search\BreadthFirstSearch.cs" />

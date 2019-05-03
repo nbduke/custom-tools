@@ -9,75 +9,117 @@ namespace Tools.DataStructures {
 	/// </summary>
 	public class Arrangement<T>
 	{
-		private readonly List<T> Collection;
+		private readonly IReadOnlyList<T> DataSource;
 
-		public Arrangement(IEnumerable<T> collection)
+		/// <summary>
+		/// Creates an Arrangement from data copied from an enumerable source.
+		/// </summary>
+		/// <param name="dataSource">the data source</param>
+		public Arrangement(IEnumerable<T> dataSource)
 		{
-			Validate.IsNotNull(collection, "collection");
+			Validate.IsNotNull(dataSource, "dataSource");
+			DataSource = new List<T>(dataSource);
+		}
 
-			Collection = new List<T>(collection);
+		/// <summary>
+		/// Creates an Arrangement in-place from a read-only data source.
+		/// </summary>
+		/// <param name="dataSource">the data source</param>
+		public Arrangement(IReadOnlyList<T> dataSource)
+		{
+			Validate.IsNotNull(dataSource, "dataSource");
+			DataSource = dataSource;
 		}
 
 		public int Count
 		{
-			get { return Collection.Count; }
+			get { return DataSource.Count; }
 		}
 
+		/// <summary>
+		/// Returns an enumerable of unordered pairs of items.
+		/// </summary>
 		public IEnumerable<Tuple<T, T>> GetPairs()
 		{
-			for (int i = 0; i < Collection.Count - 1; ++i)
+			for (int i = 0; i < DataSource.Count - 1; ++i)
 			{
-				for (int j = i + 1; j < Collection.Count; ++j)
+				for (int j = i + 1; j < DataSource.Count; ++j)
 				{
-					yield return Tuple.Create(Collection[i], Collection[j]);
+					yield return Tuple.Create(DataSource[i], DataSource[j]);
 				}
 			}
 		}
 
+		/// <summary>
+		/// Returns an enumerable of ordered pairs of items.
+		/// </summary>
 		public IEnumerable<Tuple<T, T>> GetOrderedPairs()
 		{
-			for (int i = 0; i < Collection.Count; ++i)
+			for (int i = 0; i < DataSource.Count; ++i)
 			{
-				for (int j = 0; j < Collection.Count; ++j)
+				for (int j = 0; j < DataSource.Count; ++j)
 				{
 					if (i != j)
-						yield return Tuple.Create(Collection[i], Collection[j]);
+						yield return Tuple.Create(DataSource[i], DataSource[j]);
 				}
 			}
 		}
 
+		/// <summary>
+		/// Returns an enumerable of combinations of a fixed size.
+		/// </summary>
+		/// <param name="size">the size of combinations to return</param>
 		public IEnumerable<List<T>> GetCombinations(uint size)
 		{
 			return GetCombinations(size, size);
 		}
 
+		/// <summary>
+		/// Returns an enumerable of combinations whose sizes fall within a given range.
+		/// </summary>
+		/// <param name="minimumSize">the minimum combination size</param>
+		/// <param name="maximumSize">the maximum combination size</param>
 		public IEnumerable<List<T>> GetCombinations(uint minimumSize, uint maximumSize)
 		{
 			var enumerator = new ArrangementEnumerator<T>(
-				Collection,
+				DataSource,
 				minimumSize,
 				maximumSize,
-				false /*isPermutation*/);
+				false /*isPermutation*/
+			);
 			return enumerator.Iterate();
 		}
 
+		/// <summary>
+		/// Returns an enumerable of permutations of the entire data source.
+		/// </summary>
 		public IEnumerable<List<T>> GetPermutations()
 		{
-			return GetPermutations((uint)Collection.Count);
+			return GetPermutations((uint)DataSource.Count);
 		}
 
+		/// <summary>
+		/// Returns an enumerable of permutations of a fixed size.
+		/// </summary>
+		/// <param name="size">the size of permutations to return</param>
 		public IEnumerable<List<T>> GetPermutations(uint size)
 		{
 			return GetPermutations(size, size);
 		}
 
+		/// <summary>
+		/// Returns an enumerable of permutations whose sizes fall within a given range.
+		/// </summary>
+		/// <param name="minimumSize">the minimum permutation size</param>
+		/// <param name="maximumSize">the maximum permutation size</param>
 		public IEnumerable<List<T>> GetPermutations(uint minimumSize, uint maximumSize)
 		{
 			var enumerator = new ArrangementEnumerator<T>(
-				Collection,
+				DataSource,
 				minimumSize,
 				maximumSize,
-				true /*isPermutation*/);
+				true /*isPermutation*/
+			);
 			return enumerator.Iterate();
 		}
 	}
