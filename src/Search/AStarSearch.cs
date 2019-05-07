@@ -18,25 +18,29 @@ namespace Tools.Algorithms.Search {
 	public class AStarSearch<T>
 	{
 		private readonly Func<T, IEnumerable<Tuple<T, double>>> GetWeightedChildren;
-		private readonly Func<T, double> EstimateGoalWeight;
 
-		public AStarSearch(
-			Func<T, IEnumerable<Tuple<T, double>>> getWeightedChildren,
-			Func<T, double> estimateGoalWeight
-		)
+		public AStarSearch(Func<T, IEnumerable<Tuple<T, double>>> getWeightedChildren)
 		{
 			Validate.IsNotNull(getWeightedChildren, "getWeightedChildren");
-			Validate.IsNotNull(estimateGoalWeight, "estimateGoalWeight");
 			GetWeightedChildren = getWeightedChildren;
-			EstimateGoalWeight = estimateGoalWeight;
 		}
 
-		public IEnumerable<T> FindPath(T start, T end)
+		public IEnumerable<T> FindPath(
+			T start,
+			T end,
+			Func<T, double> estimateRemainingPathWeight
+		)
 		{
 			Validate.IsNotNull(start, "start");
 			Validate.IsNotNull(end, "end");
+			Validate.IsNotNull(estimateRemainingPathWeight, "estimateRemainingPathWeight");
 
-			PathNode<T> terminalNode = FindNode(start, node => node.Equals(end));
+			PathNode<T> terminalNode = FindNode(
+				start,
+				node => node.Equals(end),
+				estimateRemainingPathWeight
+			);
+
 			if (terminalNode == null)
 				return new T[] { };
 			else
@@ -46,10 +50,12 @@ namespace Tools.Algorithms.Search {
 		public PathNode<T> FindNode(
 			T start,
 			Func<PathNode<T>, bool> nodePredicate,
+			Func<T, double> estimateRemainingPathWeight,
 			uint maxSearchDistance = uint.MaxValue - 1
 		)
 		{
 			Validate.IsNotNull(nodePredicate, "nodePredicate");
+			Validate.IsNotNull(estimateRemainingPathWeight, "estimateRemainingPathWeight");
 
 			var frontier = new Heap<Tuple<PathNode<T>, double>>(t => t.Item2);
 			var explored = new HashSet<PathNode<T>>();
@@ -76,8 +82,10 @@ namespace Tools.Algorithms.Search {
 
 					if (!explored.Contains(childNode))
 					{
-						double costEstimate = childNode.CumulativePathWeight + EstimateGoalWeight(child);
-						frontier.Push(new Tuple<PathNode<T>, double>(childNode, costEstimate));
+						double totalWeightEstimate =
+							childNode.CumulativePathWeight +
+							estimateRemainingPathWeight(child);
+						frontier.Push(new Tuple<PathNode<T>, double>(childNode, totalWeightEstimate));
 					}
 				}
 			}
