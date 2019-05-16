@@ -487,5 +487,60 @@ namespace Test
 			CollectionAssert.AreEqual(thirdPermutation.ToCharArray(), enumerator.Current);
 		}
 		#endregion
+
+		#region Product
+		[TestMethod]
+		public void Product_WithNullArrangement_ThrowsNullArgumentException()
+		{
+			// Arrange
+			var arrangement = new Arrangement<char>("foo");
+
+			// Act
+			Action action = () =>
+			{
+				arrangement.Product<int>(null);
+			};
+
+			// Assert
+			Assert.ThrowsException<ArgumentNullException>(action);
+		}
+
+		[TestMethod]
+		public void Product_WithEmptyArrangement_ReturnsEmptyEnumerable()
+		{
+			// Arrange
+			var arrangement = new Arrangement<char>("bar");
+			var empty = new Arrangement<char>("");
+
+			// Act
+			var product = arrangement.Product(empty);
+
+			// Assert
+			Assert.AreEqual(0, product.Count());
+		}
+
+		[TestMethod]
+		public void Product_WithNonemptyArrangement_ReturnsAllPairsFromTheTwoSets()
+		{
+			// Arrange
+			var arrangement = new Arrangement<int>(new int[] { 0, 2 });
+			var other = new Arrangement<char>("abc");
+
+			// Act
+			var product = arrangement.Product(other);
+
+			// Assert
+			var expectedProduct = new Tuple<int, char>[]
+			{
+				Tuple.Create(0, 'a'),
+				Tuple.Create(0, 'b'),
+				Tuple.Create(0, 'c'),
+				Tuple.Create(2, 'a'),
+				Tuple.Create(2, 'b'),
+				Tuple.Create(2, 'c')
+			};
+			CollectionAssert.AreEqual(expectedProduct, product.ToList());
+		}
+		#endregion
 	}
 }

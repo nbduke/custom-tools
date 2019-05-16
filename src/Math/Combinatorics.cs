@@ -1,4 +1,7 @@
-﻿namespace Tools.Math {
+﻿using System;
+using System.Collections.Generic;
+
+namespace Tools.Math {
 
 	/// <summary>
 	/// Exposes helper functions for calculating factorials, combinations,
@@ -74,6 +77,26 @@
 			}
 
 			return value;
+		}
+
+		/// <summary>
+		/// Returns the Cartesian product of two enumerables.
+		/// </summary>
+		public static IEnumerable<Tuple<T1, T2>> CartesianProduct<T1, T2>(
+			IEnumerable<T1> first,
+			IEnumerable<T2> second
+		)
+		{
+			Validate.IsNotNull(first, "first");
+			Validate.IsNotNull(second, "second");
+
+			foreach (var a in first)
+			{
+				foreach (var b in second)
+				{
+					yield return new Tuple<T1, T2>(a, b);
+				}
+			}
 		}
 	}
 

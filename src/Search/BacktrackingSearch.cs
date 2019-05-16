@@ -24,7 +24,6 @@ namespace Tools.Algorithms.Search {
 
 		public IEnumerable<T> FindPath(T start, T end)
 		{
-			Validate.IsNotNull(start, "start");
 			Validate.IsNotNull(end, "end");
 
 			PathNode<T> terminalNode = FindNode(start, node => node.Equals(end));
@@ -39,6 +38,7 @@ namespace Tools.Algorithms.Search {
 			NodePredicate<T> nodePredicate,
 			uint maxSearchDistance = uint.MaxValue)
 		{
+			Validate.IsNotNull(start, "start");
 			Validate.IsNotNull(nodePredicate, "nodePredicate");
 
 			if (maxSearchDistance == 0)

@@ -20,7 +20,6 @@ namespace Tools.Algorithms.Search {
 
 		public IEnumerable<T> FindPath(T start, T end)
 		{
-			Validate.IsNotNull(start, "start");
 			Validate.IsNotNull(end, "end");
 
 			PathNode<T> terminalNode = FindNode(start, node => node.Equals(end));

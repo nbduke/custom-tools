@@ -44,6 +44,7 @@ namespace Tools.Algorithms.Search {
 			NodeAction<T> processNode,
 			uint maxSearchDistance = uint.MaxValue)
 		{
+			Validate.IsNotNull(start, "start");
 			Validate.IsNotNull(processNode, "processNode");
 
 			if (maxSearchDistance == 0)

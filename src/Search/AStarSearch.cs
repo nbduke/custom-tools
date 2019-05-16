@@ -31,9 +31,7 @@ namespace Tools.Algorithms.Search {
 			Func<T, double> estimateRemainingPathWeight
 		)
 		{
-			Validate.IsNotNull(start, "start");
 			Validate.IsNotNull(end, "end");
-			Validate.IsNotNull(estimateRemainingPathWeight, "estimateRemainingPathWeight");
 
 			PathNode<T> terminalNode = FindNode(
 				start,
@@ -60,7 +58,7 @@ namespace Tools.Algorithms.Search {
 			var frontier = new Heap<Tuple<PathNode<T>, double>>(t => t.Item2);
 			var explored = new HashSet<PathNode<T>>();
 			var startNode = new PathNode<T>(start);
-			frontier.Push(new Tuple<PathNode<T>, double>(startNode, 0));
+			frontier.Push(Tuple.Create(startNode, 0.0));
 
 			while (frontier.Count > 0)
 			{
@@ -85,7 +83,7 @@ namespace Tools.Algorithms.Search {
 						double totalWeightEstimate =
 							childNode.CumulativePathWeight +
 							estimateRemainingPathWeight(child);
-						frontier.Push(new Tuple<PathNode<T>, double>(childNode, totalWeightEstimate));
+						frontier.Push(Tuple.Create(childNode, totalWeightEstimate));
 					}
 				}
 			}
