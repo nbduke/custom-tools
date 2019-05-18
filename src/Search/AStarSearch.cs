@@ -28,15 +28,17 @@ namespace Tools.Algorithms.Search {
 		public IEnumerable<T> FindPath(
 			T start,
 			T end,
-			Func<T, double> estimateRemainingPathWeight
+			Func<T, double> estimateRemainingPathWeight,
+			uint maxSearchDistance = uint.MaxValue - 1
 		)
 		{
 			Validate.IsNotNull(end, "end");
 
 			PathNode<T> terminalNode = FindNode(
 				start,
-				node => node.Equals(end),
-				estimateRemainingPathWeight
+				state => state.Equals(end),
+				estimateRemainingPathWeight,
+				maxSearchDistance
 			);
 
 			if (terminalNode == null)
@@ -47,39 +49,39 @@ namespace Tools.Algorithms.Search {
 
 		public PathNode<T> FindNode(
 			T start,
-			Func<PathNode<T>, bool> nodePredicate,
+			Func<T, bool> predicate,
 			Func<T, double> estimateRemainingPathWeight,
 			uint maxSearchDistance = uint.MaxValue - 1
 		)
 		{
-			Validate.IsNotNull(nodePredicate, "nodePredicate");
+			Validate.IsNotNull(predicate, "predicate");
 			Validate.IsNotNull(estimateRemainingPathWeight, "estimateRemainingPathWeight");
 
 			var frontier = new Heap<Tuple<PathNode<T>, double>>(t => t.Item2);
-			var explored = new HashSet<PathNode<T>>();
+			var explored = new HashSet<T>();
 			var startNode = new PathNode<T>(start);
 			frontier.Push(Tuple.Create(startNode, 0.0));
 
 			while (frontier.Count > 0)
 			{
 				var currentNode = frontier.Pop().Item1;
-				if (nodePredicate(currentNode))
+				if (predicate(currentNode.State))
 					return currentNode;
 				else if (
 					currentNode.CumulativePathLength >= maxSearchDistance + 1 ||
-					explored.Contains(currentNode)
+					explored.Contains(currentNode.State)
 				)
 					continue;
 
-				explored.Add(currentNode);
+				explored.Add(currentNode.State);
 				foreach (var childAndWeight in GetWeightedChildren(currentNode.State))
 				{
 					T child = childAndWeight.Item1;
 					double weight = childAndWeight.Item2;
-					var childNode = new PathNode<T>(child, currentNode, weight);
 
-					if (!explored.Contains(childNode))
+					if (!explored.Contains(child))
 					{
+						var childNode = new PathNode<T>(child, currentNode, weight);
 						double totalWeightEstimate =
 							childNode.CumulativePathWeight +
 							estimateRemainingPathWeight(child);

@@ -11,34 +11,17 @@ namespace Test {
 	public class LeastWeightPathSearchUnitTests
 	{
 		#region Constructor
-		private void Constructor_WithNullArgument_ThrowsArgumentNullException(
-			ChildGenerator<int> getChildren,
-			EdgeWeightCalculator<int> getEdgeWeight)
+		[TestMethod]
+		public void Constructor_WithNullChildGenerator_ThrowsArgumentNullException()
 		{
 			// Act
 			Action action = () =>
 			{
-				var lwps = new LeastWeightPathSearch<int>(getChildren, getEdgeWeight);
+				var search = new LeastWeightPathSearch<int>(null);
 			};
 
 			// Assert
 			Assert.ThrowsException<ArgumentNullException>(action);
-		}
-
-		[TestMethod]
-		public void Constructor_WithNullChildGenerator_ThrowsArgumentNullException()
-		{
-			Constructor_WithNullArgument_ThrowsArgumentNullException(
-				null,
-				AnyEdgeWeightCalculator);
-		}
-
-		[TestMethod]
-		public void Constructor_WithNullEdgeWeightCalculator_ThrowsArgumentNullException()
-		{
-			Constructor_WithNullArgument_ThrowsArgumentNullException(
-				SearchTestHelpers.AnyChildGenerator,
-				null);
 		}
 		#endregion
 
@@ -96,8 +79,8 @@ namespace Test {
 		{
 			// Arrange
 			var lwps = new LeastWeightPathSearch<string>(
-				TestGraphs.EdgelessGraph<string>(),
-				AnyEdgeWeightCalculator);
+				EdgeWeighter.ConstantWeight(TestGraphs.EdgelessGraph<string>())
+			);
 
 			// Act
 			var path = lwps.FindPath("start", "end");
@@ -111,8 +94,8 @@ namespace Test {
 		{
 			// Arrange
 			var lwps = new LeastWeightPathSearch<int>(
-				TestGraphs.FiniteGraph(10),
-				AnyEdgeWeightCalculator);
+				EdgeWeighter.ConstantWeight(TestGraphs.FiniteGraph(10))
+			);
 			int start = 0;
 			int end = 20;
 
@@ -128,8 +111,8 @@ namespace Test {
 		{
 			// Arrange
 			var lwps = new LeastWeightPathSearch<int>(
-				TestGraphs.OnePathGraph(),
-				AnyEdgeWeightCalculator);
+				EdgeWeighter.ConstantWeight(TestGraphs.OnePathGraph())
+			);
 			int start = 0;
 			int end = 9;
 
@@ -146,8 +129,8 @@ namespace Test {
 		{
 			// Arrange
 			var lwps = new LeastWeightPathSearch<int>(
-				TestGraphs.TwoAsymmetricalPathsGraph(),
-				(int parent, int child) =>
+				EdgeWeighter.VariableWeight(TestGraphs.TwoAsymmetricalPathsGraph(),
+				(int child) =>
 				{
 					// Give the even path (which is also the longer path in this graph)
 					// less weight.
@@ -155,7 +138,8 @@ namespace Test {
 						return 0.49;
 					else
 						return 0.75;
-				});
+				})
+			);
 			int start = 1;
 			int end = 7;
 
@@ -178,7 +162,7 @@ namespace Test {
 			// Act
 			Action action = () =>
 			{
-				lwps.FindNode(null /*start*/, SearchTestHelpers.AnyNodePredicate);
+				lwps.FindNode(null /*start*/, SearchTestHelpers.AnyPredicate);
 			};
 
 			// Assert
@@ -186,7 +170,7 @@ namespace Test {
 		}
 
 		[TestMethod]
-		public void FindNode_NodePredicateIsNull_ThrowsArgumentNullException()
+		public void FindNode_PredicateIsNull_ThrowsArgumentNullException()
 		{
 			// Arrange
 			var lwps = AnyLWPS<string>();
@@ -194,7 +178,7 @@ namespace Test {
 			// Act
 			Action action = () =>
 			{
-				lwps.FindNode("start", null /*nodePredicate*/);
+				lwps.FindNode("start", null /*predicate*/);
 			};
 
 			// Assert
@@ -234,8 +218,8 @@ namespace Test {
 		{
 			// Arrange
 			var lwps = new LeastWeightPathSearch<string>(
-				TestGraphs.EdgelessGraph<string>(),
-				AnyEdgeWeightCalculator);
+				EdgeWeighter.ConstantWeight(TestGraphs.EdgelessGraph<string>())
+			);
 
 			// Act
 			var node = lwps.FindNode("start", n => false);
@@ -245,12 +229,12 @@ namespace Test {
 		}
 
 		[TestMethod]
-		public void FindNode_NodePredicateNeverPassesAndGraphIsFinite_ReturnsNull()
+		public void FindNode_PredicateNeverPassesAndGraphIsFinite_ReturnsNull()
 		{
 			// Arrange
 			var lwps = new LeastWeightPathSearch<int>(
-				TestGraphs.FiniteGraph(3),
-				AnyEdgeWeightCalculator);
+				EdgeWeighter.ConstantWeight(TestGraphs.FiniteGraph(3))
+			);
 			int start = 2;
 
 			// Act
@@ -261,35 +245,35 @@ namespace Test {
 		}
 
 		[TestMethod]
-		public void FindNode_NodePredicateWouldPassButPathIsLongerThanMaxSearchDistance_ReturnsNull()
+		public void FindNode_PredicateWouldPassButPathIsLongerThanMaxSearchDistance_ReturnsNull()
 		{
 			// Arrange
 			var lwps = new LeastWeightPathSearch<int>(
-				TestGraphs.OnePathGraph(),
-				AnyEdgeWeightCalculator);
+				EdgeWeighter.ConstantWeight(TestGraphs.OnePathGraph())
+			);
 			int start = -1;
 			int end = 7;
 			uint maxSearchDistance = 2;
 
 			// Act
-			var node = lwps.FindNode(start, n => n.State == end, maxSearchDistance);
+			var node = lwps.FindNode(start, s => s == end, maxSearchDistance);
 
 			// Assert
 			Assert.IsNull(node);
 		}
 
 		[TestMethod]
-		public void FindNode_NodePredicatePasses_ReturnsNodeThatPassedPredicateWithPathLeadingToStart()
+		public void FindNode_PredicatePasses_ReturnsNodeThatPassedPredicateWithPathLeadingToStart()
 		{
 			// Arrange
 			var lwps = new LeastWeightPathSearch<int>(
-				TestGraphs.OnePathGraph(),
-				AnyEdgeWeightCalculator);
+				EdgeWeighter.ConstantWeight(TestGraphs.OnePathGraph())
+			);
 			int start = -3;
 			int end = 0;
 
 			// Act
-			var node = lwps.FindNode(start, n => n.State == end);
+			var node = lwps.FindNode(start, s => s == end);
 
 			// Assert
 			var expectedNode = new PathNode<int>(end);
@@ -301,18 +285,18 @@ namespace Test {
 		}
 
 		[TestMethod]
-		public void FindNode_EdgesHaveNonzeroCostAndNodePredicatePasses_ReturnsNodeWithCorrectCumulativePathWeight()
+		public void FindNode_EdgesHaveNonzeroCostAndPredicatePasses_ReturnsNodeWithCorrectCumulativePathWeight()
 		{
 			// Arrange
 			double weight = 3.14;
 			var lwps = new LeastWeightPathSearch<int>(
-				TestGraphs.OnePathGraph(),
-				ConstantEdgeWeightCalculator<int>(weight));
+				EdgeWeighter.ConstantWeight(TestGraphs.OnePathGraph(), weight)
+			);
 			int start = 0;
 			int end = 12;
 
 			// Act
-			var node = lwps.FindNode(start, n => n.State == end);
+			var node = lwps.FindNode(start, s => s == end);
 
 			// Assert
 			double expectedTotalWeight = (end - start) * weight;
@@ -320,26 +304,27 @@ namespace Test {
 		}
 
 		[TestMethod]
-		public void FindNode_NodePredicatePassesForTwoNodesAtSameDistanceFromStartButDifferentWeights_ReturnsNodeOnPathWithLessWeight()
+		public void FindNode_PredicatePassesForTwoNodesAtSameDistanceFromStartButDifferentWeights_ReturnsNodeOnPathWithLessWeight()
 		{
 			// Arrange
 			var lwps = new LeastWeightPathSearch<int>(
-				TestGraphs.BinaryTree(),
-				(int parent, int child) =>
+				EdgeWeighter.VariableWeight(TestGraphs.BinaryTree(),
+				(int child) =>
 				{
-					// Give odd nodes more weight
-					if (child == parent * 2)
+					// Give even nodes less weight
+					if (child % 2 == 0)
 						return 1;
 					else
 						return 1.5;
-				});
+				})
+			);
 
 			// Act
 			// In a binary tree, nodes 8 and 9 are equidistant from the root
 			// (both are children of node 4).
-			var node = lwps.FindNode(1, n =>
+			var node = lwps.FindNode(1, s =>
 			{
-				return n.State == 8 || n.State == 9;
+				return s == 8 || s == 9;
 			});
 
 			// Assert
@@ -354,12 +339,8 @@ namespace Test {
 		{
 			// Arrange
 			var lwps = new LeastWeightPathSearch<int>(
-				TestGraphs.OneCycleGraph(10),
-				(int parent, int child) =>
-				{
-					return -2; // negative edge weights
-				});
-
+				EdgeWeighter.ConstantWeight(TestGraphs.OneCycleGraph(10), -2)
+			);
 			int start = 3;
 			int end = 100;
 
@@ -373,22 +354,7 @@ namespace Test {
 
 		private LeastWeightPathSearch<T> AnyLWPS<T>()
 		{
-			return new LeastWeightPathSearch<T>(
-				SearchTestHelpers.AnyChildGenerator,
-				AnyEdgeWeightCalculator);
-		}
-
-		private static double AnyEdgeWeightCalculator<T>(T parent, T child)
-		{
-			return 0;
-		}
-
-		private static EdgeWeightCalculator<T> ConstantEdgeWeightCalculator<T>(double weight)
-		{
-			return (T parent, T child) =>
-			{
-				return weight;
-			};
+			return new LeastWeightPathSearch<T>(SearchTestHelpers.AnyWeightedChildGenerator);
 		}
 	};
 

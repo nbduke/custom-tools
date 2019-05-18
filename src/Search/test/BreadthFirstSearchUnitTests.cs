@@ -129,7 +129,7 @@ namespace Test {
 			// Act
 			Action action = () =>
 			{
-				bfs.FindNode(null /*start*/, SearchTestHelpers.AnyNodePredicate);
+				bfs.FindNode(null /*start*/, SearchTestHelpers.AnyPredicate);
 			};
 
 			// Assert
@@ -217,7 +217,7 @@ namespace Test {
 			uint maxSearchDistance = 8;
 
 			// Act
-			var node = bfs.FindNode(start, n => n.State == end, maxSearchDistance);
+			var node = bfs.FindNode(start, s => s == end, maxSearchDistance);
 
 			// Assert
 			Assert.IsNull(node);
@@ -232,7 +232,7 @@ namespace Test {
 			int end = 4;
 
 			// Act
-			var node = bfs.FindNode(start, n => n.State == end);
+			var node = bfs.FindNode(start, s => s == end);
 
 			// Assert
 			var expectedNode = new PathNode<int>(end);

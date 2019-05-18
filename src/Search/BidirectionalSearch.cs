@@ -14,8 +14,8 @@ namespace Tools.Algorithms.Search {
 	/// </summary>
 	public class BidirectionalSearch<T>
 	{
-		private readonly ChildGenerator<T> GetForwardChildren;
-		private readonly ChildGenerator<T> GetReverseChildren;
+		private readonly Func<T, IEnumerable<T>> GetForwardChildren;
+		private readonly Func<T, IEnumerable<T>> GetReverseChildren;
 		private readonly Action<IEnumerable<T>> RepairReversePath;
 
 		/// <summary>
@@ -26,7 +26,7 @@ namespace Tools.Algorithms.Search {
 		/// states in the reverse path. The function will be given the path in the final order,
 		/// starting with the node found in both paths</param>
 		public BidirectionalSearch(
-			ChildGenerator<T> getChildrenUndirected,
+			Func<T, IEnumerable<T>> getChildrenUndirected,
 			Action<IEnumerable<T>> repairReversePath = null)
 			: this(getChildrenUndirected, getChildrenUndirected, repairReversePath)
 		{
@@ -43,8 +43,8 @@ namespace Tools.Algorithms.Search {
 		/// states in the reverse path. The function will be given the path in the final order,
 		/// starting with the node found in both paths</param>
 		public BidirectionalSearch(
-			ChildGenerator<T> getForwardChildren,
-			ChildGenerator<T> getReverseChildren,
+			Func<T, IEnumerable<T>> getForwardChildren,
+			Func<T, IEnumerable<T>> getReverseChildren,
 			Action<IEnumerable<T>> repairReversePath = null)
 		{
 			Validate.IsNotNull(getForwardChildren, "getForwardChildren");
@@ -65,7 +65,7 @@ namespace Tools.Algorithms.Search {
 
 			var forwardFrontier = new HashSet<PathNode<T>>();
 			var reverseFrontier = new HashSet<PathNode<T>>();
-			var explored = new HashSet<PathNode<T>>();
+			var explored = new HashSet<T>();
 			IEnumerable<T> solution = null;
 
 			forwardFrontier.Add(new PathNode<T>(start));
@@ -106,22 +106,26 @@ namespace Tools.Algorithms.Search {
 			return new T[] { };
 		}
 
+		/*
+		 * Updates either the forward or the reverse frontier by exploring every unexplored
+		 * node in the frontier and checking for child membership in the other frontier. If
+		 * a matching child is found, then a solution exists.
+		 */
 		private static void UpdateFrontier(
 			ref HashSet<PathNode<T>> currentFrontier,
 			HashSet<PathNode<T>> otherFrontier,
-			HashSet<PathNode<T>> explored,
-			ChildGenerator<T> getChildren,
+			HashSet<T> explored,
+			Func<T, IEnumerable<T>> getChildren,
 			Action<PathNode<T>, PathNode<T>> onMatchFound)
 		{
 			var nextFrontier = new HashSet<PathNode<T>>();
 			foreach (var currentNode in currentFrontier)
 			{
-				explored.Add(currentNode);
-
+				explored.Add(currentNode.State);
 				foreach (var child in getChildren(currentNode.State))
 				{
 					var childNode = new PathNode<T>(child, currentNode);
-					if (!explored.Contains(childNode) &&
+					if (!explored.Contains(child) &&
 						!currentFrontier.Contains(childNode))
 					{
 						if (otherFrontier.Contains(childNode))

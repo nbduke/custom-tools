@@ -1,10 +1,37 @@
-using Tools.Algorithms.Search;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Test {
 
+	public static class EdgeWeighter
+	{
+		public static Func<T, IEnumerable<Tuple<T, double>>> ConstantWeight<T>(
+			Func<T, IEnumerable<T>> graph,
+			double weight = 1
+		)
+		{
+			return state =>
+			{
+				return graph(state).Select(c => Tuple.Create(c, weight));
+			};
+		}
+
+		public static Func<T, IEnumerable<Tuple<T, double>>> VariableWeight<T>(
+			Func<T, IEnumerable<T>> graph,
+			Func<T, double> getWeight
+		)
+		{
+			return state =>
+			{
+				return graph(state).Select(c => Tuple.Create(c, getWeight(c)));
+			};
+		}
+	}
+
 	public static class TestGraphs
 	{
-		public static ChildGenerator<T> EdgelessGraph<T>()
+		public static Func<T, IEnumerable<T>> EdgelessGraph<T>()
 		{
 			return state =>
 			{
@@ -15,7 +42,7 @@ namespace Test {
 		/*
 		 * 1 -- 2 -- 3 -- ...
 		 */
-		public static ChildGenerator<int> OnePathGraph()
+		public static Func<int, IEnumerable<int>> OnePathGraph()
 		{
 			return state =>
 			{
@@ -26,7 +53,7 @@ namespace Test {
 		/*
 		 * 1 -- 2 -- 3 -- ... -- maxState
 		 */
-		public static ChildGenerator<int> FiniteGraph(int maxState)
+		public static Func<int, IEnumerable<int>> FiniteGraph(int maxState)
 		{
 			return state =>
 			{
@@ -42,7 +69,7 @@ namespace Test {
 		 *	  2   3
 		 *	 4 5 6 7
 		 */
-		public static ChildGenerator<int> BinaryTree()
+		public static Func<int, IEnumerable<int>> BinaryTree()
 		{
 			return state =>
 			{
@@ -55,7 +82,7 @@ namespace Test {
 		 *  \	   /
 		 *   2 -- 3
 		 */
-		public static ChildGenerator<int> OneCycleGraph(int cycleLength)
+		public static Func<int, IEnumerable<int>> OneCycleGraph(int cycleLength)
 		{
 			return state =>
 			{
@@ -70,7 +97,7 @@ namespace Test {
 		 *  \			/
 		 *   3 ------- 5
 		 */
-		public static ChildGenerator<int> TwoAsymmetricalPathsGraph()
+		public static Func<int, IEnumerable<int>> TwoAsymmetricalPathsGraph()
 		{
 			return state =>
 			{
@@ -96,7 +123,7 @@ namespace Test {
 		/*
 		 * Same as above, but the reverse child generator.
 		 */
-		public static ChildGenerator<int> ReverseTwoAsymmetricalPathsGraph()
+		public static Func<int, IEnumerable<int>> ReverseTwoAsymmetricalPathsGraph()
 		{
 			return state =>
 			{

@@ -35,7 +35,7 @@ namespace Test {
 			// Act
 			Action action = () =>
 			{
-				dfs.FindNode(null /*start*/, SearchTestHelpers.AnyNodePredicate);
+				dfs.FindNode(null /*start*/, SearchTestHelpers.AnyPredicate);
 			};
 
 			// Assert
@@ -123,7 +123,7 @@ namespace Test {
 			uint maxSearchDistance = 11;
 
 			// Act
-			var node = dfs.FindNode(start, n => n.State == end, maxSearchDistance);
+			var node = dfs.FindNode(start, s => s == end, maxSearchDistance);
 
 			// Assert
 			Assert.IsNull(node);
@@ -138,7 +138,7 @@ namespace Test {
 			int end = 15;
 
 			// Act
-			var node = dfs.FindNode(start, n => n.State == end);
+			var node = dfs.FindNode(start, s => s == end);
 
 			// Assert
 			var expectedNode = new PathNode<int>(end);
@@ -160,7 +160,7 @@ namespace Test {
 			int end = 7;
 
 			// Act
-			var node = dfs.FindNode(start, n => n.State == end);
+			var node = dfs.FindNode(start, s => s == end);
 
 			// Assert
 			var expectedNode = new PathNode<int>(end);
@@ -179,7 +179,7 @@ namespace Test {
 			int end = 2;
 
 			// Act
-			var node = dfs.FindNode(start, n => n.State == end);
+			var node = dfs.FindNode(start, s => s == end);
 
 			// Assert
 			var expectedNode = new PathNode<int>(end);
@@ -212,7 +212,7 @@ namespace Test {
 			int end = 7;
 
 			// Act
-			var node = dfs.FindNode(start, n => n.State == end);
+			var node = dfs.FindNode(start, s => s == end);
 
 			// Assert
 			var expectedNode = new PathNode<int>(end);

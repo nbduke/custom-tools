@@ -66,7 +66,6 @@
     <Compile Include="..\..\src\Search\FlexibleBacktrackingSearch.cs" />
     <Compile Include="..\..\src\Search\LeastWeightPathSearch.cs" />
     <Compile Include="..\..\src\Search\PathNode.cs" />
-    <Compile Include="..\..\src\Search\SearchBehaviors.cs" />
   </ItemGroup>
   <ItemGroup>
     <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
