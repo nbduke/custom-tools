@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 
+using Tools.Math;
+
 namespace Tools.DataStructures {
 
 	/// <summary>
@@ -121,6 +123,15 @@ namespace Tools.DataStructures {
 				true /*isPermutation*/
 			);
 			return enumerator.Iterate();
+		}
+
+		/// <summary>
+		/// Returns the Cartesian product of this and another Arrangement.
+		/// </summary>
+		public IEnumerable<Tuple<T, U>> Product<U>(Arrangement<U> other)
+		{
+			Validate.IsNotNull(other, "other");
+			return Combinatorics.CartesianProduct(DataSource, other.DataSource);
 		}
 	}
 }
