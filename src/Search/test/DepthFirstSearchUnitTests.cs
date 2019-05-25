@@ -59,7 +59,7 @@ namespace Test {
 		}
 
 		[TestMethod]
-		public void FindNode_MaxSearchDistanceIsZeroAndStartPassesPredicate_ReturnsStartNode()
+		public void FindNode_MaxPathLengthIsZero_ReturnsNull()
 		{
 			// Arrange
 			var dfs = new DepthFirstSearch<string>(SearchTestHelpers.AnyChildGenerator);
@@ -67,20 +67,6 @@ namespace Test {
 
 			// Act
 			var node = dfs.FindNode(start, n => true, 0);
-
-			// Assert
-			var expectedNode = new PathNode<string>(start);
-			Assert.AreEqual(expectedNode, node);
-		}
-
-		[TestMethod]
-		public void FindNode_MaxSearchDistanceIsZeroAndStartDoesNotPassPredicate_ReturnsNull()
-		{
-			// Arrange
-			var dfs = new DepthFirstSearch<string>(SearchTestHelpers.AnyChildGenerator);
-
-			// Act
-			var node = dfs.FindNode("start", n => false, 0);
 
 			// Assert
 			Assert.IsNull(node);
@@ -114,16 +100,16 @@ namespace Test {
 		}
 
 		[TestMethod]
-		public void FindNode_NodePredicateWouldPassButPathIsLongerThanMaxSearchDistance_ReturnsNull()
+		public void FindNode_NodePredicateWouldPassButPathIsLongerThanMaxPathLength_ReturnsNull()
 		{
 			// Arrange
 			var dfs = new DepthFirstSearch<int>(TestGraphs.OnePathGraph());
 			int start = 3;
 			int end = 15;
-			uint maxSearchDistance = 11;
+			uint maxPathLength = 12;
 
 			// Act
-			var node = dfs.FindNode(start, s => s == end, maxSearchDistance);
+			var node = dfs.FindNode(start, s => s == end, maxPathLength);
 
 			// Assert
 			Assert.IsNull(node);

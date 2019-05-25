@@ -29,7 +29,7 @@ namespace Tools.Algorithms.Search {
 			T start,
 			T end,
 			Func<T, double> estimateRemainingPathWeight,
-			uint maxSearchDistance = uint.MaxValue - 1
+			uint maxPathLength = uint.MaxValue
 		)
 		{
 			Validate.IsNotNull(end, "end");
@@ -38,7 +38,7 @@ namespace Tools.Algorithms.Search {
 				start,
 				state => state.Equals(end),
 				estimateRemainingPathWeight,
-				maxSearchDistance
+				maxPathLength
 			);
 
 			if (terminalNode == null)
@@ -51,11 +51,14 @@ namespace Tools.Algorithms.Search {
 			T start,
 			Func<T, bool> predicate,
 			Func<T, double> estimateRemainingPathWeight,
-			uint maxSearchDistance = uint.MaxValue - 1
+			uint maxPathLength = uint.MaxValue
 		)
 		{
 			Validate.IsNotNull(predicate, "predicate");
 			Validate.IsNotNull(estimateRemainingPathWeight, "estimateRemainingPathWeight");
+
+			if (maxPathLength == 0)
+				return null;
 
 			var frontier = new Heap<Tuple<PathNode<T>, double>>(t => t.Item2);
 			var explored = new HashSet<T>();
@@ -68,7 +71,7 @@ namespace Tools.Algorithms.Search {
 				if (predicate(currentNode.State))
 					return currentNode;
 				else if (
-					currentNode.CumulativePathLength >= maxSearchDistance + 1 ||
+					currentNode.CumulativePathLength >= maxPathLength ||
 					explored.Contains(currentNode.State)
 				)
 					continue;

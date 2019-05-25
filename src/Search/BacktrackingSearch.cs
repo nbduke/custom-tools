@@ -14,7 +14,7 @@ namespace Tools.Algorithms.Search {
 		private readonly Func<T, IEnumerable<T>> GetChildren;
 		private readonly bool AssumeChildrenNotInPath;
 		private Func<T, bool> Predicate;
-		private uint MaxSearchDistance;
+		private uint MaxPathLength;
 
 		/// <summary>
 		/// Creates a BacktrackingSearch.
@@ -37,7 +37,7 @@ namespace Tools.Algorithms.Search {
 		public IEnumerable<T> FindPath(
 			T start,
 			T end,
-			uint maxSearchDistance = uint.MaxValue
+			uint maxPathLength = uint.MaxValue
 		)
 		{
 			Validate.IsNotNull(end, "end");
@@ -45,7 +45,7 @@ namespace Tools.Algorithms.Search {
 			PathNode<T> terminalNode = FindNode(
 				start,
 				state => state.Equals(end),
-				maxSearchDistance
+				maxPathLength
 			);
 
 			if (terminalNode == null)
@@ -57,20 +57,19 @@ namespace Tools.Algorithms.Search {
 		public PathNode<T> FindNode(
 			T start,
 			Func<T, bool> predicate,
-			uint maxSearchDistance = uint.MaxValue)
+			uint maxPathLength = uint.MaxValue)
 		{
 			Validate.IsNotNull(start, "start");
 			Validate.IsNotNull(predicate, "predicate");
 
-			if (maxSearchDistance == 0)
-				return null;
-
 			var startNode = new PathNode<T>(start);
+			if (maxPathLength == 0)
+				return null;
 			if (predicate(start))
 				return startNode;
 
 			Predicate = predicate;
-			MaxSearchDistance = maxSearchDistance;
+			MaxPathLength = maxPathLength;
 			return SearchHelper(startNode);
 		}
 
@@ -85,7 +84,7 @@ namespace Tools.Algorithms.Search {
 					{
 						return childNode;
 					}
-					else if (childNode.CumulativePathLength < MaxSearchDistance)
+					else if (childNode.CumulativePathLength < MaxPathLength)
 					{
 						PathNode<T> returnValue = SearchHelper(childNode);
 						if (returnValue != null)

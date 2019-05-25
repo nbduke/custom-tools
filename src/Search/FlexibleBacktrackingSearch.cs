@@ -29,7 +29,7 @@ namespace Tools.Algorithms.Search {
 		private readonly Func<T, IEnumerable<T>> GetChildren;
 		private readonly bool AssumeChildrenNotInPath;
 		private Func<PathNode<T>, NodeOption> ProcessNode;
-		private uint MaxSearchDistance;
+		private uint MaxPathLength;
 
 		/// <summary>
 		/// Creates a FlexibleBacktrackingSearch.
@@ -51,12 +51,12 @@ namespace Tools.Algorithms.Search {
 		public void Search(
 			T start,
 			Func<PathNode<T>, NodeOption> processNode,
-			uint maxSearchDistance = uint.MaxValue)
+			uint maxPathLength = uint.MaxValue)
 		{
 			Validate.IsNotNull(start, "start");
 			Validate.IsNotNull(processNode, "processNode");
 
-			if (maxSearchDistance == 0)
+			if (maxPathLength == 0)
 				return;
 
 			var startNode = new PathNode<T>(start);
@@ -73,7 +73,7 @@ namespace Tools.Algorithms.Search {
 			}
 
 			ProcessNode = processNode;
-			MaxSearchDistance = maxSearchDistance;
+			MaxPathLength = maxPathLength;
 			SearchHelper(startNode);
 		}
 
@@ -81,9 +81,9 @@ namespace Tools.Algorithms.Search {
 		{
 			foreach (T child in GetChildren(currentNode.State))
 			{
-				var childNode = new PathNode<T>(child, currentNode);
 				if (AssumeChildrenNotInPath || !currentNode.PathContains(child))
 				{
+					var childNode = new PathNode<T>(child, currentNode);
 					switch (ProcessNode(childNode))
 					{
 						case NodeOption.Stop:
@@ -96,7 +96,7 @@ namespace Tools.Algorithms.Search {
 							throw new ArgumentException("Unknown NodeOption");
 					}
 
-					if (childNode.CumulativePathLength < MaxSearchDistance)
+					if (childNode.CumulativePathLength < MaxPathLength)
 					{
 						if (!SearchHelper(childNode))
 							return false;

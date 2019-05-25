@@ -21,7 +21,7 @@ namespace Tools.Algorithms.Search {
 		public IEnumerable<T> FindPath(
 			T start,
 			T end,
-			uint maxSearchDistance = uint.MaxValue - 1
+			uint maxPathLength = uint.MaxValue
 		)
 		{
 			Validate.IsNotNull(end, "end");
@@ -29,7 +29,7 @@ namespace Tools.Algorithms.Search {
 			PathNode<T> terminalNode = FindNode(
 				start,
 				state => state.Equals(end),
-				maxSearchDistance
+				maxPathLength
 			);
 
 			if (terminalNode == null)
@@ -41,16 +41,16 @@ namespace Tools.Algorithms.Search {
 		public PathNode<T> FindNode(
 			T start,
 			Func<T, bool> predicate,
-			uint maxSearchDistance = uint.MaxValue - 1
+			uint maxPathLength = uint.MaxValue
 		)
 		{
 			Validate.IsNotNull(predicate, "predicate");
 
 			var startNode = new PathNode<T>(start);
+			if (maxPathLength == 0)
+				return null;
 			if (predicate(start))
 				return startNode;
-			else if (maxSearchDistance == 0)
-				return null;
 
 			var frontier = new Queue<PathNode<T>>();
 			var explored = new HashSet<T>();
@@ -70,7 +70,7 @@ namespace Tools.Algorithms.Search {
 						var childNode = new PathNode<T>(child, currentNode);
 						if (predicate(child))
 							return childNode;
-						else if (childNode.CumulativePathLength < maxSearchDistance + 1)
+						else if (childNode.CumulativePathLength < maxPathLength)
 							frontier.Enqueue(childNode);
 					}
 				}

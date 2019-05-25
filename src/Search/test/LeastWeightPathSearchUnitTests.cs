@@ -186,7 +186,7 @@ namespace Test {
 		}
 
 		[TestMethod]
-		public void FindNode_MaxSearchDistanceIsZeroAndStartPassesPredicate_ReturnsStartNode()
+		public void FindNode_MaxPathLengthIsZero_ReturnsNull()
 		{
 			// Arrange
 			var lwps = AnyLWPS<string>();
@@ -194,20 +194,6 @@ namespace Test {
 
 			// Act
 			var node = lwps.FindNode(start, n => true, 0);
-
-			// Assert
-			var expectedNode = new PathNode<string>(start);
-			Assert.AreEqual(expectedNode, node);
-		}
-
-		[TestMethod]
-		public void FindNode_MaxSearchDistanceIsZeroAndStartDoesNotPassPredicate_ReturnsNull()
-		{
-			// Arrange
-			var lwps = AnyLWPS<string>();
-
-			// Act
-			var node = lwps.FindNode("start", n => false, 0);
 
 			// Assert
 			Assert.IsNull(node);
@@ -245,7 +231,7 @@ namespace Test {
 		}
 
 		[TestMethod]
-		public void FindNode_PredicateWouldPassButPathIsLongerThanMaxSearchDistance_ReturnsNull()
+		public void FindNode_PredicateWouldPassButPathIsLongerThanMaxPathLength_ReturnsNull()
 		{
 			// Arrange
 			var lwps = new LeastWeightPathSearch<int>(
@@ -253,10 +239,10 @@ namespace Test {
 			);
 			int start = -1;
 			int end = 7;
-			uint maxSearchDistance = 2;
+			uint maxPathLength = 8;
 
 			// Act
-			var node = lwps.FindNode(start, s => s == end, maxSearchDistance);
+			var node = lwps.FindNode(start, s => s == end, maxPathLength);
 
 			// Assert
 			Assert.IsNull(node);

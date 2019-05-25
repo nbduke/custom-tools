@@ -27,7 +27,7 @@ namespace Tools.Algorithms.Search {
 		public IEnumerable<T> FindPath(
 			T start,
 			T end,
-			uint maxSearchDistance = uint.MaxValue - 1
+			uint maxPathLength = uint.MaxValue
 		)
 		{
 			Validate.IsNotNull(end, "end");
@@ -35,7 +35,7 @@ namespace Tools.Algorithms.Search {
 			PathNode<T> terminalNode = FindNode(
 				start,
 				state => state.Equals(end),
-				maxSearchDistance
+				maxPathLength
 			);
 
 			if (terminalNode == null)
@@ -47,10 +47,13 @@ namespace Tools.Algorithms.Search {
 		public PathNode<T> FindNode(
 			T start,
 			Func<T, bool> nodePredicate,
-			uint maxSearchDistance = uint.MaxValue - 1
+			uint maxPathLength = uint.MaxValue
 		)
 		{
 			Validate.IsNotNull(nodePredicate, "nodePredicate");
+
+			if (maxPathLength == 0)
+				return null;
 
 			var frontier = new Heap<PathNode<T>>(n => n.CumulativePathWeight);
 			var explored = new HashSet<T>();
@@ -62,7 +65,7 @@ namespace Tools.Algorithms.Search {
 				if (nodePredicate(currentNode.State))
 					return currentNode;
 				else if (
-					currentNode.CumulativePathLength >= maxSearchDistance + 1 ||
+					currentNode.CumulativePathLength >= maxPathLength ||
 					explored.Contains(currentNode.State)
 				)
 					continue;
