@@ -129,7 +129,7 @@ namespace Test {
 			// Act
 			Action action = () =>
 			{
-				bfs.FindNode(null /*start*/, SearchTestHelpers.AnyNodePredicate);
+				bfs.FindNode(null /*start*/, SearchTestHelpers.AnyPredicate);
 			};
 
 			// Assert
@@ -153,7 +153,7 @@ namespace Test {
 		}
 
 		[TestMethod]
-		public void FindNode_MaxSearchDistanceIsZeroAndStartPassesPredicate_ReturnsStartNode()
+		public void FindNode_MaxPathLengthIsZero_ReturnsNull()
 		{
 			// Arrange
 			var bfs = new BreadthFirstSearch<string>(SearchTestHelpers.AnyChildGenerator);
@@ -161,20 +161,6 @@ namespace Test {
 
 			// Act
 			var node = bfs.FindNode(start, n => true, 0);
-
-			// Assert
-			var expectedNode = new PathNode<string>(start);
-			Assert.AreEqual(expectedNode, node);
-		}
-
-		[TestMethod]
-		public void FindNode_MaxSearchDistanceIsZeroAndStartDoesNotPassPredicate_ReturnsNull()
-		{
-			// Arrange
-			var bfs = new BreadthFirstSearch<string>(SearchTestHelpers.AnyChildGenerator);
-
-			// Act
-			var node = bfs.FindNode("start", n => false, 0);
 
 			// Assert
 			Assert.IsNull(node);
@@ -208,16 +194,16 @@ namespace Test {
 		}
 
 		[TestMethod]
-		public void FindNode_NodePredicateWouldPassButPathIsLongerThanMaxSearchDistance_ReturnsNull()
+		public void FindNode_NodePredicateWouldPassButPathIsLongerThanMaxPathLength_ReturnsNull()
 		{
 			// Arrange
 			var bfs = new BreadthFirstSearch<int>(TestGraphs.OnePathGraph());
 			int start = 1;
 			int end = 10;
-			uint maxSearchDistance = 8;
+			uint maxPathLength = 9;
 
 			// Act
-			var node = bfs.FindNode(start, n => n.State == end, maxSearchDistance);
+			var node = bfs.FindNode(start, s => s == end, maxPathLength);
 
 			// Assert
 			Assert.IsNull(node);
@@ -232,7 +218,7 @@ namespace Test {
 			int end = 4;
 
 			// Act
-			var node = bfs.FindNode(start, n => n.State == end);
+			var node = bfs.FindNode(start, s => s == end);
 
 			// Assert
 			var expectedNode = new PathNode<int>(end);

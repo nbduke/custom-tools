@@ -14,49 +14,49 @@ namespace Test {
 		public void TestLeastWeightPathSearch()
 		{
 			// Arrange
-			City start = new City(CityName.Sibiu);
-			CityName[] expectedPath = { CityName.Sibiu, CityName.RimnicuVilcea, CityName.Pitesti, CityName.Bucharest };
-
+			var cityMap = GetCityMap();
 			var leastWeightPathSearch = new LeastWeightPathSearch<City>(
-				city => city.GetNeighboringCities(),
-				(parent, child) => parent.GetDistance(child));
+				city => cityMap[city]
+			);
 
 			// Act
-			var finalNode = leastWeightPathSearch.FindNode(start,
-				node => node.State.Name == CityName.Bucharest); // find Bucharest
-
-			if (finalNode == null)
-			{
-				Assert.Fail("FindNode must find the corret node");
-				return;
-			}
-
-			var actualPath = finalNode.GetPath().Select(city => city.Name).ToList();
+			var path = leastWeightPathSearch.FindPath(City.Sibiu, City.Bucharest);
 
 			// Assert
-			CollectionAssert.AreEqual(expectedPath, actualPath);
+			City[] expectedPath =
+			{
+				City.Sibiu,
+				City.RimnicuVilcea,
+				City.Pitesti,
+				City.Bucharest
+			};
+			CollectionAssert.AreEqual(expectedPath, path.ToList());
 		}
 
 		[TestMethod]
 		public void TestBidirectionalSearch()
 		{
 			// Arrange
-			City start = new City(CityName.Sibiu);
-			City end = new City(CityName.Bucharest);
-			CityName[] expectedPath = { CityName.Sibiu, CityName.Fagaras, CityName.Bucharest };
-
+			var cityMap = GetCityMap();
 			var bidirectionalSearch = new BidirectionalSearch<City>(
-				city => city.GetNeighboringCities());
+				city => cityMap[city].Select(t => t.Item1)
+			);
 
 			// Act
-			var actualPath = bidirectionalSearch.FindPath(start, end).Select(city => city.Name);
+			var actualPath = bidirectionalSearch.FindPath(City.Fagaras, City.Pitesti);
 
 			// Assert
+			City[] expectedPath =
+			{
+				City.Fagaras,
+				City.Bucharest,
+				City.Pitesti
+			};
 			CollectionAssert.AreEqual(expectedPath, actualPath.ToList());
 		}
 
-		#region Helper classes
-		private enum CityName
+		#region Helpers
+		private enum City
 		{
 			Sibiu,
 			Fagaras,
@@ -65,85 +65,43 @@ namespace Test {
 			Bucharest
 		}
 
-		private class City
+		private static Dictionary<City, Tuple<City, double>[]> GetCityMap()
 		{
-			public CityName Name;
-
-			private static Dictionary<CityName, CityName[]> Neighbors;
-
-			public City(CityName name)
+			return new Dictionary<City, Tuple<City, double>[]>
 			{
-				Name = name;
-				EnsureConnections();
-			}
-
-			public IEnumerable<City> GetNeighboringCities()
-			{
-				foreach (var neighbor in Neighbors[Name])
 				{
-					yield return new City(neighbor);
-				}
-			}
-
-			public double GetDistance(City toCity)
-			{
-				switch (Name)
+					City.Sibiu,
+					new Tuple<City, double>[]
+					{
+						Tuple.Create(City.Fagaras, 99.0),
+						Tuple.Create(City.RimnicuVilcea, 80.0)
+					}
+				},
 				{
-					case CityName.Sibiu:
-						return toCity.Name == CityName.Fagaras ? 99 : 80;
-					case CityName.Fagaras:
-						return 211;
-					case CityName.RimnicuVilcea:
-						return 97;
-					case CityName.Pitesti:
-						return 101;
-					default:
-						return 0;
-				}
-			}
-
-			public override bool Equals(object obj)
-			{
-				return obj is City other && Name == other.Name;
-			}
-
-			public override int GetHashCode()
-			{
-				return Name.GetHashCode();
-			}
-
-			private static void EnsureConnections()
-			{
-				if (Neighbors == null)
+					City.Fagaras,
+					new Tuple<City, double>[]
+					{
+						Tuple.Create(City.Sibiu, 99.0),
+						Tuple.Create(City.Bucharest, 211.0)
+					}
+				},
 				{
-					Neighbors = new Dictionary<CityName, CityName[]>();
-					Neighbors[CityName.Sibiu] = new CityName[]
+					City.RimnicuVilcea,
+					new Tuple<City, double>[]
 					{
-						CityName.Fagaras,
-						CityName.RimnicuVilcea
-					};
-					Neighbors[CityName.Fagaras] = new CityName[]
+						Tuple.Create(City.Sibiu, 80.0),
+						Tuple.Create(City.Pitesti, 97.0)
+					}
+				},
+				{
+					City.Pitesti,
+					new Tuple<City, double>[]
 					{
-						CityName.Sibiu,
-						CityName.Bucharest
-					};
-					Neighbors[CityName.RimnicuVilcea] = new CityName[]
-					{
-						CityName.Sibiu,
-						CityName.Pitesti
-					};
-					Neighbors[CityName.Pitesti] = new CityName[]
-					{
-						CityName.RimnicuVilcea,
-						CityName.Bucharest
-					};
-					Neighbors[CityName.Bucharest] = new CityName[]
-					{
-						CityName.Fagaras,
-						CityName.Pitesti
-					};
+						Tuple.Create(City.RimnicuVilcea, 97.0),
+						Tuple.Create(City.Bucharest, 101.0)
+					}
 				}
-			}
+			};
 		}
 		#endregion
 	}

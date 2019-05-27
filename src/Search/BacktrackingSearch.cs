@@ -11,22 +11,43 @@ namespace Tools.Algorithms.Search {
 	/// </summary>
 	public class BacktrackingSearch<T>
 	{
-		private readonly ChildGenerator<T> GetChildren;
-		private NodePredicate<T> NodePredicate;
-		private uint MaxSearchDistance;
+		private readonly Func<T, IEnumerable<T>> GetChildren;
+		private readonly bool AssumeChildrenNotInPath;
+		private Func<T, bool> Predicate;
+		private uint MaxPathLength;
 
-		public BacktrackingSearch(ChildGenerator<T> getChildren)
+		/// <summary>
+		/// Creates a BacktrackingSearch.
+		/// </summary>
+		/// <param name="getChildren">generates child states</param>
+		/// <param name="assumeChildrenNotInPath">if true, the algorithm will not check
+		/// whether each child is already in the current path. BEWARE: This is a performance
+		/// optimization for special cases. If in doubt, leave this false.</param>
+		public BacktrackingSearch(
+			Func<T, IEnumerable<T>> getChildren,
+			bool assumeChildrenNotInPath = false
+		)
 		{
 			Validate.IsNotNull(getChildren, "getChildren");
 
 			GetChildren = getChildren;
+			AssumeChildrenNotInPath = assumeChildrenNotInPath;
 		}
 
-		public IEnumerable<T> FindPath(T start, T end)
+		public IEnumerable<T> FindPath(
+			T start,
+			T end,
+			uint maxPathLength = uint.MaxValue
+		)
 		{
 			Validate.IsNotNull(end, "end");
 
-			PathNode<T> terminalNode = FindNode(start, node => node.Equals(end));
+			PathNode<T> terminalNode = FindNode(
+				start,
+				state => state.Equals(end),
+				maxPathLength
+			);
+
 			if (terminalNode == null)
 				return new T[] { };
 			else
@@ -35,22 +56,21 @@ namespace Tools.Algorithms.Search {
 
 		public PathNode<T> FindNode(
 			T start,
-			NodePredicate<T> nodePredicate,
-			uint maxSearchDistance = uint.MaxValue)
+			Func<T, bool> predicate,
+			uint maxPathLength = uint.MaxValue)
 		{
 			Validate.IsNotNull(start, "start");
-			Validate.IsNotNull(nodePredicate, "nodePredicate");
-
-			if (maxSearchDistance == 0)
-				return null;
+			Validate.IsNotNull(predicate, "predicate");
 
 			var startNode = new PathNode<T>(start);
-			if (nodePredicate(startNode))
+			if (maxPathLength == 0)
+				return null;
+			if (predicate(start))
 				return startNode;
 
-			NodePredicate = nodePredicate;
-			MaxSearchDistance = maxSearchDistance;
-			return SearchHelper(new PathNode<T>(start));
+			Predicate = predicate;
+			MaxPathLength = maxPathLength;
+			return SearchHelper(startNode);
 		}
 
 		private PathNode<T> SearchHelper(PathNode<T> currentNode)
@@ -58,13 +78,13 @@ namespace Tools.Algorithms.Search {
 			foreach (T child in GetChildren(currentNode.State))
 			{
 				var childNode = new PathNode<T>(child, currentNode);
-				if (!currentNode.PathContains(child))
+				if (AssumeChildrenNotInPath || !currentNode.PathContains(child))
 				{
-					if (NodePredicate(childNode))
+					if (Predicate(childNode.State))
 					{
 						return childNode;
 					}
-					else if (childNode.CumulativePathLength < MaxSearchDistance)
+					else if (childNode.CumulativePathLength < MaxPathLength)
 					{
 						PathNode<T> returnValue = SearchHelper(childNode);
 						if (returnValue != null)

@@ -1,6 +1,22 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace Tools.Algorithms.Search {
+
+	/// <summary>
+	/// Specifies a behavior for FlexibleBacktrackingSearch to take at each node.
+	/// </summary>
+	public enum NodeOption
+	{
+		// Terminates the algorithm (this makes the algorithm identical to BacktrackingSearch)
+		Stop,
+
+		// The algorithm extends the search path through the current node
+		Continue,
+
+		// The algorithm backtracks to the current node's parent and continues with the next child
+		Backtrack
+	}
 
 	/// <summary>
 	/// Like BacktrackingSearch, FlexibleBacktrackingSearch is a memory-optimized
@@ -8,19 +24,12 @@ namespace Tools.Algorithms.Search {
 	/// FlexibleBacktrackingSearch enables searching over arbitrary regions of the graph,
 	/// applying a customizable action at each node.
 	/// </summary>
-	/// <remarks>
-	/// The NodeAction given to the Search method allows one of the following behaviors at
-	/// each node:
-	///		Stop:					the algorithm terminates (identical to BacktrackingSearch)
-	///		Continue:				the algorithm extends the search path through the current node
-	///		BacktrackAndContinue:	the algorithm backtracks to the node's parent and continues with its next child
-	/// </remarks>
 	public class FlexibleBacktrackingSearch<T>
 	{
-		private readonly ChildGenerator<T> GetChildren;
+		private readonly Func<T, IEnumerable<T>> GetChildren;
 		private readonly bool AssumeChildrenNotInPath;
-		private NodeAction<T> ProcessNode;
-		private uint MaxSearchDistance;
+		private Func<PathNode<T>, NodeOption> ProcessNode;
+		private uint MaxPathLength;
 
 		/// <summary>
 		/// Creates a FlexibleBacktrackingSearch.
@@ -30,7 +39,7 @@ namespace Tools.Algorithms.Search {
 		/// whether each child is already in the current path. BEWARE: This is a performance
 		/// optimization for special cases. If in doubt, leave this false.</param>
 		public FlexibleBacktrackingSearch(
-			ChildGenerator<T> getChildren,
+			Func<T, IEnumerable<T>> getChildren,
 			bool assumeChildrenNotInPath = false)
 		{
 			Validate.IsNotNull(getChildren, "getChildren");
@@ -41,30 +50,29 @@ namespace Tools.Algorithms.Search {
 
 		public void Search(
 			T start,
-			NodeAction<T> processNode,
-			uint maxSearchDistance = uint.MaxValue)
+			Func<PathNode<T>, NodeOption> processNode,
+			uint maxPathLength = uint.MaxValue)
 		{
 			Validate.IsNotNull(start, "start");
 			Validate.IsNotNull(processNode, "processNode");
 
-			if (maxSearchDistance == 0)
+			if (maxPathLength == 0)
 				return;
 
 			var startNode = new PathNode<T>(start);
 			switch (processNode(startNode))
 			{
 				case NodeOption.Stop:
+				case NodeOption.Backtrack:
 					return;
 				case NodeOption.Continue:
 					break;
-				case NodeOption.BacktrackThenContinue:
-					return; // there is nothing to backtrack to
 				default:
 					throw new ArgumentException("Unknown NodeOption");
 			}
 
 			ProcessNode = processNode;
-			MaxSearchDistance = maxSearchDistance;
+			MaxPathLength = maxPathLength;
 			SearchHelper(startNode);
 		}
 
@@ -72,22 +80,22 @@ namespace Tools.Algorithms.Search {
 		{
 			foreach (T child in GetChildren(currentNode.State))
 			{
-				var childNode = new PathNode<T>(child, currentNode);
 				if (AssumeChildrenNotInPath || !currentNode.PathContains(child))
 				{
+					var childNode = new PathNode<T>(child, currentNode);
 					switch (ProcessNode(childNode))
 					{
 						case NodeOption.Stop:
 							return false;
 						case NodeOption.Continue:
 							break;
-						case NodeOption.BacktrackThenContinue:
+						case NodeOption.Backtrack:
 							continue;
 						default:
 							throw new ArgumentException("Unknown NodeOption");
 					}
 
-					if (childNode.CumulativePathLength < MaxSearchDistance)
+					if (childNode.CumulativePathLength < MaxPathLength)
 					{
 						if (!SearchHelper(childNode))
 							return false;

@@ -9,20 +9,29 @@ namespace Tools.Algorithms.Search {
 	/// <typeparam name="T">the type of nodes in the graph</typeparam>
 	public class BreadthFirstSearch<T>
 	{
-		private readonly ChildGenerator<T> GetChildren;
+		private readonly Func<T, IEnumerable<T>> GetChildren;
 
-		public BreadthFirstSearch(ChildGenerator<T> getChildren)
+		public BreadthFirstSearch(Func<T, IEnumerable<T>> getChildren)
 		{
 			Validate.IsNotNull(getChildren, "getChildren");
 
 			GetChildren = getChildren;
 		}
 
-		public IEnumerable<T> FindPath(T start, T end)
+		public IEnumerable<T> FindPath(
+			T start,
+			T end,
+			uint maxPathLength = uint.MaxValue
+		)
 		{
 			Validate.IsNotNull(end, "end");
 
-			PathNode<T> terminalNode = FindNode(start, node => node.Equals(end));
+			PathNode<T> terminalNode = FindNode(
+				start,
+				state => state.Equals(end),
+				maxPathLength
+			);
+
 			if (terminalNode == null)
 				return new T[] { };
 			else
@@ -31,36 +40,37 @@ namespace Tools.Algorithms.Search {
 
 		public PathNode<T> FindNode(
 			T start,
-			NodePredicate<T> nodePredicate,
-			uint maxSearchDistance = uint.MaxValue - 1)
+			Func<T, bool> predicate,
+			uint maxPathLength = uint.MaxValue
+		)
 		{
-			Validate.IsNotNull(nodePredicate, "nodePredicate");
+			Validate.IsNotNull(predicate, "predicate");
 
 			var startNode = new PathNode<T>(start);
-			if (nodePredicate(startNode))
-				return startNode;
-			else if (maxSearchDistance == 0)
+			if (maxPathLength == 0)
 				return null;
+			if (predicate(start))
+				return startNode;
 
 			var frontier = new Queue<PathNode<T>>();
-			var explored = new HashSet<PathNode<T>>();
+			var explored = new HashSet<T>();
 			frontier.Enqueue(startNode);
 
 			while (frontier.Count > 0)
 			{
 				PathNode<T> currentNode = frontier.Dequeue();
-				if (explored.Contains(currentNode))
+				if (explored.Contains(currentNode.State))
 					continue;
 
-				explored.Add(currentNode);
+				explored.Add(currentNode.State);
 				foreach (T child in GetChildren(currentNode.State))
 				{
-					var childNode = new PathNode<T>(child, currentNode);
-					if (!explored.Contains(childNode))
+					if (!explored.Contains(child))
 					{
-						if (nodePredicate(childNode))
+						var childNode = new PathNode<T>(child, currentNode);
+						if (predicate(child))
 							return childNode;
-						else if (childNode.CumulativePathLength < maxSearchDistance + 1)
+						else if (childNode.CumulativePathLength < maxPathLength)
 							frontier.Enqueue(childNode);
 					}
 				}
