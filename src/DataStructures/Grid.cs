@@ -34,6 +34,36 @@ namespace Tools.DataStructures {
 		private readonly T[,] Data;
 
 		/// <summary>
+		/// Creates a Grid from a flat list.
+		/// </summary>
+		/// <param name="data">the list</param>
+		/// <param name="rows">the number of rows to create</param>
+		/// <param name="columns">the number of columns to create</param>
+		/// <param name="order">the order to fill the grid in</param>
+		public static Grid<T> Unflatten(
+			IEnumerable<T> data,
+			int rows,
+			int columns,
+			GridOrder order = GridOrder.RowMajor
+		)
+		{
+			Validate.IsNotNull(data, "data");
+
+			var grid = new Grid<T>(rows, columns);
+			var dataEnumerator = data.GetEnumerator();
+
+			foreach (var cell in grid.GetCellsInOrder(order))
+			{
+				if (dataEnumerator.MoveNext())
+					grid[cell] = dataEnumerator.Current;
+				else
+					break;
+			}
+
+			return grid;
+		}
+
+		/// <summary>
 		/// Creates an empty grid.
 		/// </summary>
 		/// <param name="rows">the number of rows to create</param>
@@ -107,7 +137,6 @@ namespace Tools.DataStructures {
 		/// </summary>
 		/// <param name="row">the row of the target cell</param>
 		/// <param name="column">the column of the target cell</param>
-		/// <returns></returns>
 		public T this[int row, int column]
 		{
 			get
@@ -206,7 +235,8 @@ namespace Tools.DataStructures {
 		/// </summary>
 		/// <param name="order">the enumeration order (default is row-major)</param>
 		public IEnumerable<KeyValuePair<GridCell, T>> GetItemLocationPairs(
-			GridOrder order = GridOrder.RowMajor)
+			GridOrder order = GridOrder.RowMajor
+		)
 		{
 			foreach (var cell in GetCellsInOrder(order))
 			{

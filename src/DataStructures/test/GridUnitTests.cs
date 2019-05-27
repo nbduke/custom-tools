@@ -71,6 +71,113 @@ namespace Test
 		}
 		#endregion
 
+		#region Unflatten
+		[TestMethod]
+		public void Unflatten_WithNullData_ThrowsArgumentNullException()
+		{
+			// Act
+			Action action = () =>
+			{
+				Grid<int>.Unflatten(null, 0, 0);
+			};
+
+			// Assert
+			Assert.ThrowsException<ArgumentNullException>(action);
+		}
+
+		[TestMethod]
+		public void Unflatten_WithEmptyData_ConstructsEmptyGridWithGivenRowsAndColumns()
+		{
+			// Act
+			var grid = Grid<string>.Unflatten(new string[] { }, 1, 2);
+
+			// Assert
+			foreach (string s in grid)
+			{
+				Assert.IsTrue(string.IsNullOrEmpty(s));
+			}
+		}
+
+		[TestMethod]
+		public void Unflatten_WithCompleteDataAndRowMajorGridOrder_ConstructsExpectedGrid()
+		{
+			// Arrange
+			string[] data =
+			{
+				"foo", "bar", "baz", "bat",
+				"a",   "ab",  "abc", "abcd"
+			};
+
+			// Act
+			var grid = Grid<string>.Unflatten(data, 2, 4, GridOrder.RowMajor);
+
+			// Assert
+			CollectionAssert.AreEqual(data, grid.ToList());
+		}
+
+		[TestMethod]
+		public void Unflatten_WithCompleteDataAndColumnMajorGridOrder_ConstructsExpectedGrid()
+		{
+			// Arrange
+			int[] data =
+			{
+				1, 2, 3, 4, 5, 6, 7, 8
+			};
+
+			// Act
+			var grid = Grid<int>.Unflatten(data, 2, 4, GridOrder.ColumnMajor);
+
+			// Assert
+			int[] expectedGridContents =
+			{
+				1, 3, 5, 7,
+				2, 4, 6, 8
+			};
+			CollectionAssert.AreEqual(expectedGridContents, grid.ToList());
+		}
+
+		[TestMethod]
+		public void Unflatten_WithIncompleteData_ConstructsGridWithAllDataLeavingExtraCellsEmpty()
+		{
+			// Arrange
+			int[] data =
+			{
+				0, 1, 2,
+				4
+			};
+
+			// Act
+			var grid = Grid<int>.Unflatten(data, 2, 3);
+
+			// Assert
+			int[] expectedGridContents =
+			{
+				0, 1, 2, 4, 0, 0
+			};
+			CollectionAssert.AreEqual(expectedGridContents, grid.ToList());
+		}
+
+		[TestMethod]
+		public void Unflatten_WithExtraData_ConstructsGridWithAsMuchDataAsNeeded()
+		{
+			// Arrange
+			int[] data =
+			{
+				1, 1, 2, 3, 5, 8, 13, 21, 34
+			};
+
+			// Act
+			var grid = Grid<int>.Unflatten(data, 3, 1);
+
+			// Assert
+			int[] expectedGridContents =
+			{
+				1, 1, 2
+			};
+			CollectionAssert.AreEqual(expectedGridContents, grid.ToList());
+		}
+		#endregion
+
 		#region Rows
 		[TestMethod]
 		public void Rows_AtAnyTime_ReturnsValueGivenToConstructor()
