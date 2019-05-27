@@ -59,6 +59,7 @@
     <Compile Include="..\..\src\Search\test\BidirectionalSearchUnitTests.cs" />
     <Compile Include="..\..\src\Search\test\BreadthFirstSearchUnitTests.cs" />
     <Compile Include="..\..\src\Search\test\DepthFirstSearchUnitTests.cs" />
+	<Compile Include="..\..\src\Search\test\FlexibleBacktrackingSearchUnitTests.cs" />
     <Compile Include="..\..\src\Search\test\LeastWeightPathSearchUnitTests.cs" />
     <Compile Include="..\..\src\Search\test\SearchComponentTests.cs" />
     <Compile Include="..\..\src\Search\test\SearchTestHelpers.cs" />

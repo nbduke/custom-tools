@@ -63,11 +63,10 @@ namespace Tools.Algorithms.Search {
 			switch (processNode(startNode))
 			{
 				case NodeOption.Stop:
+				case NodeOption.Backtrack:
 					return;
 				case NodeOption.Continue:
 					break;
-				case NodeOption.Backtrack:
-					return; // there is nothing to backtrack to
 				default:
 					throw new ArgumentException("Unknown NodeOption");
 			}
