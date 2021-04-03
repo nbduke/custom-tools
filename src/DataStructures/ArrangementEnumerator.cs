@@ -112,9 +112,7 @@ namespace Tools.DataStructures {
 			while (IndexEnumeratorStack.Count > 0)
 			{
 				var currentEnumerator = IndexEnumeratorStack.Peek();
-				bool increaseDepth = false;
-
-				while (currentEnumerator.MoveNext())
+				if (currentEnumerator.MoveNext())
 				{
 					int currentIndex = currentEnumerator.Current;
 					IndexStack.Push(currentIndex);
@@ -125,15 +123,8 @@ namespace Tools.DataStructures {
 						// We've found the next arrangement
 						return true;
 					}
-					else
-					{
-						// We need to move on to the next index and continue building from there
-						increaseDepth = true;
-						break;
-					}
 				}
-
-				if (!increaseDepth)
+				else
 				{
 					IndexEnumeratorStack.Pop();
 					if (IndexStack.Count > 0)

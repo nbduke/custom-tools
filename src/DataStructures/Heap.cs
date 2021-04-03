@@ -24,7 +24,7 @@ namespace Tools.DataStructures {
 
 		private readonly List<T> Data;
 		private readonly Comparison<T> Compare;
-		private readonly int? MaxCapacity;
+		private readonly int MaxCapacity;
 
 		/// <summary>
 		/// Constructs a heap with the default comparer for T.
@@ -33,7 +33,7 @@ namespace Tools.DataStructures {
 		/// pushing new items will cause the least item to be evicted</param>
 		public Heap(int? maxCapacity = null)
 		{
-			MaxCapacity = maxCapacity;
+			MaxCapacity = maxCapacity.HasValue ? maxCapacity.Value : int.MaxValue;
 			Compare = Comparer<T>.Default.Compare;
 			Data = new List<T>();
 		}
@@ -66,19 +66,6 @@ namespace Tools.DataStructures {
 		}
 
 		/// <summary>
-		/// Constructs a heap whose items are ordered by a comparer object.
-		/// </summary>
-		/// <param name="comparer">the comparer object</param>
-		/// <param name="maxCapacity">(optional) specifies the capacity at which
-		/// pushing new items will cause the least item to be evicted</param>
-		public Heap(IComparer<T> comparer, int? maxCapacity = null)
-			: this(maxCapacity)
-		{
-			Validate.IsNotNull(comparer, "comparer");
-			Compare = comparer.Compare;
-		}
-
-		/// <summary>
 		/// Pushes a new item onto the heap. If the heap is at its maximum capacity,
 		/// the least item after pushing will be evicted.
 		/// </summary>
@@ -86,9 +73,9 @@ namespace Tools.DataStructures {
 		public void Push(T item)
 		{
 			Data.Add(item);
-			HeapifyBottomUp(Count - 1);
+			HeapifyBottomUp();
 
-			if (MaxCapacity.HasValue && Count > MaxCapacity)
+			if (Count > MaxCapacity)
 				Pop();
 		}
 
@@ -97,9 +84,7 @@ namespace Tools.DataStructures {
 			T result = Top;
 			Swap(0, Count - 1);
 			Data.RemoveAt(Count - 1);
-
-			HeapifyTopDown(0);
-
+			HeapifyTopDown();
 			return result;
 		}
 
@@ -119,44 +104,49 @@ namespace Tools.DataStructures {
 		}
 
 		/*
-		 * Enforces the heap property starting from the given index and
-		 * propagating toward the root.
+		 * Enforces the heap property starting at the bottom of the heap and
+		 * propagating upward.
 		 */
-		private void HeapifyBottomUp(int index)
+		private void HeapifyBottomUp()
 		{
-			if (index <= 0)
-				return;
+			int current = Count - 1;
+			int parent = (current - 1) / 2;
 
-			int parentIndex = (int)System.Math.Floor((index - 1) / 2.0);
-			if (!InOrder(parentIndex, index))
+			while (current > 0 && !InOrder(parent, current))
 			{
-				Swap(parentIndex, index);
-				HeapifyBottomUp(parentIndex);
+				Swap(parent, current);
+				current = parent;
+				parent = (current - 1) / 2;
 			}
 		}
 
 		/*
-		 * Enforces the heap property starting from the given index and
-		 * propagating toward the leaves.
+		 * Enforces the heap property starting from the top of the heap and
+		 * propagating downward.
 		 */
-		private void HeapifyTopDown(int index)
+		private void HeapifyTopDown()
 		{
-			int leftChildIndex = index * 2 + 1;
-			int rightChildIndex = leftChildIndex + 1;
+			int current = 0;
+			int leftChild = current * 2 + 1;
+			int rightChild = leftChild + 1;
 
-			if (leftChildIndex >= Count)
-				return;
-
-			int inOrderChildIndex;
-			if (rightChildIndex >= Count)
-				inOrderChildIndex = leftChildIndex;
-			else
-				inOrderChildIndex = InOrder(leftChildIndex, rightChildIndex) ? leftChildIndex : rightChildIndex;
-
-			if (!InOrder(index, inOrderChildIndex))
+			while (leftChild < Count)
 			{
-				Swap(index, inOrderChildIndex);
-				HeapifyTopDown(inOrderChildIndex);
+				int childToCompare = leftChild;
+				if (rightChild < Count && InOrder(rightChild, leftChild))
+					childToCompare = rightChild;
+
+				if (!InOrder(current, childToCompare))
+				{
+					Swap(current, childToCompare);
+					current = childToCompare;
+					leftChild = current * 2 + 1;
+					rightChild = leftChild + 1;
+				}
+				else
+				{
+					break;
+				}
 			}
 		}
 
@@ -171,7 +161,7 @@ namespace Tools.DataStructures {
 
 		private void Swap(int p, int q)
 		{
-			var temp = Data[p];
+			T temp = Data[p];
 			Data[p] = Data[q];
 			Data[q] = temp;
 		}

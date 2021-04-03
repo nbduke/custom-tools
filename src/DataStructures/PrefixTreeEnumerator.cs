@@ -12,7 +12,6 @@ namespace Tools.DataStructures
 	 */
 	class PrefixTreeEnumerator : IEnumerator<string>
 	{
-		private IPrefixTreeNode CurrentNode;
 		private readonly StringBuilder WordBuilder;
 		private readonly Stack<IEnumerator<IPrefixTreeNode>> NodeEnumeratorStack;
 		private bool CheckInitialPrefix;
@@ -21,11 +20,10 @@ namespace Tools.DataStructures
 		{
 			Validate.IsNotNull(subtreeRoot, "subtreeRoot");
 
-			CurrentNode = subtreeRoot;
 			WordBuilder = new StringBuilder(prefix);
 			NodeEnumeratorStack = new Stack<IEnumerator<IPrefixTreeNode>>();
-			NodeEnumeratorStack.Push(CurrentNode.Children.GetEnumerator());
-			CheckInitialPrefix = CurrentNode.IsEndOfWord;
+			NodeEnumeratorStack.Push(subtreeRoot.Children.GetEnumerator());
+			CheckInitialPrefix = subtreeRoot.IsEndOfWord;
 		}
 
 		public string Current
@@ -49,31 +47,20 @@ namespace Tools.DataStructures
 			while (NodeEnumeratorStack.Count > 0)
 			{
 				var enumerator = NodeEnumeratorStack.Peek();
-				bool increaseDepth = false;
-
-				while (enumerator.MoveNext())
+				if (enumerator.MoveNext())
 				{
-					CurrentNode = enumerator.Current;
-					WordBuilder.Append(CurrentNode.Character);
-					NodeEnumeratorStack.Push(CurrentNode.Children.GetEnumerator());
+					WordBuilder.Append(enumerator.Current.Character);
+					NodeEnumeratorStack.Push(enumerator.Current.Children.GetEnumerator());
 
-					if (CurrentNode.IsEndOfWord)
+					if (enumerator.Current.IsEndOfWord)
 					{
 						// We've found the next word
 						return true;
 					}
-					else
-					{
-						// We need to move on to the next node and continue searching
-						increaseDepth = true;
-						break;
-					}
 				}
-
-				if (!increaseDepth)
+				else
 				{
 					NodeEnumeratorStack.Pop();
-
 					if (WordBuilder.Length > 0)
 						WordBuilder.Length -= 1;
 				}
